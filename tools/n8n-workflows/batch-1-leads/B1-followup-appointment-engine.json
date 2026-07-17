@@ -1,0 +1,35 @@
+{
+  "name": "B1·2 Follow-up & Appointment Engine — reminders + booking + escalation (3 automations combined)",
+  "nodes": [
+    {
+      "parameters": {"content": "## ⚙️ SETUP — step by step\n1. Attach **Google Sheets** + **Telegram** credentials (see B1·1). Replace REPLACE_SHEET_ID everywhere.\n2. Attach **Google Calendar** credential; pick your calendar in the 'Create appointment' node.\n3. Variables needed: TG_OWNER_CHAT_ID, WA_PHONE_NUMBER_ID + Meta header credential (only if WhatsApp reminders wanted — else delete that node and the flow still works via Telegram).\n4. Booking webhook: Activate → copy Production URL of `book-visit` → use it as the action of your 'Book a visit' form (name, phone, datetime fields).\n5. Meta template needed once: **visit_reminder** → 'Namaste {{1}}! Reminder: your private viewing at {{2}} is tomorrow at {{3}}. Reply here to reschedule.'\n\n## HOW IT RUNS\n• 9:00 daily — reads CRM, finds FollowUp ≤ today & not Sold/Lost → Telegram list to owner.\n• If a follow-up is ≥3 days overdue → 🔴 escalation ping.\n• Booking webhook → adds calendar event + confirms.\n• 18:00 daily — tomorrow's appointments get a WhatsApp reminder.\n\n## 🔧 FIX\n• Wrong dates → sheet dates must be YYYY-MM-DD.\n• Calendar 404 → re-pick calendar after connecting credential.\n• Template rejected → wait for Meta approval; check name spelling.", "height": 560, "width": 480},
+      "id": "note", "name": "Sticky Note", "type": "n8n-nodes-base.stickyNote", "typeVersion": 1, "position": [-560, -160]
+    },
+    {"parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "0 9 * * *"}]}}, "id": "cr9", "name": "Daily 9:00", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, -120]},
+    {"parameters": {"documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "Enquiries", "mode": "name"}, "options": {}}, "id": "rd", "name": "Read CRM", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [200, -120], "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}}},
+    {
+      "parameters": {"jsCode": "const t = new Date().toISOString().slice(0,10);\nconst rows = items.map(i=>i.json).filter(r => r.FollowUp && r.FollowUp <= t && !['Sold','Lost'].includes(r.Status));\nconst esc = rows.filter(r => (new Date(t) - new Date(r.FollowUp))/864e5 >= 3);\nconst list = rows.slice(0,15).map(r=>`• ${r.Customer} (${r.Phone||'no phone'}) — ${r.Item||''} [due ${r.FollowUp}]`).join('\\n');\nreturn [{ json: { text: rows.length ? `⏰ ${rows.length} follow-ups due:\\n${list}` : '✅ No follow-ups due today.', escText: esc.length ? `🔴 ESCALATION — ${esc.length} lead(s) ignored 3+ days:\\n`+esc.map(r=>'• '+r.Customer+' '+(r.Phone||'')).join('\\n') : '' } }];"},
+      "id": "pick", "name": "Due + escalations", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [400, -120]
+    },
+    {"parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "={{$json.text}}{{$json.escText ? '\\n\\n'+$json.escText : ''}}", "additionalFields": {}}, "id": "tgd", "name": "Telegram: follow-up list", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [600, -120], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}},
+    {"parameters": {"httpMethod": "POST", "path": "book-visit", "responseMode": "onReceived", "options": {}}, "id": "whB", "name": "Webhook: book a visit", "type": "n8n-nodes-base.webhook", "typeVersion": 2, "position": [0, 120]},
+    {"parameters": {"calendar": {"__rl": true, "value": "REPLACE_CALENDAR", "mode": "list"}, "start": "={{$json.body.datetime}}", "end": "={{ new Date(new Date($json.body.datetime).getTime()+45*60000).toISOString() }}", "additionalFields": {"summary": "=Showroom visit — {{$json.body.name}} ({{$json.body.phone}})"}}, "id": "cal", "name": "Create appointment", "type": "n8n-nodes-base.googleCalendar", "typeVersion": 1.3, "position": [200, 120], "credentials": {"googleCalendarOAuth2Api": {"id": "REPLACE", "name": "Google Calendar"}}},
+    {"parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "=📅 Visit booked: {{$json.summary || $('Webhook: book a visit').item.json.body.name}} — {{$('Webhook: book a visit').item.json.body.datetime}}", "additionalFields": {}}, "id": "tgb", "name": "Telegram: booking alert", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [400, 120], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}},
+    {"parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "0 18 * * *"}]}}, "id": "cr18", "name": "Daily 18:00", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, 320]},
+    {"parameters": {"operation": "getAll", "calendar": {"__rl": true, "value": "REPLACE_CALENDAR", "mode": "list"}, "timeMin": "={{ new Date(Date.now()+864e5).toISOString().slice(0,10) }}T00:00:00", "timeMax": "={{ new Date(Date.now()+864e5).toISOString().slice(0,10) }}T23:59:59", "options": {}}, "id": "tom", "name": "Tomorrow's appointments", "type": "n8n-nodes-base.googleCalendar", "typeVersion": 1.3, "position": [200, 320], "credentials": {"googleCalendarOAuth2Api": {"id": "REPLACE", "name": "Google Calendar"}}},
+    {
+      "parameters": {"method": "POST", "url": "=https://graph.facebook.com/v21.0/{{$env.WA_PHONE_NUMBER_ID}}/messages", "authentication": "genericCredentialType", "genericAuthType": "httpHeaderAuth", "sendBody": true, "specifyBody": "json", "jsonBody": "={ \"messaging_product\": \"whatsapp\", \"to\": \"{{ ($json.summary.match(/\\\\((\\\\d+)\\\\)/)||[])[1] }}\", \"type\": \"template\", \"template\": { \"name\": \"visit_reminder\", \"language\": { \"code\": \"en\" }, \"components\": [ { \"type\": \"body\", \"parameters\": [ { \"type\": \"text\", \"text\": \"{{ $json.summary.split('—')[1]?.split('(')[0]?.trim() || 'ji' }}\" }, { \"type\": \"text\", \"text\": \"{{$env.BRAND_NAME}}\" }, { \"type\": \"text\", \"text\": \"{{ $json.start.dateTime?.slice(11,16) || 'the booked time' }}\" } ] } ] } }", "options": {}},
+      "id": "waR", "name": "WhatsApp: visit reminder (optional)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [400, 320], "credentials": {"httpHeaderAuth": {"id": "REPLACE", "name": "Meta Bearer Token"}}
+    }
+  ],
+  "connections": {
+    "Daily 9:00": {"main": [[{"node": "Read CRM", "type": "main", "index": 0}]]},
+    "Read CRM": {"main": [[{"node": "Due + escalations", "type": "main", "index": 0}]]},
+    "Due + escalations": {"main": [[{"node": "Telegram: follow-up list", "type": "main", "index": 0}]]},
+    "Webhook: book a visit": {"main": [[{"node": "Create appointment", "type": "main", "index": 0}]]},
+    "Create appointment": {"main": [[{"node": "Telegram: booking alert", "type": "main", "index": 0}]]},
+    "Daily 18:00": {"main": [[{"node": "Tomorrow's appointments", "type": "main", "index": 0}]]},
+    "Tomorrow's appointments": {"main": [[{"node": "WhatsApp: visit reminder (optional)", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}

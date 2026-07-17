@@ -1,0 +1,29 @@
+{
+  "name": "B1·1 Lead Capture Hub — form + missed-call + Justdial + link-clicks → one CRM (4 automations combined)",
+  "nodes": [
+    {
+      "parameters": {"content": "## ⚙️ SETUP — step by step\n1. Credentials → add **Google Sheets OAuth** (connect your Google account).\n2. Create a spreadsheet with tab **Enquiries** (columns: Date, Type, Source, Item, Amount, Customer, Phone, FollowUp, Status). Copy its ID from the URL into every Sheets node (replace REPLACE_SHEET_ID).\n3. Credentials → add **Telegram** (token from @BotFather). Set variable **TG_OWNER_CHAT_ID** (Settings → Variables).\n4. Activate the workflow (top-right toggle). Copy each Webhook node's **Production URL**:\n   • `lead-form` → paste as your website form's action / Webflow-Wix webhook.\n   • `missed-call` → paste in your telephony panel (Exotel/Knowlarity/Twilio) as the missed-call webhook.\n   • `click-log` → use as the link behind 'Chat on WhatsApp' buttons: it logs, then redirects to wa.me.\n5. For Justdial: forward Justdial lead emails to a Gmail label, connect **Gmail credential**, set the label in the Gmail Trigger.\n\n## 🔧 FIX\n• Webhook 404 → workflow not Active, or using Test URL instead of Production.\n• Sheets 403 → re-connect OAuth, share the sheet with the connected account.\n• Telegram silent → send 'hi' to the bot once, check TG_OWNER_CHAT_ID.", "height": 560, "width": 480},
+      "id": "note1", "name": "Sticky Note", "type": "n8n-nodes-base.stickyNote", "typeVersion": 1, "position": [-560, -180]
+    },
+    {"parameters": {"httpMethod": "POST", "path": "lead-form", "responseMode": "onReceived", "options": {}}, "id": "whF", "name": "Webhook: website form", "type": "n8n-nodes-base.webhook", "typeVersion": 2, "position": [0, -200]},
+    {"parameters": {"httpMethod": "POST", "path": "missed-call", "responseMode": "onReceived", "options": {}}, "id": "whC", "name": "Webhook: missed call", "type": "n8n-nodes-base.webhook", "typeVersion": 2, "position": [0, 0]},
+    {"parameters": {"httpMethod": "GET", "path": "click-log", "responseMode": "responseNode", "options": {}}, "id": "whL", "name": "Webhook: WhatsApp-button click", "type": "n8n-nodes-base.webhook", "typeVersion": 2, "position": [0, 200]},
+    {"parameters": {"pollTimes": {"item": [{"mode": "everyX", "value": 5, "unit": "minutes"}]}, "filters": {"labelIds": ["REPLACE_JUSTDIAL_LABEL"]}}, "id": "gm", "name": "Gmail: Justdial lead emails", "type": "n8n-nodes-base.gmailTrigger", "typeVersion": 1.2, "position": [0, 400], "credentials": {"gmailOAuth2": {"id": "REPLACE", "name": "Gmail"}}},
+    {
+      "parameters": {"jsCode": "// Normalise every source into one lead object\nconst src = $prevNode.name;\nconst j = $json;\nlet lead = { Date: new Date().toISOString().slice(0,10), Type: 'Enquiry', Status: 'New', FollowUp: new Date(Date.now()+864e5).toISOString().slice(0,10) };\nif (src.includes('form')) Object.assign(lead, { Source: 'Website', Customer: j.body?.name, Phone: j.body?.phone, Item: j.body?.message });\nelse if (src.includes('missed')) Object.assign(lead, { Source: 'Missed call', Customer: 'Missed call', Phone: j.body?.from || j.body?.CallFrom });\nelse if (src.includes('click')) Object.assign(lead, { Source: 'WA button', Customer: j.query?.page || 'site visitor', Phone: '' });\nelse { const t = (j.text || j.snippet || ''); Object.assign(lead, { Source: 'Justdial', Customer: (t.match(/Name[:\\s]+([^\\n,]+)/i)||[])[1] || 'Justdial lead', Phone: (t.match(/(\\+?91[\\s-]?)?([6-9]\\d{9})/)||[])[2] || '', Item: (t.match(/Requirement[:\\s]+([^\\n]+)/i)||[])[1] || '' }); }\nreturn [{ json: lead }];"},
+      "id": "norm", "name": "Normalise lead", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [260, 100]
+    },
+    {"parameters": {"operation": "append", "documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "Enquiries", "mode": "name"}, "columns": {"mappingMode": "autoMapInputData"}, "options": {}}, "id": "sh", "name": "Append to CRM sheet", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [480, 100], "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}}},
+    {"parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "=🆕 {{$json.Source}} lead: {{$json.Customer}} {{$json.Phone ? '('+$json.Phone+')' : ''}}{{$json.Item ? ' — '+$json.Item : ''}}\n➡ Follow up by {{$json.FollowUp}}", "additionalFields": {}}, "id": "tg", "name": "Telegram: alert owner", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [700, 100], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}},
+    {"parameters": {"respondWith": "redirect", "redirectURL": "=https://wa.me/{{$env.OWNER_WA_NUMBER}}?text=Namaste!%20I%20saw%20your%20jewellery%20online", "options": {}}, "id": "resp", "name": "Redirect click → WhatsApp", "type": "n8n-nodes-base.respondToWebhook", "typeVersion": 1.1, "position": [260, 300]}
+  ],
+  "connections": {
+    "Webhook: website form": {"main": [[{"node": "Normalise lead", "type": "main", "index": 0}]]},
+    "Webhook: missed call": {"main": [[{"node": "Normalise lead", "type": "main", "index": 0}]]},
+    "Webhook: WhatsApp-button click": {"main": [[{"node": "Normalise lead", "type": "main", "index": 0}, {"node": "Redirect click → WhatsApp", "type": "main", "index": 0}]]},
+    "Gmail: Justdial lead emails": {"main": [[{"node": "Normalise lead", "type": "main", "index": 0}]]},
+    "Normalise lead": {"main": [[{"node": "Append to CRM sheet", "type": "main", "index": 0}]]},
+    "Append to CRM sheet": {"main": [[{"node": "Telegram: alert owner", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}

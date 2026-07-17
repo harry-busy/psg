@@ -1,0 +1,45 @@
+{
+  "name": "4 · Review request — 3 days after a sale (WhatsApp template)",
+  "nodes": [
+    {
+      "parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "0 11 * * *"}]}},
+      "id": "cron", "name": "Every day 11:00", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, 0]
+    },
+    {
+      "parameters": {"documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "Enquiries", "mode": "name"}, "options": {}},
+      "id": "sheet", "name": "Read sales", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [200, 0],
+      "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}}
+    },
+    {
+      "parameters": {
+        "jsCode": "const target = new Date(Date.now() - 3*864e5).toISOString().slice(0,10);\nreturn items.filter(i => (i.json.Type||'').toLowerCase()==='sale' && (i.json.Date||'').startsWith(target) && i.json.Phone && i.json.ReviewAsked !== 'yes')\n  .map(i => ({ json: { phone: String(i.json.Phone).replace(/\\D/g,''), name: i.json.Customer || 'ji', row: i.json.row_number } }));"
+      },
+      "id": "pick", "name": "Sold 3 days ago, not yet asked", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [400, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v21.0/{{$env.WA_PHONE_NUMBER_ID}}/messages",
+        "authentication": "genericCredentialType", "genericAuthType": "httpHeaderAuth",
+        "sendBody": true, "specifyBody": "json",
+        "jsonBody": "={ \"messaging_product\": \"whatsapp\", \"to\": \"{{$json.phone}}\", \"type\": \"template\", \"template\": { \"name\": \"review_request\", \"language\": { \"code\": \"en\" }, \"components\": [ { \"type\": \"body\", \"parameters\": [ { \"type\": \"text\", \"text\": \"{{$json.name}}\" }, { \"type\": \"text\", \"text\": \"{{$env.REVIEW_LINK}}\" } ] } ] } }",
+        "options": {}
+      },
+      "id": "send", "name": "WhatsApp: review template", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [600, 0],
+      "credentials": {"httpHeaderAuth": {"id": "REPLACE", "name": "Meta Bearer Token"}},
+      "notes": "Create an approved template named review_request in Meta Business:\\n'Namaste {{1}}! Thank you for choosing us 💛 If you loved your jewellery, please bless us with a review: {{2}}'"
+    },
+    {
+      "parameters": {"operation": "update", "documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "Enquiries", "mode": "name"}, "columns": {"mappingMode": "defineBelow", "value": {"row_number": "={{$json.row}}", "ReviewAsked": "yes"}, "matchingColumns": ["row_number"]}, "options": {}},
+      "id": "mark", "name": "Mark ReviewAsked=yes", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [800, 0],
+      "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}}
+    }
+  ],
+  "connections": {
+    "Every day 11:00": {"main": [[{"node": "Read sales", "type": "main", "index": 0}]]},
+    "Read sales": {"main": [[{"node": "Sold 3 days ago, not yet asked", "type": "main", "index": 0}]]},
+    "Sold 3 days ago, not yet asked": {"main": [[{"node": "WhatsApp: review template", "type": "main", "index": 0}]]},
+    "WhatsApp: review template": {"main": [[{"node": "Mark ReviewAsked=yes", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}

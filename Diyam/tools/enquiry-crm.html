@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Enquiry CRM — Jewellery Lead Tracker</title>
+<style>
+:root{--red:#D2042D;--cream:#EAE5D4;--ink:#2A1A1D;--green:#1E7D34}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Calibri,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--red);color:#fff;padding:14px 22px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:center}
+h1{font-size:20px}
+main{max-width:1250px;margin:0 auto;padding:18px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px}
+.stat{background:#fff;border-radius:12px;padding:14px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.stat b{display:block;font-size:26px;color:var(--red)}
+.stat span{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#8a7f6d}
+.panel{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:16px}
+.panel h2{font-size:13px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+input,select{padding:8px;border:1px solid #d8cfc0;border-radius:8px;font-size:13px;background:#fffdf7;width:100%}
+.btn{background:var(--red);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-weight:600;cursor:pointer;font-size:13px}
+.btn.sec{background:var(--ink)}.btn.wa{background:#25D366}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--cream);text-align:left;padding:8px;font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+td{padding:8px;border-bottom:1px solid #f0ead9;vertical-align:middle}
+tr.due{background:#fff3c4}
+select.stage{padding:4px;font-size:12px;border-radius:6px}
+.s-New{color:#2E5AAC}.s-Contacted{color:#C05621}.s-Appointment{color:#5B3A8C}.s-Visited{color:#0E7C7B}.s-Sold{color:var(--green);font-weight:700}.s-Lost{color:#999}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.chip{padding:5px 12px;border-radius:16px;background:#fff;border:1px solid #d8cfc0;font-size:12px;cursor:pointer}
+.chip.on{background:var(--red);color:#fff;border-color:var(--red)}
+.rowbtns{display:flex;gap:4px}
+.rowbtns button{border:none;background:none;cursor:pointer;font-size:15px}
+</style>
+</head>
+<body>
+<header><h1>📇 Enquiry CRM</h1><div><button class="btn sec" id="exp">⬇ Export CSV</button> <button class="btn sec" id="impBtn">⬆ Import</button><input type="file" id="imp" accept=".csv" hidden></div></header>
+<main>
+<div class="stats" id="stats"></div>
+<div class="panel">
+  <h2>＋ New enquiry</h2>
+  <div class="formgrid">
+    <input id="f_name" placeholder="Customer name *">
+    <input id="f_phone" placeholder="Phone (91…)">
+    <select id="f_source"><option>WhatsApp</option><option>Instagram</option><option>Walk-in</option><option>Call</option><option>Facebook</option><option>Justdial</option><option>Referral</option></select>
+    <input id="f_item" placeholder="Interested in (e.g. bridal set)">
+    <input id="f_budget" placeholder="Budget ₹ (approx)">
+    <select id="f_occ"><option value="">Occasion…</option><option>Wedding</option><option>Engagement</option><option>Festival</option><option>Birthday/Anniversary</option><option>Investment</option><option>Daily wear</option></select>
+    <input id="f_next" type="date" title="Next follow-up">
+    <button class="btn" id="add">Add enquiry</button>
+  </div>
+</div>
+<div class="panel">
+  <h2>Pipeline</h2>
+  <div class="filters" id="filters"></div>
+  <div style="overflow-x:auto"><table><thead><tr><th>Customer</th><th>Source</th><th>Interest</th><th>Budget</th><th>Occasion</th><th>Follow-up</th><th>Stage</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const STAGES=["New","Contacted","Appointment","Visited","Sold","Lost"];
+let data=JSON.parse(localStorage.getItem("crm")||"[]"),filter="All";
+const save=()=>localStorage.setItem("crm",JSON.stringify(data));
+const today=()=>new Date().toISOString().slice(0,10);
+$("add").onclick=()=>{if(!$("f_name").value.trim())return alert("Name required");
+data.unshift({id:Date.now(),name:$("f_name").value.trim(),phone:$("f_phone").value.trim(),source:$("f_source").value,item:$("f_item").value,budget:$("f_budget").value,occ:$("f_occ").value,next:$("f_next").value,stage:"New",created:today()});
+["f_name","f_phone","f_item","f_budget","f_next"].forEach(i=>$(i).value="");save();render()};
+function render(){
+// stats
+const wk=new Date(Date.now()-6*864e5).toISOString().slice(0,10);
+const s={total:data.length,week:data.filter(d=>d.created>=wk).length,due:data.filter(d=>d.next&&d.next<=today()&&!["Sold","Lost"].includes(d.stage)).length,appt:data.filter(d=>d.stage==="Appointment").length,sold:data.filter(d=>d.stage==="Sold").length};
+s.conv=s.total?Math.round(s.sold/s.total*100):0;
+$("stats").innerHTML=`<div class="stat"><b>${s.week}</b><span>This week</span></div><div class="stat"><b>${s.total}</b><span>Total enquiries</span></div><div class="stat"><b style="color:#C05621">${s.due}</b><span>Follow-ups due</span></div><div class="stat"><b style="color:#5B3A8C">${s.appt}</b><span>Appointments</span></div><div class="stat"><b style="color:var(--green)">${s.sold}</b><span>Sold</span></div><div class="stat"><b>${s.conv}%</b><span>Conversion</span></div>`;
+// filters
+$("filters").innerHTML=["All",...STAGES,"Due today"].map(f=>`<span class="chip ${f===filter?"on":""}" onclick="setF('${f}')">${f}</span>`).join("");
+// rows
+let rows=data;
+if(filter==="Due today")rows=data.filter(d=>d.next&&d.next<=today()&&!["Sold","Lost"].includes(d.stage));
+else if(filter!=="All")rows=data.filter(d=>d.stage===filter);
+$("rows").innerHTML=rows.map(d=>{const due=d.next&&d.next<=today()&&!["Sold","Lost"].includes(d.stage);
+return`<tr class="${due?"due":""}"><td><b>${esc(d.name)}</b><br><small>${esc(d.phone||"")}</small></td><td>${d.source}</td><td>${esc(d.item||"—")}</td><td>${esc(d.budget||"—")}</td><td>${d.occ||"—"}</td><td><input type="date" value="${d.next||""}" onchange="setNext(${d.id},this.value)" style="padding:3px;font-size:12px"></td>
+<td><select class="stage s-${d.stage}" onchange="setStage(${d.id},this.value)">${STAGES.map(s=>`<option ${s===d.stage?"selected":""}>${s}</option>`).join("")}</select></td>
+<td class="rowbtns">${d.phone?`<button title="WhatsApp" onclick="wa(${d.id})">💬</button>`:""}<button title="Delete" onclick="del(${d.id})">🗑️</button></td></tr>`}).join("")||`<tr><td colspan="8" style="text-align:center;color:#8a7f6d;padding:20px">No enquiries yet — add the first one above.</td></tr>`}
+window.setF=f=>{filter=f;render()};
+window.setStage=(id,v)=>{const d=data.find(x=>x.id===id);d.stage=v;save();render()};
+window.setNext=(id,v)=>{const d=data.find(x=>x.id===id);d.next=v;save();render()};
+window.del=id=>{if(confirm("Delete this enquiry?")){data=data.filter(x=>x.id!==id);save();render()}};
+window.wa=id=>{const d=data.find(x=>x.id===id);window.open("https://wa.me/"+d.phone.replace(/\D/g,"")+"?text="+encodeURIComponent(`Namaste ${d.name} ji! Thank you for your interest in ${d.item||"our jewellery"}. When may we welcome you to the showroom?`))};
+const esc=s=>(s||"").replace(/</g,"&lt;");
+$("exp").onclick=()=>{const h=["name","phone","source","item","budget","occ","next","stage","created"];
+const csv=[h.join(",")].concat(data.map(d=>h.map(k=>`"${(d[k]||"").toString().replace(/"/g,'""')}"`).join(","))).join("\n");
+const a=document.createElement("a");a.download="enquiries.csv";a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.click()};
+$("impBtn").onclick=()=>$("imp").click();
+$("imp").onchange=e=>{const r=new FileReader();r.onload=()=>{const lines=r.result.split(/\r?\n/).slice(1).filter(Boolean);
+lines.forEach(l=>{const c=l.match(/("([^"]|"")*"|[^,]*)(,|$)/g).map(x=>x.replace(/,$/,"").replace(/^"|"$/g,"").replace(/""/g,'"'));
+data.push({id:Date.now()+Math.random(),name:c[0],phone:c[1],source:c[2]||"WhatsApp",item:c[3],budget:c[4],occ:c[5],next:c[6],stage:STAGES.includes(c[7])?c[7]:"New",created:c[8]||today()})});save();render()};r.readAsText(e.target.files[0])};
+render();
+</script>
+</body>
+</html>

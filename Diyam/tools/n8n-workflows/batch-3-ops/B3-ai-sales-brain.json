@@ -1,0 +1,40 @@
+{
+  "name": "B3·3 AI Sales Brain — lead scoring + hot-lead alerts + stale-lead AI nudges (2 automations combined)",
+  "nodes": [
+    {
+      "parameters": {"content": "## ⚙️ SETUP — step by step\n1. Variables: **GEMINI_API_KEY, TG_OWNER_CHAT_ID, BRAND_NAME**. Attach Telegram + Sheets credentials; replace REPLACE_SHEET_ID.\n2. Uses the same **Enquiries** tab as B1·1 (Date, Type, Source, Item, Amount/Budget, Customer, Phone, FollowUp, Status). Add a column **Score** (leave blank; the AI fills a copy in Telegram — write back manually or add a Sheets-update node).\n\n## HOW IT RUNS\n• Daily 09:30 — all open leads → Gemini scores 1-10 on buying intent (bridal + budget + recent = hot). Score ≥ 8 → 🔥 instant hot-lead alert with a suggested next action.\n• Daily 16:00 — leads untouched 4+ days (not Sold/Lost, FollowUp in the past) → Gemini writes a personalised, non-pushy WhatsApp nudge for each → wa.me links to your Telegram. One tap to send.\n\n## WHY IT WORKS\nBridal buyers research 3-6 months — a warm, personal nudge at the right time beats any discount. The AI personalises by item, occasion and budget.\n\n## 🔧 FIX\n• Weird scores → give Gemini more signal: fill Item/Budget/Occasion columns.\n• Too many nudges → raise the stale threshold in 'Stale leads'.", "height": 540, "width": 480},
+      "id": "note", "name": "Sticky Note", "type": "n8n-nodes-base.stickyNote", "typeVersion": 1, "position": [-560, -160]
+    },
+    {"parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "30 9 * * *"}]}}, "id": "cr1", "name": "Daily 9:30", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, -100]},
+    {"parameters": {"documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "Enquiries", "mode": "name"}, "options": {}}, "id": "rd1", "name": "Read leads", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [180, -100], "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}}},
+    {"parameters": {"jsCode": "const open = items.map(i=>i.json).filter(r => !['Sold','Lost'].includes(r.Status));\nreturn open.length ? [{ json: { leads: open.slice(0,40) } }] : [];"}, "id": "open", "name": "Open leads", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [360, -100]},
+    {
+      "parameters": {"method": "POST", "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={{$env.GEMINI_API_KEY}}", "sendBody": true, "specifyBody": "json", "jsonBody": "={ \"contents\": [{ \"parts\": [{ \"text\": \"Score each jewellery showroom lead 1-10 for buying intent (bridal/wedding + clear budget + recent + appointment stage = higher). Return STRICT JSON array: [{name, phone, score, reason, next_action}] and nothing else. Leads: {{ JSON.stringify($json.leads) }}\" }] }] }", "options": {}},
+      "id": "score", "name": "Gemini: score leads", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [540, -100]
+    },
+    {"parameters": {"jsCode": "let t = $json.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim();\nlet arr = [];\ntry { arr = JSON.parse(t); } catch(e) { return [{ json: { text: '⚠️ Scoring parse failed — raw:\\n'+t.slice(0,1000) } }]; }\nconst hot = arr.filter(x=>x.score>=8);\nconst text = hot.length ? '🔥 HOT LEADS today:\\n'+hot.map(x=>`• ${x.name} (${x.phone||'no phone'}) — ${x.score}/10 — ${x.reason}\\n  ➡ ${x.next_action}`).join('\\n') : '📋 Leads scored — no 8+ today. Top 3:\\n'+arr.sort((a,b)=>b.score-a.score).slice(0,3).map(x=>`• ${x.name} ${x.score}/10 — ${x.next_action}`).join('\\n');\nreturn [{ json: { text } }];"}, "id": "hot", "name": "Extract hot leads", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [720, -100]},
+    {"parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "={{$json.text}}", "additionalFields": {}}, "id": "tg1", "name": "Telegram: hot-lead brief", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [900, -100], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}},
+    {"parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "0 16 * * *"}]}}, "id": "cr2", "name": "Daily 16:00", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, 140]},
+    {"parameters": {"documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "Enquiries", "mode": "name"}, "options": {}}, "id": "rd2", "name": "Read leads (stale)", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [180, 140], "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}}},
+    {"parameters": {"jsCode": "const cut = new Date(Date.now()-4*864e5).toISOString().slice(0,10);\nconst rows = items.map(i=>i.json).filter(r => !['Sold','Lost'].includes(r.Status) && r.Phone && r.FollowUp && r.FollowUp <= cut);\nreturn rows.length ? [{ json: { leads: rows.slice(0,10) } }] : [];"}, "id": "stale", "name": "Stale leads (4+ days)", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [360, 140]},
+    {
+      "parameters": {"method": "POST", "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={{$env.GEMINI_API_KEY}}", "sendBody": true, "specifyBody": "json", "jsonBody": "={ \"contents\": [{ \"parts\": [{ \"text\": \"Write a short, warm, personalised WhatsApp re-engagement message (2-3 lines, no pressure, no discounts) for EACH lead of {{$env.BRAND_NAME}} jewellery showroom. Return STRICT JSON: [{name, phone, message}]. Leads: {{ JSON.stringify($json.leads) }}\" }] }] }", "options": {}},
+      "id": "nudge", "name": "Gemini: personalised nudges", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [540, 140]
+    },
+    {"parameters": {"jsCode": "let t = $json.candidates[0].content.parts[0].text.replace(/```json|```/g,'').trim();\nlet arr=[]; try{arr=JSON.parse(t)}catch(e){return [{json:{text:'⚠️ Nudge parse failed:\\n'+t.slice(0,800)}}]}\nreturn [{ json: { text: '💬 One-tap nudges for quiet leads:\\n\\n'+arr.map(x=>`${x.name}: \"${x.message}\"\\n👉 https://wa.me/${String(x.phone).replace(/\\D/g,'')}?text=${encodeURIComponent(x.message)}`).join('\\n\\n') } }];"}, "id": "links", "name": "Build wa.me links", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [720, 140]},
+    {"parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "={{$json.text.slice(0,3900)}}", "additionalFields": {}}, "id": "tg2", "name": "Telegram: nudge pack", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [900, 140], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}}
+  ],
+  "connections": {
+    "Daily 9:30": {"main": [[{"node": "Read leads", "type": "main", "index": 0}]]},
+    "Read leads": {"main": [[{"node": "Open leads", "type": "main", "index": 0}]]},
+    "Open leads": {"main": [[{"node": "Gemini: score leads", "type": "main", "index": 0}]]},
+    "Gemini: score leads": {"main": [[{"node": "Extract hot leads", "type": "main", "index": 0}]]},
+    "Extract hot leads": {"main": [[{"node": "Telegram: hot-lead brief", "type": "main", "index": 0}]]},
+    "Daily 16:00": {"main": [[{"node": "Read leads (stale)", "type": "main", "index": 0}]]},
+    "Read leads (stale)": {"main": [[{"node": "Stale leads (4+ days)", "type": "main", "index": 0}]]},
+    "Stale leads (4+ days)": {"main": [[{"node": "Gemini: personalised nudges", "type": "main", "index": 0}]]},
+    "Gemini: personalised nudges": {"main": [[{"node": "Build wa.me links", "type": "main", "index": 0}]]},
+    "Build wa.me links": {"main": [[{"node": "Telegram: nudge pack", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}

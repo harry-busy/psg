@@ -1,0 +1,38 @@
+{
+  "name": "MEGA 3 - E-commerce & Order Ops Engine (Aurra Hype / Designomics)",
+  "meta": { "ospyr": "18 sub-workflows: new-product AI images+video+desc, marketplace sync (Amazon/Flipkart/Meesho), WhatsApp broadcast, order confirm, shipment, tracking, RTO score, COD verify, cart recovery, review request, low-stock PO, returns, daily roll-up.", "requiredKeys": ["OpenAI","Higgsfield","Photoroom","Shopify","Amazon SP-API","Flipkart Seller","Meesho","Shiprocket","GoKwik (RTO)","WhatsApp (AiSensy/WATI)","Zoho Inventory"] },
+  "active": false,
+  "settings": {},
+  "nodes": [
+    { "id": "t1", "name": "1. Product created (Shopify webhook)", "type": "n8n-nodes-base.webhook", "typeVersion": 1, "position": [200, 160], "parameters": { "httpMethod": "POST", "path": "product-created", "responseMode": "onReceived" } },
+    { "id": "t2", "name": "2. Order created (Shopify webhook)", "type": "n8n-nodes-base.webhook", "typeVersion": 1, "position": [200, 520], "parameters": { "httpMethod": "POST", "path": "order-created", "responseMode": "onReceived" } },
+    { "id": "t3", "name": "3. Daily 9pm roll-up", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1, "position": [200, 880], "parameters": { "rule": { "interval": [ { "field": "cronExpression", "expression": "0 21 * * *" } ] } } },
+    { "id": "n1", "name": "4. AI description (OpenAI)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [460, 60], "parameters": { "method": "POST", "url": "https://api.openai.com/v1/chat/completions", "sendBody": true }, "notes": "OpenAI key" },
+    { "id": "n2", "name": "5. AI product images (Photoroom)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [460, 180], "parameters": { "method": "POST", "url": "https://image-api.photoroom.com/v2/edit", "sendBody": true } },
+    { "id": "n3", "name": "6. Product video (Higgsfield)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [720, 180], "parameters": { "method": "POST", "url": "https://api.higgsfield.ai/v1/video/generate", "sendBody": true }, "notes": "Higgsfield key (paid)" },
+    { "id": "n4", "name": "7. Sync to Amazon (SP-API)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [980, 60], "parameters": { "method": "PUT", "url": "https://sellingpartnerapi-eu.amazon.com/listings/2021-08-01/items", "sendBody": true }, "notes": "Amazon SP-API creds" },
+    { "id": "n5", "name": "8. Sync to Flipkart", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [980, 180], "parameters": { "method": "POST", "url": "https://api.flipkart.net/sellers/listings/v3/create", "sendBody": true } },
+    { "id": "n6", "name": "9. Sync to Meesho", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [980, 300], "parameters": { "method": "POST", "url": "https://api.meesho.com/catalog/v1/products", "sendBody": true } },
+    { "id": "n7", "name": "10. Broadcast new product (WhatsApp)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [980, 420], "parameters": { "method": "POST", "url": "https://backend.aisensy.com/campaign/t1/api", "sendBody": true }, "notes": "WhatsApp key" },
+    { "id": "n8", "name": "11. Order confirm (WhatsApp)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [460, 460], "parameters": { "method": "POST", "url": "https://backend.aisensy.com/campaign/t1/api", "sendBody": true } },
+    { "id": "n9", "name": "12. Create shipment (Shiprocket)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [720, 460], "parameters": { "method": "POST", "url": "https://apiv2.shiprocket.in/v1/external/orders/create/adhoc", "sendBody": true }, "notes": "Shiprocket key" },
+    { "id": "n10", "name": "13. Tracking updates (WhatsApp)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [980, 540], "parameters": { "method": "POST", "url": "https://backend.aisensy.com/campaign/t1/api", "sendBody": true } },
+    { "id": "n11", "name": "14. RTO/COD risk score (OpenAI/GoKwik)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [460, 600], "parameters": { "method": "POST", "url": "https://api.gokwik.co/v1/rto/score", "sendBody": true }, "notes": "GoKwik key" },
+    { "id": "n12", "name": "15. COD verify (WhatsApp)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [720, 600], "parameters": { "method": "POST", "url": "https://backend.aisensy.com/campaign/t1/api", "sendBody": true } },
+    { "id": "n13", "name": "16. Abandoned cart recovery", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [980, 660], "parameters": { "method": "POST", "url": "https://backend.aisensy.com/campaign/t1/api", "sendBody": true } },
+    { "id": "n14", "name": "17. Review request (post-delivery)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [980, 780], "parameters": { "method": "POST", "url": "https://backend.aisensy.com/campaign/t1/api", "sendBody": true } },
+    { "id": "n15", "name": "18. Low-stock + draft PO (Zoho Inv)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [460, 880], "parameters": { "method": "POST", "url": "https://www.zohoapis.in/inventory/v1/purchaseorders", "sendBody": true }, "notes": "Zoho Inventory key" },
+    { "id": "n16", "name": "19. Multi-channel stock sync", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [720, 880], "parameters": { "method": "POST", "url": "https://www.zohoapis.in/inventory/v1/items/sync", "sendBody": true } },
+    { "id": "n17", "name": "20. Daily sales roll-up (OpenAI -> WhatsApp)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [980, 900], "parameters": { "method": "POST", "url": "https://api.openai.com/v1/chat/completions", "sendBody": true } }
+  ],
+  "connections": {
+    "1. Product created (Shopify webhook)": { "main": [[ {"node":"4. AI description (OpenAI)","type":"main","index":0}, {"node":"5. AI product images (Photoroom)","type":"main","index":0} ]] },
+    "5. AI product images (Photoroom)": { "main": [[ {"node":"6. Product video (Higgsfield)","type":"main","index":0} ]] },
+    "6. Product video (Higgsfield)": { "main": [[ {"node":"7. Sync to Amazon (SP-API)","type":"main","index":0}, {"node":"8. Sync to Flipkart","type":"main","index":0}, {"node":"9. Sync to Meesho","type":"main","index":0}, {"node":"10. Broadcast new product (WhatsApp)","type":"main","index":0} ]] },
+    "2. Order created (Shopify webhook)": { "main": [[ {"node":"11. Order confirm (WhatsApp)","type":"main","index":0}, {"node":"14. RTO/COD risk score (OpenAI/GoKwik)","type":"main","index":0} ]] },
+    "11. Order confirm (WhatsApp)": { "main": [[ {"node":"12. Create shipment (Shiprocket)","type":"main","index":0} ]] },
+    "12. Create shipment (Shiprocket)": { "main": [[ {"node":"13. Tracking updates (WhatsApp)","type":"main","index":0}, {"node":"17. Review request (post-delivery)","type":"main","index":0} ]] },
+    "14. RTO/COD risk score (OpenAI/GoKwik)": { "main": [[ {"node":"15. COD verify (WhatsApp)","type":"main","index":0} ]] },
+    "3. Daily 9pm roll-up": { "main": [[ {"node":"16. Abandoned cart recovery","type":"main","index":0}, {"node":"18. Low-stock + draft PO (Zoho Inv)","type":"main","index":0}, {"node":"19. Multi-channel stock sync","type":"main","index":0}, {"node":"20. Daily sales roll-up (OpenAI -> WhatsApp)","type":"main","index":0} ]] }
+  }
+}

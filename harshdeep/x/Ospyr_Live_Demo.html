@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ospyr — Live Automation Demos</title>
+<style>
+:root{--red:#D2042D;--cream:#EAE5D4;--ink:#2A1A1D;--card:#FFFDF7;--line:#E3D9C5;--gold:#B98900}
+*{box-sizing:border-box}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:"Segoe UI",Calibri,Arial,sans-serif;line-height:1.5}
+header{background:var(--red);color:var(--cream);padding:26px 22px}
+header h1{margin:0;font-size:26px;letter-spacing:.5px}
+header p{margin:6px 0 0;opacity:.9;font-size:14px}
+.wrap{max-width:1000px;margin:0 auto;padding:18px 16px 60px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+.tab{border:1px solid var(--red);color:var(--red);background:transparent;border-radius:999px;padding:8px 16px;font-size:14px;cursor:pointer}
+.tab.on{background:var(--red);color:var(--cream)}
+.panel{display:none;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.panel.on{display:block}
+h2{color:var(--red);font-size:20px;margin:0 0 4px}
+.muted{color:#6b5f52;font-size:13px;margin:0 0 14px}
+label{display:block;font-size:13px;color:#6b5f52;margin:10px 0 4px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit;background:#fff}
+button.go{background:var(--red);color:var(--cream);border:0;border-radius:10px;padding:11px 18px;font-size:14px;cursor:pointer;margin-top:12px}
+button.chip{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:13px;cursor:pointer;margin:4px 6px 0 0}
+.out{margin-top:16px;background:#fff;border:1px dashed var(--red);border-radius:12px;padding:16px;white-space:pre-wrap;font-size:14px;min-height:30px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px}
+.kpi b{display:block;font-size:24px;color:var(--red)}
+.kpi span{font-size:12px;color:#6b5f52}
+.chat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;max-height:320px;overflow:auto}
+.bub{max-width:80%;padding:9px 12px;border-radius:14px;margin:6px 0;font-size:14px}
+.bot{background:#F4EFE3;color:var(--ink)}
+.me{background:var(--red);color:var(--cream);margin-left:auto}
+.card2{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.card2 .ph{height:150px;background:var(--red);color:var(--cream);display:flex;align-items:center;justify-content:center;font-size:15px;position:relative}
+.card2 .play{position:absolute;width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.9);color:var(--red);display:flex;align-items:center;justify-content:center;font-size:22px}
+.card2 .body{padding:12px}
+.tag{display:inline-block;background:#F4EFE3;color:var(--gold);border-radius:999px;padding:2px 9px;font-size:12px;margin:2px 4px 0 0}
+footer{max-width:1000px;margin:0 auto;padding:0 16px 40px;color:#6b5f52;font-size:12px}
+.badge{display:inline-block;background:var(--cream);color:var(--red);border:1px solid var(--red);border-radius:999px;padding:2px 10px;font-size:11px;margin-left:8px}
+</style>
+</head>
+<body>
+<header>
+<h1>OSPYR &nbsp;·&nbsp; Live automation demos</h1>
+<p>Four working automations running on sample data — no accounts, no logins. Click around: it really runs in your browser.</p>
+</header>
+<div class="wrap">
+<div class="tabs">
+<button class="tab on" data-p="p1">1 · AI Content Studio</button>
+<button class="tab" data-p="p2">2 · Lead Qualifier Bot</button>
+<button class="tab" data-p="p3">3 · Photo → Creative + Video</button>
+<button class="tab" data-p="p4">4 · Founder Daily Digest</button>
+</div>
+
+<!-- 1 CONTENT -->
+<div class="panel on" id="p1">
+<h2>AI Content Studio <span class="badge">demo</span></h2>
+<p class="muted">Type a product or topic. Get a ready-to-post caption, hashtags and an image brief — instantly.</p>
+<label>Business type</label>
+<select id="c_biz"><option>Jewellery store</option><option>Streetwear brand</option><option>Gifting brand</option><option>Event company</option></select>
+<label>Product / topic</label>
+<input id="c_topic" placeholder="e.g. new bridal gold necklace collection">
+<button class="go" onclick="genContent()">Generate post</button>
+<div class="out" id="c_out">Your generated post will appear here…</div>
+</div>
+
+<!-- 2 LEAD BOT -->
+<div class="panel" id="p2">
+<h2>Lead Qualifier &amp; Booking Bot <span class="badge">demo</span></h2>
+<p class="muted">A visitor chats, the bot qualifies them and books a slot — every lead captured, none dropped.</p>
+<div class="chat" id="chat"></div>
+<div id="opts" style="margin-top:8px"></div>
+</div>
+
+<!-- 3 CREATIVE -->
+<div class="panel" id="p3">
+<h2>Photo → branded creative + showcase video <span class="badge">demo</span></h2>
+<p class="muted">Pick a sample product. Watch it become a branded post card and a showcase video — automatically.</p>
+<div>
+<button class="chip" onclick="makeCreative('Gold necklace','Jewellery')">Gold necklace</button>
+<button class="chip" onclick="makeCreative('Oversized tee','Streetwear')">Oversized tee</button>
+<button class="chip" onclick="makeCreative('Gift hamper','Gifting')">Gift hamper</button>
+</div>
+<div class="grid" id="cr_out" style="margin-top:16px"></div>
+</div>
+
+<!-- 4 DASHBOARD -->
+<div class="panel" id="p4">
+<h2>Founder daily digest &amp; dashboard <span class="badge">demo</span></h2>
+<p class="muted">The owner's whole business in one screen and one morning message.</p>
+<div class="grid">
+<div class="kpi"><b id="k1">₹1.84L</b><span>sales yesterday</span></div>
+<div class="kpi"><b id="k2">37</b><span>new enquiries</span></div>
+<div class="kpi"><b id="k3">3.1x</b><span>blended ROAS</span></div>
+<div class="kpi"><b id="k4">6</b><span>low-stock items</span></div>
+</div>
+<button class="go" onclick="genDigest()">Generate 8am WhatsApp digest</button>
+<div class="out" id="d_out">Your morning digest will appear here…</div>
+</div>
+</div>
+<footer>Ospyr — the team behind the business. These are self-contained sample demos for illustration; production versions connect securely to your real channels. © 2026 Ospyr.</footer>
+
+<script>
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('on'));
+  t.classList.add('on');document.getElementById(t.dataset.p).classList.add('on');
+});
+
+function genContent(){
+  const biz=document.getElementById('c_biz').value, topic=document.getElementById('c_topic').value||'our new collection';
+  const hooks={'Jewellery store':'✨ Crafted to be remembered.','Streetwear brand':'🔥 The drop you\'ve been waiting for.','Gifting brand':'🎁 Make it unforgettable.','Event company':'🎉 Moments, done right.'};
+  const tags={'Jewellery store':'#bridalgold #916hallmark #jewellery #mysore','Streetwear brand':'#streetwear #hypebeast #newdrop #ootd','Gifting brand':'#giftingideas #custombox #madeinbharat','Event company':'#eventplanner #experiences #celebrations'};
+  const out=`${hooks[biz]}\n\nIntroducing: ${topic}.\n\nEvery detail designed for you — quality you can trust, style you'll love. Limited pieces. DM us or tap the link to reserve yours today.\n\n${tags[biz]}\n\n— — —\nIMAGE BRIEF: clean studio shot of "${topic}", soft warm lighting, brand colours, lifestyle angle, 4:5 crop.\nBEST TIME TO POST: 7:30 PM.`;
+  typeInto('c_out',out);
+}
+
+const flow=[
+ {q:"Hi! 👋 Welcome to the demo. What are you looking for today?",o:["Bridal collection","A gift","Just browsing"]},
+ {q:"Lovely choice. What's your budget range?",o:["Under ₹50k","₹50k–2L","Above ₹2L"]},
+ {q:"When are you hoping to buy?",o:["This week","This month","Just exploring"]},
+ {q:"Great — I can book you a quick showroom/video appointment. Which works?",o:["Today 5 PM","Tomorrow 11 AM","Weekend"]},
+];
+let step=0;
+function renderChat(){
+  const c=document.getElementById('chat'),o=document.getElementById('opts');
+  if(step<flow.length){
+    add(flow[step].q,'bot');o.innerHTML='';
+    flow[step].o.forEach(opt=>{const b=document.createElement('button');b.className='chip';b.textContent=opt;b.onclick=()=>{add(opt,'me');step++;setTimeout(renderChat,350);};o.appendChild(b);});
+  }else{
+    add("Perfect ✅ You're booked. A confirmation + reminder just went out, and you've been saved to the CRM as a qualified lead. A human will follow up. (In production this fires automatically.)",'bot');
+    o.innerHTML='<button class="go" onclick="restart()">Run it again</button>';
+  }
+}
+function add(t,cls){const c=document.getElementById('chat');const d=document.createElement('div');d.className='bub '+cls;d.textContent=t;c.appendChild(d);c.scrollTop=c.scrollHeight;}
+function restart(){step=0;document.getElementById('chat').innerHTML='';renderChat();}
+
+function makeCreative(name,cat){
+  const el=document.getElementById('cr_out');
+  el.innerHTML=`
+  <div class="card2"><div class="ph">${name} — branded post card</div><div class="body"><b>${name}</b><div><span class="tag">${cat}</span><span class="tag">on-brand</span><span class="tag">auto-captioned</span></div><p style="font-size:13px;color:#6b5f52;margin:8px 0 0">Auto-generated in your brand colours, ready to post.</p></div></div>
+  <div class="card2"><div class="ph" id="vph"><span class="play">▶</span><span style="position:absolute;bottom:8px;font-size:12px;opacity:.9">showcase video · 0:08</span></div><div class="body"><b>${name} — 360° showcase</b><p style="font-size:13px;color:#6b5f52;margin:8px 0 0">One photo → a scroll-stopping video. Click ▶ to preview.</p></div></div>`;
+  const ph=document.getElementById('vph');
+  ph.onclick=()=>{let n=0;ph.querySelector('.play').textContent='●';const id=setInterval(()=>{n++;ph.style.filter='hue-rotate('+(n*24)+'deg)';if(n>12){clearInterval(id);ph.style.filter='';ph.querySelector('.play').textContent='▶';}},80);};
+}
+
+function genDigest(){
+  const out=`☀️ Good morning! Here's your business — 6 Jul\n\n💰 Sales yesterday: ₹1,84,200 (▲ 12%)\n🧲 New enquiries: 37 (5 bridal, 12 gifting)\n📈 Blended ROAS: 3.1x\n🏆 Top item: Bridal gold necklace (9 enquiries)\n📦 Low stock: 6 items — reorder drafted for your approval\n📅 Today: 4 appointments booked\n\nTap to approve the reorder ▶  |  See full dashboard ▶`;
+  typeInto('d_out',out);
+}
+
+function typeInto(id,text){const el=document.getElementById(id);el.textContent='';let i=0;const t=setInterval(()=>{el.textContent+=text[i++];if(i>=text.length)clearInterval(t);},8);}
+renderChat();
+</script>
+</body>
+</html>

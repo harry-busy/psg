@@ -1,0 +1,45 @@
+{
+  "name": "5 · Occasion reminders — birthdays/anniversaries → gift nudge",
+  "nodes": [
+    {
+      "parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "0 10 * * *"}]}},
+      "id": "cron", "name": "Every day 10:00", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, 0]
+    },
+    {
+      "parameters": {"documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "Customers", "mode": "name"}, "options": {}},
+      "id": "sheet", "name": "Read customers", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [200, 0],
+      "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}},
+      "notes": "Customers sheet columns: Name, Phone, Occasion (Birthday/Anniversary), OccasionDate (YYYY-MM-DD or MM-DD), SpousePartner (optional)."
+    },
+    {
+      "parameters": {
+        "jsCode": "// Fire 7 days before the occasion (month-day match)\nconst t = new Date(Date.now() + 7*864e5);\nconst md = String(t.getMonth()+1).padStart(2,'0') + '-' + String(t.getDate()).padStart(2,'0');\nreturn items.filter(i => (i.json.OccasionDate||'').slice(-5) === md && i.json.Phone)\n  .map(i => ({ json: {\n    phone: String(i.json.Phone).replace(/\\D/g,''),\n    name: i.json.Name || 'ji',\n    occ: i.json.Occasion || 'special day'\n  }}));"
+      },
+      "id": "pick", "name": "Occasion in 7 days", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [400, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v21.0/{{$env.WA_PHONE_NUMBER_ID}}/messages",
+        "authentication": "genericCredentialType", "genericAuthType": "httpHeaderAuth",
+        "sendBody": true, "specifyBody": "json",
+        "jsonBody": "={ \"messaging_product\": \"whatsapp\", \"to\": \"{{$json.phone}}\", \"type\": \"template\", \"template\": { \"name\": \"occasion_nudge\", \"language\": { \"code\": \"en\" }, \"components\": [ { \"type\": \"body\", \"parameters\": [ { \"type\": \"text\", \"text\": \"{{$json.name}}\" }, { \"type\": \"text\", \"text\": \"{{$json.occ}}\" } ] } ] } }",
+        "options": {}
+      },
+      "id": "send", "name": "WhatsApp: occasion template", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [600, -80],
+      "credentials": {"httpHeaderAuth": {"id": "REPLACE", "name": "Meta Bearer Token"}},
+      "notes": "Approved template occasion_nudge: 'Namaste {{1}}! A {{2}} is coming up 💛 Make it unforgettable with gold — reply here and we will keep a curated selection ready for you.'"
+    },
+    {
+      "parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "=🎁 Occasion nudge sent: {{$json.name}} ({{$json.occ}}) — {{$json.phone}}", "additionalFields": {}},
+      "id": "tg", "name": "Telegram: notify owner", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [600, 100],
+      "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}
+    }
+  ],
+  "connections": {
+    "Every day 10:00": {"main": [[{"node": "Read customers", "type": "main", "index": 0}]]},
+    "Read customers": {"main": [[{"node": "Occasion in 7 days", "type": "main", "index": 0}]]},
+    "Occasion in 7 days": {"main": [[{"node": "WhatsApp: occasion template", "type": "main", "index": 0}, {"node": "Telegram: notify owner", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}

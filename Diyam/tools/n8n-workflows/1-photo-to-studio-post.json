@@ -1,0 +1,55 @@
+{
+  "name": "1 · Photo → AI studio image → post back (Telegram in/out)",
+  "nodes": [
+    {
+      "parameters": {"updates": ["message"], "additionalFields": {"download": true, "imageSize": "large"}},
+      "id": "tg-trigger", "name": "Telegram: photo received", "type": "n8n-nodes-base.telegramTrigger", "typeVersion": 1.1, "position": [0, 0],
+      "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}
+    },
+    {
+      "parameters": {
+        "jsCode": "// Build Gemini image-edit request from the incoming Telegram photo\nconst bin = items[0].binary.data;\nreturn [{ json: { body: {\n  contents: [{ parts: [\n    { inlineData: { mimeType: bin.mimeType || 'image/jpeg', data: bin.data } },\n    { text: 'Re-render this jewellery as a professional luxury studio product photograph: elegant premium backdrop, soft key lighting, crisp focus on the jewellery, realistic, no added text or people.' }\n  ]}],\n  generationConfig: { responseModalities: ['TEXT','IMAGE'] }\n} } , binary: items[0].binary }];"
+      },
+      "id": "build-req", "name": "Build Gemini request", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key={{$env.GEMINI_API_KEY}}",
+        "sendBody": true, "specifyBody": "json", "jsonBody": "={{ JSON.stringify($json.body) }}",
+        "options": {}
+      },
+      "id": "gemini", "name": "Gemini: studio re-shoot", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract the generated image (base64) into n8n binary\nconst parts = $json.candidates?.[0]?.content?.parts || [];\nconst img = parts.find(p => p.inlineData);\nif (!img) throw new Error('Gemini returned no image');\nreturn [{ json: { caption: 'New design ✨' }, binary: { photo: { data: img.inlineData.data, mimeType: img.inlineData.mimeType || 'image/png', fileName: 'studio.png' } } }];"
+      },
+      "id": "extract", "name": "Extract image", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [660, 0]
+    },
+    {
+      "parameters": {"operation": "sendPhoto", "chatId": "={{ $('Telegram: photo received').item.json.message.chat.id }}", "binaryData": true, "binaryPropertyName": "photo", "additionalFields": {"caption": "✨ Studio version — ready to post"}},
+      "id": "tg-reply", "name": "Telegram: send studio image back", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [880, -80],
+      "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v21.0/{{$env.IG_USER_ID}}/media",
+        "sendBody": true, "specifyBody": "json",
+        "jsonBody": "={ \"image_url\": \"PUBLIC_IMAGE_URL_HERE\", \"caption\": \"New design ✨ #gold #jewellery\", \"access_token\": \"{{$env.META_ACCESS_TOKEN}}\" }",
+        "options": {}
+      },
+      "id": "ig-post", "name": "OPTIONAL: Instagram post (Graph API)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [880, 100],
+      "notesInFlow": true,
+      "notes": "Instagram Graph API needs a PUBLIC image URL: add an upload step (S3/Cloudinary/Drive) before this node, then a second call to /media_publish with the returned creation_id. Requires a Meta app + IG business account."
+    }
+  ],
+  "connections": {
+    "Telegram: photo received": {"main": [[{"node": "Build Gemini request", "type": "main", "index": 0}]]},
+    "Build Gemini request": {"main": [[{"node": "Gemini: studio re-shoot", "type": "main", "index": 0}]]},
+    "Gemini: studio re-shoot": {"main": [[{"node": "Extract image", "type": "main", "index": 0}]]},
+    "Extract image": {"main": [[{"node": "Telegram: send studio image back", "type": "main", "index": 0}, {"node": "OPTIONAL: Instagram post (Graph API)", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}

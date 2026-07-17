@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ospyr Jewellery Suite — All-in-One</title>
+<style>
+:root{--red:#D2042D;--cream:#EAE5D4;--ink:#2A1A1D;--green:#1E7D34;--gold:#c9a227}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Calibri,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--red);color:#fff;padding:10px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:0;z-index:9}
+header h1{font-size:17px;white-space:nowrap}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:12.5px;cursor:pointer;font-weight:600}
+nav button.on{background:#fff;color:var(--red)}
+main{max-width:1250px;margin:0 auto;padding:16px}
+.tab{display:none}.tab.on{display:block}
+.panel{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:14px}
+.panel h2{font-size:13px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;border-bottom:2px solid var(--cream);padding-bottom:6px}
+label{font-size:12px;font-weight:600;display:block;margin:8px 0 3px}
+input,select,textarea{width:100%;padding:8px;border:1px solid #d8cfc0;border-radius:8px;font-size:13px;background:#fffdf7}
+.btn{background:var(--red);color:#fff;border:none;border-radius:8px;padding:10px 14px;font-weight:600;cursor:pointer;font-size:13.5px;margin-top:8px}
+.btn.sec{background:var(--ink)}.btn.wa{background:#25D366}.btn.tg{background:#2AABEE}.btn.ai{background:#5B3A8C}
+.btn:disabled{opacity:.5;cursor:wait}
+.grid{display:grid;gap:16px}.g2{grid-template-columns:340px 1fr}.g22{grid-template-columns:1fr 1fr}
+@media(max-width:900px){.g2,.g22{grid-template-columns:1fr}}
+canvas.prev{max-width:100%;max-height:60vh;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.18);background:#eee}
+.drop{border:2px dashed var(--red);border-radius:10px;padding:18px;text-align:center;cursor:pointer;background:#fff8f4;font-size:13px}
+.sw{width:38px;height:38px;border-radius:8px;cursor:pointer;border:3px solid transparent;display:inline-block;margin:2px}
+.sw.active{border-color:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--cream);text-align:left;padding:7px;font-size:11px;text-transform:uppercase}
+td{padding:7px;border-bottom:1px solid #f0ead9}
+tr.due{background:#fff3c4}
+tr.total td{border-top:3px double var(--red);font-size:17px;color:var(--red);font-weight:800}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px}
+.stat{background:#fff;border-radius:12px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.stat b{display:block;font-size:22px;color:var(--red)}
+.stat span{font-size:10px;text-transform:uppercase;color:#8a7f6d;letter-spacing:.5px}
+.chip{padding:4px 11px;border-radius:14px;background:#fff;border:1px solid #d8cfc0;font-size:12px;cursor:pointer;display:inline-block;margin:2px}
+.chip.on{background:var(--red);color:#fff;border-color:var(--red)}
+.note{font-size:11px;color:#8a7f6d;margin-top:6px;line-height:1.6}
+.fest{background:#fff;border-radius:10px;padding:12px;margin-bottom:8px;border-left:4px solid var(--red);font-size:13px}
+.fest.major{border-left-color:var(--gold);background:linear-gradient(90deg,#fffbe8,#fff)}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 20px;border-radius:24px;font-size:13px;display:none;z-index:99;max-width:90%}
+.ok{color:var(--green);font-weight:700}.bad{color:#B02A37;font-weight:700}
+.row{display:flex;gap:6px;flex-wrap:wrap}
+.big{font-size:30px;font-weight:800;color:var(--red);text-align:center;margin:8px 0 2px}
+</style>
+</head>
+<body>
+<header>
+<h1>💎 OSPYR SUITE</h1>
+<nav id="nav"></nav>
+</header>
+<main id="main"></main>
+<div id="toast"></div>
+<script type="module">
+/* ================= SHARED CORE ================= */
+const $=id=>document.getElementById(id);
+const store=(k,v)=>v===undefined?JSON.parse(localStorage.getItem("os_"+k)||"null"):localStorage.setItem("os_"+k,JSON.stringify(v));
+let S=Object.assign({brand:"PSG Gold",waNum:"",rate24:7400,rateAg:110,making:12,gemKey:"",gemModel:"gemini-2.5-flash-image",tgToken:"",tgChat:"",tgNotify:true},store("settings")||{});
+const saveS=()=>store("settings",S);
+const fmt=n=>"₹ "+Math.round(n).toLocaleString("en-IN");
+const today=()=>new Date().toISOString().slice(0,10);
+const esc=s=>(s||"").toString().replace(/</g,"&lt;");
+function toast(m,ms=3000){const t=$("toast");t.textContent=m;t.style.display="block";clearTimeout(t._x);t._x=setTimeout(()=>t.style.display="none",ms)}
+/* Telegram (works from browser — Bot API allows CORS) */
+async function tgText(text){if(!S.tgToken||!S.tgChat)return toast("⚠ Add Telegram bot token + chat ID in Settings");
+try{const r=await fetch(`https://api.telegram.org/bot${S.tgToken}/sendMessage`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({chat_id:S.tgChat,text})});
+(await r.json()).ok?toast("✅ Sent to Telegram"):toast("❌ Telegram rejected — check token/chat ID")}catch(e){toast("❌ Telegram error: "+e.message)}}
+async function tgPhoto(canvas,caption){if(!S.tgToken||!S.tgChat)return toast("⚠ Add Telegram bot token + chat ID in Settings");
+canvas.toBlob(async blob=>{const fd=new FormData();fd.append("chat_id",S.tgChat);fd.append("caption",caption||"");fd.append("photo",blob,"image.jpg");
+try{const r=await fetch(`https://api.telegram.org/bot${S.tgToken}/sendPhoto`,{method:"POST",body:fd});
+(await r.json()).ok?toast("✅ Image sent to Telegram"):toast("❌ Telegram rejected — check token/chat ID")}catch(e){toast("❌ Telegram error: "+e.message)}},"image/jpeg",.92)}
+/* Gemini (works from browser with API key) */
+async function gemini(parts,wantImage=false){if(!S.gemKey){toast("⚠ Add your free Gemini API key in Settings");return null}
+const model=wantImage?S.gemModel:"gemini-2.0-flash";
+const body={contents:[{parts}]};if(wantImage)body.generationConfig={responseModalities:["TEXT","IMAGE"]};
+try{const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${S.gemKey}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+const j=await r.json();if(j.error){toast("❌ Gemini: "+j.error.message.slice(0,90));return null}
+const ps=j.candidates?.[0]?.content?.parts||[];
+if(wantImage){const im=ps.find(p=>p.inlineData);return im?im.inlineData.data:(toast("Gemini returned no image — try again"),null)}
+return ps.map(p=>p.text||"").join("")}catch(e){toast("❌ Gemini error: "+e.message);return null}}
+const cvToPart=cv=>({inlineData:{mimeType:"image/jpeg",data:cv.toDataURL("image/jpeg",.9).split(",")[1]}});
+/* ================= TABS ================= */
+const TABS=[["home","🏠 Home"],["studio","📸 Studio"],["cards","🏷️ Cards"],["calc","🪙 Calculator"],["crm","📇 CRM"],["cal","📅 Calendar"],["qr","⭐ QR"],["scheme","💰 Scheme"],["dash","📊 Dashboard"],["set","⚙️ Settings"]];
+$("nav").innerHTML=TABS.map(([id,l])=>`<button data-t="${id}">${l}</button>`).join("");
+const M=$("main");
+M.innerHTML=TABS.map(([id])=>`<section class="tab" id="tab-${id}"></section>`).join("");
+document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>go(b.dataset.t));
+function go(t){document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.t===t));
+document.querySelectorAll(".tab").forEach(s=>s.classList.toggle("on",s.id==="tab-"+t));
+if(t==="dash")dashRender();if(t==="crm")crmRender();if(t==="home")homeRender()}
+/* ================= HOME ================= */
+$("tab-home").innerHTML=`<div class="stats" id="homeStats"></div>
+<div class="panel"><h2>Today at ${esc(S.brand)}</h2><div id="homeBody" style="font-size:13.5px;line-height:1.8"></div>
+<button class="btn tg" id="homeTg">📤 Send today's summary to Telegram</button></div>
+<div class="panel"><h2>Integration status</h2><div id="intStatus" style="font-size:13px;line-height:2"></div></div>`;
+function homeRender(){const crm=store("crm")||[];const wk=new Date(Date.now()-6*864e5).toISOString().slice(0,10);
+const due=crm.filter(d=>d.next&&d.next<=today()&&!["Sold","Lost"].includes(d.stage));
+const sold=crm.filter(d=>d.stage==="Sold").length;
+$("homeStats").innerHTML=`<div class="stat"><b>${crm.filter(d=>d.created>=wk).length}</b><span>Enquiries 7d</span></div><div class="stat"><b style="color:#C05621">${due.length}</b><span>Follow-ups due</span></div><div class="stat"><b style="color:var(--green)">${sold}</b><span>Sold</span></div><div class="stat"><b>${fmt(S.rate24)}</b><span>24K rate /g</span></div><div class="stat"><b>${fmt(S.rate24*0.916)}</b><span>22K rate /g</span></div>`;
+$("homeBody").innerHTML=(due.length?`<b>⏰ Follow-ups due:</b> ${due.map(d=>esc(d.name)).join(", ")}<br>`:"✅ No follow-ups pending.<br>")+`Gold 22K today ≈ <b>${fmt(S.rate24*0.916)}/g</b>. Use Studio to shoot → post today's design; check Calendar for upcoming festival pushes.`;
+$("intStatus").innerHTML=`Telegram bot: ${S.tgToken&&S.tgChat?'<span class="ok">connected</span>':'<span class="bad">not set</span>'} · Gemini AI: ${S.gemKey?'<span class="ok">key added</span>':'<span class="bad">no key</span>'} · WhatsApp: <span class="ok">share-links active</span> (full automation via the n8n pack) · Data: CRM ↔ Dashboard ↔ Home all share this device's storage.`;
+$("homeTg").onclick=()=>{const crm=store("crm")||[];const due=crm.filter(d=>d.next&&d.next<=today()&&!["Sold","Lost"].includes(d.stage));
+tgText(`📊 ${S.brand} — ${today()}\nEnquiries total: ${crm.length}\nFollow-ups due: ${due.length}${due.length?" ("+due.map(d=>d.name).join(", ")+")":""}\nSold: ${crm.filter(d=>d.stage==="Sold").length}\n22K rate: ${fmt(S.rate24*0.916)}/g`)}}
+/* ================= STUDIO ================= */
+$("tab-studio").innerHTML=`<div class="grid g2"><div>
+<div class="panel"><h2>Photos</h2><div class="drop" id="stDrop">Drop / click to upload<input type="file" id="stFile" accept="image/*" multiple hidden></div>
+<label style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="stAI" checked style="width:auto">AI cutout (free, in-browser)</label><div class="note" id="stStatus"></div></div>
+<div class="panel"><h2>Look</h2><div id="stSw"></div>
+<label>Subject size <span id="stZv">78%</span></label><input type="range" id="stZ" min="40" max="100" value="78">
+<label>Shadow <span id="stSv">60%</span></label><input type="range" id="stS" min="0" max="100" value="60">
+<label>Export</label><select id="stSize"><option value="1080x1080">Post 1080×1080</option><option value="1080x1350">Portrait 1080×1350</option><option value="1080x1920">Story 1080×1920</option></select></div>
+<div class="panel"><h2>Actions</h2>
+<button class="btn" id="stDl">⬇ Download</button>
+<button class="btn tg" id="stTg">📤 Send to Telegram</button>
+<button class="btn ai" id="stEnh">✨ AI re-shoot (Gemini)</button>
+<button class="btn ai" id="stCap">📝 AI caption (Gemini)</button>
+<textarea id="stCapOut" rows="4" placeholder="AI caption appears here…" style="margin-top:8px"></textarea>
+<button class="btn wa" id="stWa">💬 Share caption on WhatsApp</button></div>
+</div><div class="panel" style="text-align:center"><h2>Preview</h2><canvas id="stCv" class="prev" width="1080" height="1080"></canvas><div id="stThumbs" style="margin-top:8px"></div></div></div>`;
+const stBG=[["Cream","#EAE5D4","#d9d2bc"],["Pearl","#f7f5f0","#e4e0d5"],["Charcoal","#3a3a3d","#1c1c1f"],["Black","#1b1b1e","#000"],["Maroon","#5a1020","#2e0810"],["Blue","#1e2a5a","#0d1430"],["Gold","#e8d9a0","#c9ab55"],["Rose","#e8c9c2","#d3a79d"]];
+let stImgs=[],stCur=0,stBgSel=0,rmbg=null,rmbgL=false;
+const stCv=$("stCv"),stX=stCv.getContext("2d");
+$("stSw").innerHTML=stBG.map((b,i)=>`<span class="sw ${i?"":"active"}" style="background:linear-gradient(135deg,${b[1]},${b[2]})" data-i="${i}"></span>`).join("");
+document.querySelectorAll("#stSw .sw").forEach(s=>s.onclick=()=>{stBgSel=+s.dataset.i;document.querySelectorAll("#stSw .sw").forEach((x,j)=>x.classList.toggle("active",j===stBgSel));stDraw()});
+$("stZ").oninput=()=>{$("stZv").textContent=$("stZ").value+"%";stDraw()};
+$("stS").oninput=()=>{$("stSv").textContent=$("stS").value+"%";stDraw()};
+$("stSize").onchange=()=>{const[w,h]=$("stSize").value.split("x");stCv.width=+w;stCv.height=+h;stDraw()};
+$("stDrop").onclick=()=>$("stFile").click();
+$("stFile").onchange=e=>stAdd(e.target.files);
+async function stAdd(fl){for(const f of fl){let bmp;
+if($("stAI").checked){if(!rmbg&&!rmbgL){rmbgL=true;$("stStatus").textContent="Downloading free AI cutout model (one-time)…";
+try{const m=await import("https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.5/+esm");rmbg=m.removeBackground}catch(e){$("stStatus").textContent="Cutout model unavailable — using originals."}rmbgL=false}
+if(rmbg){$("stStatus").textContent="Cutting out…";try{bmp=await createImageBitmap(await rmbg(f))}catch(e){}}}
+if(!bmp)bmp=await createImageBitmap(f);stImgs.push(bmp);$("stStatus").textContent="";
+const t=document.createElement("canvas");t.width=56;t.height=56;t.getContext("2d").drawImage(bmp,0,0,56,56);t.style.cssText="border-radius:8px;margin:2px;cursor:pointer";
+t.onclick=()=>{stCur=[...$("stThumbs").children].indexOf(t);stDraw()};$("stThumbs").appendChild(t)}
+stCur=stImgs.length-1;stDraw()}
+function stDraw(){const W=stCv.width,H=stCv.height,[,c1,c2]=stBG[stBgSel];
+const g=stX.createLinearGradient(0,0,W,H);g.addColorStop(0,c1);g.addColorStop(1,c2);stX.fillStyle=g;stX.fillRect(0,0,W,H);
+const r=stX.createRadialGradient(W/2,H*.42,W*.05,W/2,H*.42,W*.75);r.addColorStop(0,"rgba(255,255,255,.28)");r.addColorStop(1,"rgba(255,255,255,0)");stX.fillStyle=r;stX.fillRect(0,0,W,H);
+const bmp=stImgs[stCur];
+if(bmp){const z=$("stZ").value/100,s=Math.min(W/bmp.width,H/bmp.height)*z,dw=bmp.width*s,dh=bmp.height*s,dx=(W-dw)/2,dy=(H-dh)/2-H*.02;
+const sh=$("stS").value/100;if(sh){stX.save();stX.filter=`blur(${W*.02}px)`;stX.fillStyle=`rgba(0,0,0,${.45*sh})`;stX.beginPath();stX.ellipse(W/2,dy+dh*.97,dw*.36,dh*.05+W*.008,0,0,7);stX.fill();stX.restore()}
+stX.drawImage(bmp,dx,dy,dw,dh)}else{stX.fillStyle="rgba(0,0,0,.35)";stX.font=`${W*.03}px Segoe UI`;stX.textAlign="center";stX.fillText("Upload a photo",W/2,H/2)}
+if(S.brand){stX.font=`600 ${W*.028}px Segoe UI`;stX.textAlign="right";stX.fillStyle=stBgSel>1&&stBgSel<6?"rgba(255,255,255,.85)":"rgba(42,26,29,.75)";stX.fillText(S.brand,W-W*.04,H-H*.035)}}
+$("stDl").onclick=()=>{const a=document.createElement("a");a.download="studio.jpg";a.href=stCv.toDataURL("image/jpeg",.94);a.click()};
+$("stTg").onclick=()=>tgPhoto(stCv,`${S.brand} — new design ✨`);
+$("stEnh").onclick=async()=>{if(!stImgs.length)return toast("Upload a photo first");$("stEnh").disabled=true;toast("✨ Gemini re-shooting…",8000);
+const b64=await gemini([cvToPart(stCv),{text:"Re-render this jewellery as a professional luxury studio product photograph: elegant backdrop, soft key light, crisp focus on the jewellery, realistic, no text or humans added."}],true);
+if(b64){const img=new Image();img.onload=async()=>{stImgs[stCur]=await createImageBitmap(img);stDraw();toast("✅ AI re-shoot applied")};img.src="data:image/png;base64,"+b64}
+$("stEnh").disabled=false};
+$("stCap").onclick=async()=>{$("stCap").disabled=true;toast("Writing caption…",6000);
+const t=await gemini([cvToPart(stCv),{text:`Write an Instagram caption for this jewellery photo for "${S.brand}", an Indian gold jewellery showroom. 2 short lines + 8 hashtags. Warm, premium, trust-building tone.`}]);
+if(t)$("stCapOut").value=t.trim();$("stCap").disabled=false};
+$("stWa").onclick=()=>window.open("https://wa.me/?text="+encodeURIComponent($("stCapOut").value||"New design at "+S.brand));
+stDraw();
+/* ================= CARDS ================= */
+$("tab-cards").innerHTML=`<div class="grid g2"><div class="panel"><h2>Card</h2>
+<div class="drop" id="cdDrop">📷 Add product photo<input type="file" id="cdFile" accept="image/*" hidden></div>
+<label>Product name</label><input id="cdName" placeholder="Antique Lakshmi Necklace">
+<label>Purity</label><select id="cdPur"><option>22K · 916 Hallmark</option><option>24K · 995</option><option>18K · 750</option><option>Silver 925</option><option>Diamond · IGI</option></select>
+<label>Weight</label><input id="cdWt" placeholder="12.4 g">
+<label>Price (₹ / On request)</label><input id="cdPr" placeholder="94,500">
+<label>Theme</label><select id="cdTh"><option value="light">Cream classic</option><option value="dark">Black premium</option><option value="red">Crimson festive</option></select>
+<button class="btn" id="cdDl">⬇ Download card</button>
+<button class="btn tg" id="cdTg">📤 Send to Telegram</button>
+<button class="btn ai" id="cdCap">📝 AI caption (Gemini)</button>
+<textarea id="cdCapOut" rows="3" placeholder="AI caption…" style="margin-top:6px"></textarea></div>
+<div class="panel" style="text-align:center"><h2>Preview</h2><canvas id="cdCv" class="prev" width="1080" height="1350"></canvas></div></div>`;
+const cdCv=$("cdCv"),cdX=cdCv.getContext("2d");let cdImg=null;
+const cdTH={light:{bg1:"#EAE5D4",bg2:"#dcd4bd",ink:"#2A1A1D",acc:"#D2042D",sub:"#6d6250"},dark:{bg1:"#1b1b1e",bg2:"#000",ink:"#f2ead8",acc:"#e8c96a",sub:"#b8ab90"},red:{bg1:"#9E0322",bg2:"#5a0113",ink:"#fdf6e3",acc:"#f4d47c",sub:"#e8c2b8"}};
+$("cdDrop").onclick=()=>$("cdFile").click();
+$("cdFile").onchange=async e=>{cdImg=await createImageBitmap(e.target.files[0]);cdDraw()};
+["cdName","cdPur","cdWt","cdPr","cdTh"].forEach(id=>$(id).oninput=$(id).onchange=cdDraw);
+function rr(x,y,w,h,r,X){X.beginPath();X.moveTo(x+r,y);X.arcTo(x+w,y,x+w,y+h,r);X.arcTo(x+w,y+h,x,y+h,r);X.arcTo(x,y+h,x,y,r);X.arcTo(x,y,x+w,y,r);X.closePath()}
+function cdDraw(){const W=cdCv.width,H=cdCv.height,t=cdTH[$("cdTh").value];
+const g=cdX.createLinearGradient(0,0,0,H);g.addColorStop(0,t.bg1);g.addColorStop(1,t.bg2);cdX.fillStyle=g;cdX.fillRect(0,0,W,H);
+cdX.fillStyle=t.acc;cdX.fillRect(0,0,W,8);cdX.textAlign="center";
+cdX.fillStyle=t.ink;cdX.font=`700 ${W*.045}px Georgia`;cdX.fillText(S.brand.toUpperCase(),W/2,H*.075);
+const py=H*.115,ph=H*.55,px=W*.08,pw=W*.84;
+cdX.save();rr(px,py,pw,ph,24,cdX);cdX.clip();cdX.fillStyle=$("cdTh").value==="light"?"#fff":"rgba(255,255,255,.06)";cdX.fillRect(px,py,pw,ph);
+if(cdImg){const s=Math.min(pw/cdImg.width,ph/cdImg.height)*.94,dw=cdImg.width*s,dh=cdImg.height*s;cdX.drawImage(cdImg,px+(pw-dw)/2,py+(ph-dh)/2,dw,dh)}else{cdX.fillStyle=t.sub;cdX.font=`${W*.03}px Segoe UI`;cdX.fillText("Add a product photo",W/2,py+ph/2)}
+cdX.restore();cdX.strokeStyle=t.acc;cdX.lineWidth=3;rr(px,py,pw,ph,24,cdX);cdX.stroke();
+let y=py+ph+H*.06;cdX.fillStyle=t.ink;cdX.font=`600 ${W*.042}px Georgia`;cdX.fillText($("cdName").value||"Product Name",W/2,y);
+y+=H*.045;cdX.font=`${W*.028}px Segoe UI`;cdX.fillStyle=t.sub;cdX.fillText([$("cdPur").value,$("cdWt").value&&"Weight: "+$("cdWt").value].filter(Boolean).join("   ·   "),W/2,y);
+if($("cdPr").value){y+=H*.055;cdX.fillStyle=t.acc;cdX.font=`700 ${W*.05}px Segoe UI`;cdX.fillText(($("cdPr").value.match(/^[0-9]/)?"₹ ":"")+$("cdPr").value,W/2,y)}
+const fy=H-H*.06;cdX.fillStyle=t.acc;rr(W*.2,fy-H*.033,W*.6,H*.05,26,cdX);cdX.fill();
+cdX.fillStyle=$("cdTh").value==="light"?"#fff":"#1b1b1e";cdX.font=`600 ${W*.026}px Segoe UI`;
+cdX.fillText(S.waNum?"WhatsApp to order · +"+S.waNum:"Visit our showroom",W/2,fy)}
+$("cdDl").onclick=()=>{const a=document.createElement("a");a.download="card.jpg";a.href=cdCv.toDataURL("image/jpeg",.94);a.click()};
+$("cdTg").onclick=()=>tgPhoto(cdCv,`${$("cdName").value||"New piece"} — ${$("cdPur").value}${$("cdWt").value?", "+$("cdWt").value:""}${$("cdPr").value?" — ₹"+$("cdPr").value:""}`);
+$("cdCap").onclick=async()=>{toast("Writing caption…",6000);
+const t=await gemini([{text:`Instagram caption for a jewellery product post. Brand: ${S.brand} (Indian gold showroom). Product: ${$("cdName").value}, ${$("cdPur").value}, weight ${$("cdWt").value||"n/a"}, price ${$("cdPr").value||"on request"}. 2 warm premium lines + 8 hashtags.`}]);
+if(t)$("cdCapOut").value=t.trim()};
+cdDraw();
+/* ================= CALCULATOR ================= */
+$("tab-calc").innerHTML=`<div class="grid g22"><div class="panel"><h2>Item</h2>
+<label>Purity</label><select id="ccK"><option value="0.916">Gold 22K (916)</option><option value="1">Gold 24K</option><option value="0.75">Gold 18K</option><option value="0.585">Gold 14K</option><option value="silver">Silver</option></select>
+<label>Weight (g)</label><input type="number" id="ccW" value="10" step="0.01">
+<label>Making charge</label><div class="row"><input type="number" id="ccM" style="flex:2" step="0.1"><select id="ccMt" style="flex:1"><option value="pct">%</option><option value="pg">₹/g</option><option value="flat">₹ flat</option></select></div>
+<label>Old-gold exchange deduction (₹)</label><input type="number" id="ccO" value="0"></div>
+<div class="panel"><h2>Estimate <span style="float:right;font-size:11px;color:#8a7f6d">rates from Settings</span></h2><table id="ccOut"></table>
+<button class="btn wa" id="ccWa">📲 Share on WhatsApp</button><button class="btn tg" id="ccTg">📤 Telegram</button>
+<div class="note">GST 3% included. Estimate only — final at billing.</div></div></div>`;
+$("ccM").value=S.making;
+function ccCalc(){const k=$("ccK").value,wt=+$("ccW").value||0;
+const rate=k==="silver"?S.rateAg:S.rate24*(+k);
+const metal=wt*rate;let mk=+$("ccM").value||0;const mt=$("ccMt").value;
+mk=mt==="pct"?metal*mk/100:mt==="pg"?mk*wt:mk;
+const gst=(metal+mk)*.03,total=metal+mk+gst-(+$("ccO").value||0);
+$("ccOut").innerHTML=`<tr><td>Rate</td><td style="text-align:right">${fmt(rate)}/g</td></tr><tr><td>Metal (${wt} g)</td><td style="text-align:right">${fmt(metal)}</td></tr><tr><td>Making</td><td style="text-align:right">${fmt(mk)}</td></tr><tr><td>GST 3%</td><td style="text-align:right">${fmt(gst)}</td></tr>${+$("ccO").value?`<tr><td>Old gold</td><td style="text-align:right">− ${fmt(+$("ccO").value)}</td></tr>`:""}<tr class="total"><td>Total</td><td style="text-align:right">${fmt(total)}</td></tr>`;
+return{total,wt,k}}
+["ccK","ccW","ccM","ccMt","ccO"].forEach(id=>$(id).oninput=$(id).onchange=ccCalc);
+const ccMsg=()=>{const c=ccCalc();return`*${S.brand} — Estimate*\n${$("ccK").selectedOptions[0].text}, ${c.wt} g\nTotal: ${fmt(c.total)}\n_Estimate only — visit us for exact billing._`};
+$("ccWa").onclick=()=>window.open("https://wa.me/"+(S.waNum||"")+"?text="+encodeURIComponent(ccMsg()));
+$("ccTg").onclick=()=>tgText(ccMsg());
+ccCalc();
+/* ================= CRM ================= */
+$("tab-crm").innerHTML=`<div class="stats" id="crmStats"></div>
+<div class="panel"><h2>＋ New enquiry</h2><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">
+<input id="cq_n" placeholder="Name *"><input id="cq_p" placeholder="Phone">
+<select id="cq_s"><option>WhatsApp</option><option>Instagram</option><option>Walk-in</option><option>Call</option><option>Facebook</option><option>Justdial</option><option>Referral</option></select>
+<input id="cq_i" placeholder="Interested in"><input id="cq_b" placeholder="Budget ₹">
+<input id="cq_d" type="date" title="Follow-up"><button class="btn" id="cq_add">Add</button></div>
+<div class="note">New enquiries auto-alert your Telegram (toggle in Settings).</div></div>
+<div class="panel"><h2>Pipeline</h2><div id="crmChips"></div><div style="overflow-x:auto"><table><thead><tr><th>Customer</th><th>Source</th><th>Interest</th><th>Follow-up</th><th>Stage</th><th></th></tr></thead><tbody id="crmRows"></tbody></table></div>
+<button class="btn sec" id="crmExp">⬇ Export CSV</button></div>`;
+const STG=["New","Contacted","Appointment","Visited","Sold","Lost"];let crmF="All";
+function crmData(){return store("crm")||[]}
+$("cq_add").onclick=()=>{if(!$("cq_n").value.trim())return toast("Name required");
+const d=crmData();d.unshift({id:Date.now(),name:$("cq_n").value.trim(),phone:$("cq_p").value.trim(),source:$("cq_s").value,item:$("cq_i").value,budget:$("cq_b").value,next:$("cq_d").value,stage:"New",created:today()});
+store("crm",d);["cq_n","cq_p","cq_i","cq_b","cq_d"].forEach(i=>$(i).value="");
+if(S.tgNotify&&S.tgToken&&S.tgChat)tgText(`🆕 Enquiry: ${d[0].name} (${d[0].phone||"no phone"}) via ${d[0].source}${d[0].item?" — "+d[0].item:""}${d[0].budget?" — budget ₹"+d[0].budget:""}`);
+crmRender()};
+window.crmStage=(id,v)=>{const d=crmData();d.find(x=>x.id===id).stage=v;store("crm",d);crmRender()};
+window.crmNext=(id,v)=>{const d=crmData();d.find(x=>x.id===id).next=v;store("crm",d);crmRender()};
+window.crmDel=id=>{if(confirm("Delete?")){store("crm",crmData().filter(x=>x.id!==id));crmRender()}};
+window.crmWa=id=>{const d=crmData().find(x=>x.id===id);window.open("https://wa.me/"+d.phone.replace(/\D/g,"")+"?text="+encodeURIComponent(`Namaste ${d.name} ji! Thank you for your interest in ${d.item||"our jewellery"} at ${S.brand}. When may we welcome you?`))};
+window.crmSetF=f=>{crmF=f;crmRender()};
+function crmRender(){const data=crmData();const wk=new Date(Date.now()-6*864e5).toISOString().slice(0,10);
+const due=data.filter(d=>d.next&&d.next<=today()&&!["Sold","Lost"].includes(d.stage));
+const sold=data.filter(d=>d.stage==="Sold").length;
+$("crmStats").innerHTML=`<div class="stat"><b>${data.filter(d=>d.created>=wk).length}</b><span>7 days</span></div><div class="stat"><b>${data.length}</b><span>Total</span></div><div class="stat"><b style="color:#C05621">${due.length}</b><span>Due</span></div><div class="stat"><b style="color:var(--green)">${sold}</b><span>Sold</span></div><div class="stat"><b>${data.length?Math.round(sold/data.length*100):0}%</b><span>Conversion</span></div>`;
+$("crmChips").innerHTML=["All",...STG,"Due"].map(f=>`<span class="chip ${f===crmF?"on":""}" onclick="crmSetF('${f}')">${f}</span>`).join("");
+let rows=data;if(crmF==="Due")rows=due;else if(crmF!=="All")rows=data.filter(d=>d.stage===crmF);
+$("crmRows").innerHTML=rows.map(d=>{const isDue=d.next&&d.next<=today()&&!["Sold","Lost"].includes(d.stage);
+return`<tr class="${isDue?"due":""}"><td><b>${esc(d.name)}</b><br><small>${esc(d.phone||"")}</small></td><td>${d.source}</td><td>${esc(d.item||"—")}${d.budget?"<br><small>₹"+esc(d.budget)+"</small>":""}</td>
+<td><input type="date" value="${d.next||""}" onchange="crmNext(${d.id},this.value)" style="padding:3px;font-size:11px"></td>
+<td><select onchange="crmStage(${d.id},this.value)" style="padding:3px;font-size:12px">${STG.map(s=>`<option ${s===d.stage?"selected":""}>${s}</option>`).join("")}</select></td>
+<td>${d.phone?`<button style="border:none;background:none;cursor:pointer" onclick="crmWa(${d.id})">💬</button>`:""}<button style="border:none;background:none;cursor:pointer" onclick="crmDel(${d.id})">🗑️</button></td></tr>`}).join("")||`<tr><td colspan="6" style="color:#8a7f6d;text-align:center;padding:16px">No enquiries yet.</td></tr>`}
+$("crmExp").onclick=()=>{const h=["name","phone","source","item","budget","next","stage","created"];
+const csv=[h.join(",")].concat(crmData().map(d=>h.map(k=>`"${(d[k]||"").toString().replace(/"/g,'""')}"`).join(","))).join("\n");
+const a=document.createElement("a");a.download="enquiries.csv";a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.click()};
+/* ================= CALENDAR ================= */
+const FE=[["Makar Sankranti / Pongal","2026-01-14","2027-01-15",0,0],["Valentine's Day","2026-02-14","2027-02-14",0,0],["Ugadi / Gudi Padwa","2026-03-19","2027-04-08",0,1],["Akshaya Tritiya","2026-04-21","2027-05-08",0,1],["Mother's Day","2026-05-10","2027-05-09",0,0],["Varamahalakshmi","2026-08-21","2027-08-13",1,1],["Raksha Bandhan","2026-08-28","2027-08-17",1,0],["Onam","2026-08-26","2027-09-14",1,0],["Navratri / Dussehra","2026-10-11","2027-09-30",0,1],["Karva Chauth","2026-10-29","2027-10-18",1,0],["Dhanteras","2026-11-06","2027-10-26",1,1],["Diwali","2026-11-08","2027-10-28",0,1],["Wedding Season","2026-11-15","2027-11-15",1,1],["Christmas & NY","2026-12-25","2027-12-25",0,0]];
+$("tab-cal").innerHTML=`<div class="panel"><h2>Festive campaigns</h2><div class="row"><select id="feY" style="width:110px"><option>2026</option><option>2027</option></select><select id="feI" style="width:170px"><option value="all">All</option><option value="major">Gold-major only</option></select><button class="btn sec" id="feTg">📤 Send next festival plan to Telegram</button></div><div id="feList" style="margin-top:12px"></div></div>`;
+function feRows(){const y=$("feY").value;return FE.map(f=>({name:f[0],date:y==="2026"?f[1]:f[2],approx:f[3],major:f[4]})).filter(f=>$("feI").value==="all"||f.major).sort((a,b)=>a.date.localeCompare(b.date))}
+const feMinus=(d,n)=>{const x=new Date(d+"T00:00");x.setDate(x.getDate()-n);return x.toLocaleDateString("en-IN",{day:"numeric",month:"short"})};
+function feRender(){$("feList").innerHTML=feRows().map(f=>`<div class="fest ${f.major?"major":""}"><b>${f.name}</b> — ${new Date(f.date+"T00:00").toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short"})} ${f.approx?"<small>≈ verify</small>":""}${f.major?' <small style="color:var(--gold);font-weight:700">GOLD-MAJOR</small>':""}<br><small>Teasers ${feMinus(f.date,14)} · push ${feMinus(f.date,7)} · reminder ${feMinus(f.date,2)} · review-ask day after</small></div>`).join("")}
+$("feY").onchange=$("feI").onchange=feRender;
+$("feTg").onclick=()=>{const up=feRows().filter(f=>f.date>=today())[0];if(!up)return toast("No upcoming festival this year-view");
+tgText(`📅 Next festival: ${up.name} — ${up.date}\nTeasers: ${feMinus(up.date,14)}\nMain push: ${feMinus(up.date,7)}\nReminder: ${feMinus(up.date,2)}\nPrep the collection + broadcast list now.`)};
+feRender();
+/* ================= QR ================= */
+$("tab-qr").innerHTML=`<div class="grid g2"><div class="panel"><h2>Review QR</h2>
+<label>Google review link *</label><input id="qrU" placeholder="https://g.page/r/…/review">
+<label>Tagline</label><input id="qrT" value="Loved your jewellery? Bless us with a review!">
+<button class="btn" id="qrDl">⬇ Download poster PNG</button></div>
+<div class="panel" style="text-align:center"><h2>Preview</h2><canvas id="qrCv" class="prev" width="1240" height="1754"></canvas></div></div>`;
+const qrCv=$("qrCv"),qrX=qrCv.getContext("2d");let qrHolder=document.createElement("div");qrHolder.style.display="none";document.body.appendChild(qrHolder);
+async function qrLib(){if(window.QRCode)return;await new Promise(res=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js";s.onload=res;document.head.appendChild(s)})}
+async function qrDraw(){await qrLib();qrHolder.innerHTML="";new QRCode(qrHolder,{text:$("qrU").value.trim()||"https://google.com",width:512,height:512});
+setTimeout(()=>{const q=qrHolder.querySelector("canvas");const W=qrCv.width,H=qrCv.height;
+qrX.fillStyle="#EAE5D4";qrX.fillRect(0,0,W,H);qrX.fillStyle="#D2042D";qrX.fillRect(0,0,W,H*.015);qrX.fillRect(0,H-H*.015,W,H*.015);
+qrX.textAlign="center";qrX.fillStyle="#2A1A1D";qrX.font=`700 ${W*.06}px Georgia`;qrX.fillText(S.brand.toUpperCase(),W/2,H*.12);
+qrX.font=`${W*.055}px Segoe UI`;qrX.fillText("⭐⭐⭐⭐⭐",W/2,H*.19);
+qrX.fillStyle="#D2042D";qrX.font=`600 ${W*.033}px Segoe UI`;qrX.fillText($("qrT").value,W/2,H*.26);
+const sz=W*.42,qx=(W-sz)/2,qy=H*.33;qrX.fillStyle="#fff";qrX.fillRect(qx-20,qy-20,sz+40,sz+40);qrX.strokeStyle="#D2042D";qrX.lineWidth=4;qrX.strokeRect(qx-20,qy-20,sz+40,sz+40);
+if(q)qrX.drawImage(q,qx,qy,sz,sz);
+qrX.fillStyle="#2A1A1D";qrX.font=`600 ${W*.03}px Segoe UI`;qrX.fillText("Scan with your phone camera",W/2,H*.83);
+qrX.fillStyle="#6d6250";qrX.font=`${W*.024}px Segoe UI`;qrX.fillText("30 seconds — it means the world to our family business 🙏",W/2,H*.88)},80)}
+$("qrU").oninput=$("qrT").oninput=qrDraw;
+$("qrDl").onclick=()=>{const a=document.createElement("a");a.download="review-qr.png";a.href=qrCv.toDataURL("image/png");a.click()};
+qrDraw();
+/* ================= SCHEME ================= */
+$("tab-scheme").innerHTML=`<div class="grid g22"><div class="panel"><h2>Customer calculator</h2>
+<label>Monthly amount ₹</label><input type="number" id="scA" value="5000" step="500">
+<div class="big" id="scM"></div><div class="note" style="text-align:center" id="scSub"></div><table id="scT"></table>
+<label>Name</label><input id="scN"><label>Phone</label><input id="scP">
+<button class="btn wa" id="scJoin">📲 I'm interested — WhatsApp the showroom</button></div>
+<div class="panel"><h2>Owner scheme settings</h2>
+<label>Months customer pays</label><input type="number" id="scMo" value="11">
+<label>Bonus months by showroom</label><input type="number" id="scB" value="1" step="0.5">
+<div class="note">Leads captured here alert your Telegram automatically and are stored below.</div>
+<div id="scLeads" style="font-size:12px;margin-top:8px"></div>
+<button class="btn sec" id="scExp">⬇ Export leads CSV</button></div></div>`;
+let scCfg=Object.assign({mo:11,b:1},store("scheme")||{});$("scMo").value=scCfg.mo;$("scB").value=scCfg.b;
+function scCalc(){scCfg={mo:+$("scMo").value||11,b:+$("scB").value||0};store("scheme",scCfg);
+const a=+$("scA").value||0,paid=a*scCfg.mo,bo=a*scCfg.b,tot=paid+bo,g=tot/(S.rate24*.916);
+$("scM").textContent=fmt(tot);$("scSub").textContent=`after ${scCfg.mo} months ≈ ${g.toFixed(1)} g of 22K gold`;
+$("scT").innerHTML=`<tr><td>You pay ${scCfg.mo} × ${fmt(a)}</td><td style="text-align:right">${fmt(paid)}</td></tr><tr><td>${S.brand} adds ${scCfg.b} month bonus</td><td style="text-align:right">+ ${fmt(bo)}</td></tr><tr class="total"><td>Jewellery value</td><td style="text-align:right">${fmt(tot)}</td></tr>`;
+const L=store("scLeads")||[];$("scLeads").innerHTML=L.length?`<b>${L.length} lead(s):</b> `+L.map(l=>`${esc(l.n)} (${esc(l.p)})`).join(" · "):"No leads yet."}
+["scA","scMo","scB"].forEach(id=>$(id).oninput=scCalc);
+$("scJoin").onclick=()=>{const n=$("scN").value.trim(),p=$("scP").value.trim();if(!n||!p)return toast("Enter name + phone");
+const L=store("scLeads")||[];L.push({n,p,a:$("scA").value,d:today()});store("scLeads",L);
+if(S.tgToken&&S.tgChat)tgText(`💰 Scheme lead: ${n} (${p}) — ₹${$("scA").value}/month`);
+window.open("https://wa.me/"+(S.waNum||"")+"?text="+encodeURIComponent(`Namaste! I'm ${n} (${p}). Interested in the ${S.brand} gold savings scheme at ₹${$("scA").value}/month.`));scCalc()};
+$("scExp").onclick=()=>{const L=store("scLeads")||[];const csv=["Name,Phone,Monthly,Date"].concat(L.map(l=>`"${l.n}","${l.p}",${l.a},${l.d}`)).join("\n");
+const a=document.createElement("a");a.download="scheme-leads.csv";a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.click()};
+scCalc();
+/* ================= DASHBOARD ================= */
+$("tab-dash").innerHTML=`<div class="stats" id="dsK"></div>
+<div class="grid g22"><div class="panel"><h2>Enquiries — 14 days (live from CRM tab)</h2><canvas id="dsL" height="240"></canvas></div>
+<div class="panel"><h2>By source</h2><canvas id="dsB" height="240"></canvas></div></div>
+<div class="panel"><h2>⏰ Follow-ups due</h2><table id="dsDue"></table></div>
+<div class="note" style="padding:0 4px">This dashboard reads the suite's own CRM + scheme leads live — one integrated system. (The standalone dashboard file also accepts a Google-Sheet feed.)</div>`;
+let dsCharts=[];
+async function chartLib(){if(window.Chart)return;await new Promise(res=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js";s.onload=res;document.head.appendChild(s)})}
+async function dashRender(){await chartLib();dsCharts.forEach(c=>c.destroy());dsCharts=[];
+const data=crmData();const wk=new Date(Date.now()-6*864e5).toISOString().slice(0,10);
+const due=data.filter(d=>d.next&&d.next<=today()&&!["Sold","Lost"].includes(d.stage));
+const sold=data.filter(d=>d.stage==="Sold");
+$("dsK").innerHTML=`<div class="stat"><b>${data.filter(d=>d.created>=wk).length}</b><span>Enquiries 7d</span></div><div class="stat"><b style="color:var(--green)">${sold.length}</b><span>Sold</span></div><div class="stat"><b style="color:#C05621">${due.length}</b><span>Due</span></div><div class="stat"><b>${(store("scLeads")||[]).length}</b><span>Scheme leads</span></div><div class="stat"><b>${data.length?Math.round(sold.length/data.length*100):0}%</b><span>Conversion</span></div>`;
+const days=[...Array(14)].map((_,i)=>new Date(Date.now()-(13-i)*864e5).toISOString().slice(0,10));
+dsCharts.push(new Chart($("dsL"),{type:"line",data:{labels:days.map(d=>d.slice(5)),datasets:[{label:"Enquiries",data:days.map(d=>data.filter(x=>x.created===d).length),borderColor:"#D2042D",backgroundColor:"rgba(210,4,45,.12)",fill:true,tension:.35}]},options:{plugins:{legend:{display:false}}}}));
+const srcs={};data.forEach(d=>srcs[d.source||"Other"]=(srcs[d.source||"Other"]||0)+1);
+dsCharts.push(new Chart($("dsB"),{type:"bar",data:{labels:Object.keys(srcs),datasets:[{data:Object.values(srcs),backgroundColor:"#D2042D"}]},options:{plugins:{legend:{display:false}}}}));
+$("dsDue").innerHTML="<tr><th>Customer</th><th>Interest</th><th>Due</th><th></th></tr>"+(due.map(d=>`<tr class="due"><td>${esc(d.name)}</td><td>${esc(d.item||"—")}</td><td>${d.next}</td><td>${d.phone?`<a href="https://wa.me/${d.phone.replace(/\D/g,"")}" target="_blank">💬</a>`:""}</td></tr>`).join("")||`<tr><td colspan="4" style="color:#8a7f6d">Nothing due.</td></tr>`)}
+/* ================= SETTINGS ================= */
+$("tab-set").innerHTML=`<div class="grid g22">
+<div class="panel"><h2>Business</h2>
+<label>Brand name</label><input id="seB" value="${esc(S.brand)}">
+<label>Showroom WhatsApp (91…)</label><input id="seW" value="${esc(S.waNum)}">
+<label>24K gold rate ₹/g (update daily)</label><input type="number" id="seR" value="${S.rate24}">
+<label>Silver rate ₹/g</label><input type="number" id="seAg" value="${S.rateAg}">
+<label>Default making charge %</label><input type="number" id="seM" value="${S.making}">
+<button class="btn" id="seSave">Save business settings</button></div>
+<div class="panel"><h2>Integrations</h2>
+<label>Gemini API key (free at aistudio.google.com → Get API key)</label><input id="seG" value="${esc(S.gemKey)}" placeholder="AIza…">
+<label>Gemini image model</label><input id="seGm" value="${esc(S.gemModel)}">
+<label>Telegram bot token (from @BotFather)</label><input id="seT" value="${esc(S.tgToken)}" placeholder="123456:ABC…">
+<label>Telegram chat ID</label><div class="row"><input id="seC" value="${esc(S.tgChat)}" style="flex:2"><button class="btn sec" id="seDetect" style="flex:1;margin-top:0">Detect</button></div>
+<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="seN" ${S.tgNotify?"checked":""} style="width:auto">Alert Telegram on every new enquiry/lead</label>
+<button class="btn" id="seSave2">Save integrations</button>
+<button class="btn tg" id="seTest">🧪 Test: send hello to Telegram</button>
+<div class="note"><b>Setup (5 min):</b> ① Telegram → search <b>@BotFather</b> → /newbot → copy token here. ② Open your new bot, press Start, send "hi". ③ Click <b>Detect</b> to grab your chat ID. ④ Gemini: aistudio.google.com → Get API key (free tier) → paste. WhatsApp buttons use official share links; full WhatsApp automation runs in the n8n pack (needs Meta Cloud API — server-side only, browsers are blocked by Meta).</div></div></div>`;
+function seSaveAll(){S.brand=$("seB").value.trim()||"Your Brand";S.waNum=$("seW").value.replace(/\D/g,"");S.rate24=+$("seR").value||7400;S.rateAg=+$("seAg").value||110;S.making=+$("seM").value||12;
+S.gemKey=$("seG").value.trim();S.gemModel=$("seGm").value.trim()||"gemini-2.5-flash-image";S.tgToken=$("seT").value.trim();S.tgChat=$("seC").value.trim();S.tgNotify=$("seN").checked;
+saveS();toast("✅ Saved");ccCalc();scCalc();cdDraw();stDraw();qrDraw()}
+$("seSave").onclick=$("seSave2").onclick=seSaveAll;
+$("seTest").onclick=()=>{seSaveAll();tgText(`👋 Hello from ${S.brand} — Ospyr Suite connected!`)};
+$("seDetect").onclick=async()=>{const tok=$("seT").value.trim();if(!tok)return toast("Paste the bot token first");
+try{const j=await(await fetch(`https://api.telegram.org/bot${tok}/getUpdates`)).json();
+const id=j.result?.at(-1)?.message?.chat?.id;
+if(id){$("seC").value=id;toast("✅ Chat ID detected: "+id)}else toast("Open your bot in Telegram, send 'hi', then click Detect again")}catch(e){toast("❌ "+e.message)}};
+/* boot */
+go("home");
+</script>
+</body>
+</html>

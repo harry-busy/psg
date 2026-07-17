@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Product Card Maker — Jewellery Catalog Cards</title>
+<style>
+:root{--red:#D2042D;--cream:#EAE5D4;--ink:#2A1A1D}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Calibri,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--red);color:#fff;padding:14px 22px}h1{font-size:20px}
+main{max-width:1150px;margin:0 auto;padding:18px;display:grid;grid-template-columns:340px 1fr;gap:18px}
+@media(max-width:900px){main{grid-template-columns:1fr}}
+.panel{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.panel h2{font-size:13px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;border-bottom:2px solid var(--cream);padding-bottom:6px}
+label{font-size:12px;font-weight:600;display:block;margin:8px 0 3px}
+input,select{width:100%;padding:8px;border:1px solid #d8cfc0;border-radius:8px;font-size:13px;background:#fffdf7}
+.btn{background:var(--red);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:600;cursor:pointer;width:100%;margin-top:10px;font-size:14px}
+.btn.sec{background:var(--ink)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#cv{max-width:100%;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.18)}
+#stage{display:flex;flex-direction:column;align-items:center;gap:10px}
+.drop{border:2px dashed var(--red);border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:#fff8f4;font-size:13px}
+</style>
+</head>
+<body>
+<header><h1>🏷️ Product Card Maker</h1></header>
+<main>
+<div class="panel">
+  <h2>Card details</h2>
+  <div class="drop" id="drop">📷 Click to add product photo<input type="file" id="file" accept="image/*" hidden></div>
+  <label>Brand name</label><input id="brand" value="PSG Gold" >
+  <label>Product name</label><input id="pname" placeholder="Antique Lakshmi Necklace">
+  <div class="grid2">
+    <div><label>Purity</label><select id="purity"><option>22K · 916 Hallmark</option><option>24K · 995</option><option>18K · 750</option><option>Silver 925</option><option>Diamond · IGI</option></select></div>
+    <div><label>Weight</label><input id="weight" placeholder="12.4 g"></div>
+  </div>
+  <div class="grid2">
+    <div><label>Price (₹, optional)</label><input id="price" placeholder="e.g. 94,500 or 'On request'"></div>
+    <div><label>WhatsApp number</label><input id="wa" placeholder="919876543210"></div>
+  </div>
+  <label>Theme</label>
+  <select id="theme"><option value="light">Cream · classic</option><option value="dark">Black velvet · premium</option><option value="red">Crimson · festive</option></select>
+  <button class="btn" id="dl">⬇ Download card (1080×1350)</button>
+  <button class="btn sec" id="dlsq">⬇ Download square (1080×1080)</button>
+</div>
+<div class="panel" id="stage"><h2 style="align-self:flex-start">Preview</h2><canvas id="cv" width="1080" height="1350"></canvas></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);const cv=$("cv"),ctx=cv.getContext("2d");let img=null;
+$("drop").onclick=()=>$("file").click();
+$("file").onchange=async e=>{img=await createImageBitmap(e.target.files[0]);draw()};
+["brand","pname","purity","weight","price","wa","theme"].forEach(id=>$(id).oninput=$(id).onchange=draw);
+const THEMES={light:{bg1:"#EAE5D4",bg2:"#dcd4bd",ink:"#2A1A1D",acc:"#D2042D",sub:"#6d6250"},dark:{bg1:"#1b1b1e",bg2:"#000",ink:"#f2ead8",acc:"#e8c96a",sub:"#b8ab90"},red:{bg1:"#9E0322",bg2:"#5a0113",ink:"#fdf6e3",acc:"#f4d47c",sub:"#e8c2b8"}};
+function draw(){const W=cv.width,H=cv.height,t=THEMES[$("theme").value];
+const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,t.bg1);g.addColorStop(1,t.bg2);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+// header band
+ctx.fillStyle=t.acc;ctx.fillRect(0,0,W,8);
+ctx.textAlign="center";ctx.fillStyle=t.ink;ctx.font=`700 ${W*0.045}px Georgia`;ctx.fillText(($("brand").value||"Your Brand").toUpperCase(),W/2,H*0.075);
+ctx.strokeStyle=t.acc;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(W*0.35,H*0.095);ctx.lineTo(W*0.65,H*0.095);ctx.stroke();
+// photo area
+const py=H*0.115,ph=H*(cv.height===1080?0.52:0.55),px=W*0.08,pw=W*0.84;
+ctx.save();roundRect(px,py,pw,ph,24);ctx.clip();ctx.fillStyle=$("theme").value==="light"?"#fff":"rgba(255,255,255,.06)";ctx.fillRect(px,py,pw,ph);
+if(img){const s=Math.min(pw/img.width,ph/img.height)*0.94;const dw=img.width*s,dh=img.height*s;ctx.drawImage(img,px+(pw-dw)/2,py+(ph-dh)/2,dw,dh)}else{ctx.fillStyle=t.sub;ctx.font=`${W*0.03}px Segoe UI`;ctx.fillText("Add a product photo",W/2,py+ph/2)}
+ctx.restore();ctx.strokeStyle=t.acc;ctx.lineWidth=3;roundRect(px,py,pw,ph,24);ctx.stroke();
+// details
+let y=py+ph+H*0.06;
+ctx.fillStyle=t.ink;ctx.font=`600 ${W*0.042}px Georgia`;ctx.fillText($("pname").value||"Product Name",W/2,y);
+y+=H*0.045;ctx.font=`${W*0.028}px Segoe UI`;ctx.fillStyle=t.sub;
+const meta=[$("purity").value,$("weight").value&&("Weight: "+$("weight").value)].filter(Boolean).join("   ·   ");ctx.fillText(meta,W/2,y);
+if($("price").value){y+=H*0.055;ctx.fillStyle=t.acc;ctx.font=`700 ${W*0.05}px Segoe UI`;ctx.fillText(($("price").value.match(/^[0-9,]/)?"₹ ":"")+$("price").value,W/2,y)}
+// footer CTA
+const fy=H-H*0.06;ctx.fillStyle=t.acc;roundRect(W*0.2,fy-H*0.033,W*0.6,H*0.05,26);ctx.fill();
+ctx.fillStyle=$("theme").value==="light"?"#fff":"#1b1b1e";ctx.font=`600 ${W*0.026}px Segoe UI`;
+ctx.fillText($("wa").value?("WhatsApp to order · "+$("wa").value.replace(/^91/,"+91 ")):"Visit our showroom · Enquire on WhatsApp",W/2,fy);
+}
+function roundRect(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+function dl(){const a=document.createElement("a");a.download=(($("pname").value||"card").replace(/[^a-z0-9]+/gi,"-")+".jpg").toLowerCase();a.href=cv.toDataURL("image/jpeg",.94);a.click()}
+$("dl").onclick=()=>{cv.width=1080;cv.height=1350;draw();dl()};
+$("dlsq").onclick=()=>{cv.width=1080;cv.height=1080;draw();dl();cv.width=1080;cv.height=1350;draw()};
+draw();
+</script>
+</body>
+</html>

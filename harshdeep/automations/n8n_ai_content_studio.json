@@ -1,0 +1,72 @@
+{
+  "name": "Ospyr - AI Content Studio",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "content-studio",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook1",
+      "name": "Incoming request (topic)",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "model", "value": "gpt-4o-mini" },
+            { "name": "messages", "value": "=[{\"role\":\"system\",\"content\":\"You are a social media copywriter. Return a caption, 8 hashtags, an image brief and best post time.\"},{\"role\":\"user\",\"content\":\"Business: {{$json.body.business}}. Product/topic: {{$json.body.topic}}.\"}]" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ai1",
+      "name": "Generate post (LLM)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [520, 300],
+      "notes": "Add your LLM API key as httpHeaderAuth credential (Authorization: Bearer ...)."
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            { "name": "post", "value": "={{$json.choices[0].message.content}}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "set1",
+      "name": "Format output",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [800, 300]
+    },
+    {
+      "parameters": { "respondWith": "json", "responseBody": "={{ { \"post\": $json.post } }}", "options": {} },
+      "id": "resp1",
+      "name": "Return post",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1060, 300]
+    }
+  ],
+  "connections": {
+    "Incoming request (topic)": { "main": [[{ "node": "Generate post (LLM)", "type": "main", "index": 0 }]] },
+    "Generate post (LLM)": { "main": [[{ "node": "Format output", "type": "main", "index": 0 }]] },
+    "Format output": { "main": [[{ "node": "Return post", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": {},
+  "meta": { "ospyr": "AI Content Studio - add LLM credential, optionally add a 'post to social' node after Format output." }
+}

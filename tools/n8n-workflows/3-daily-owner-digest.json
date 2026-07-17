@@ -1,0 +1,44 @@
+{
+  "name": "3 · Daily owner digest — 8am summary to Telegram/WhatsApp",
+  "nodes": [
+    {
+      "parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "0 8 * * *"}]}},
+      "id": "cron", "name": "Every day 8:00", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, 0]
+    },
+    {
+      "parameters": {"documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "Enquiries", "mode": "name"}, "options": {}},
+      "id": "sheet", "name": "Read enquiries sheet", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [220, 0],
+      "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}},
+      "notes": "Sheet columns: Date, Type(Enquiry/Sale), Source, Item, Amount, Customer, Phone, FollowUp, Status. The Ospyr Suite CRM exports exactly this CSV."
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = items.map(i => i.json);\nconst today = new Date().toISOString().slice(0,10);\nconst yest = new Date(Date.now()-864e5).toISOString().slice(0,10);\nconst y = rows.filter(r => (r.Date||'').startsWith(yest));\nconst enq = y.filter(r => (r.Type||'').toLowerCase() !== 'sale');\nconst sales = y.filter(r => (r.Type||'').toLowerCase() === 'sale');\nconst rev = sales.reduce((s,r)=> s + (parseInt(String(r.Amount||'').replace(/\\D/g,''))||0), 0);\nconst due = rows.filter(r => r.FollowUp && r.FollowUp <= today && r.Status !== 'Sold');\nconst bySrc = {};\nenq.forEach(r => bySrc[r.Source||'Other'] = (bySrc[r.Source||'Other']||0)+1);\nconst text = `📊 ${$env.BRAND_NAME||'Showroom'} — daily digest\\n\\nYesterday: ${enq.length} enquiries (${Object.entries(bySrc).map(([k,v])=>k+': '+v).join(', ')||'none'})\\nSales: ${sales.length} worth ₹${rev.toLocaleString('en-IN')}\\n\\n⏰ Follow-ups due today: ${due.length}\\n${due.slice(0,8).map(r=>'• '+r.Customer+' ('+(r.Item||'')+') '+(r.Phone||'')).join('\\n')}\\n\\n22K rate reminder: update in the Suite settings.`;\nreturn [{ json: { text } }];"
+      },
+      "id": "sum", "name": "Summarise", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [440, 0]
+    },
+    {
+      "parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "={{$json.text}}", "additionalFields": {}},
+      "id": "tg", "name": "Telegram: send digest", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [660, -80],
+      "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v21.0/{{$env.WA_PHONE_NUMBER_ID}}/messages",
+        "authentication": "genericCredentialType", "genericAuthType": "httpHeaderAuth",
+        "sendBody": true, "specifyBody": "json",
+        "jsonBody": "={ \"messaging_product\": \"whatsapp\", \"to\": \"{{$env.OWNER_WA_NUMBER}}\", \"type\": \"text\", \"text\": { \"body\": {{ JSON.stringify($json.text) }} } }",
+        "options": {}
+      },
+      "id": "wa", "name": "OPTIONAL: WhatsApp digest to owner", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [660, 100],
+      "credentials": {"httpHeaderAuth": {"id": "REPLACE", "name": "Meta Bearer Token"}}
+    }
+  ],
+  "connections": {
+    "Every day 8:00": {"main": [[{"node": "Read enquiries sheet", "type": "main", "index": 0}]]},
+    "Read enquiries sheet": {"main": [[{"node": "Summarise", "type": "main", "index": 0}]]},
+    "Summarise": {"main": [[{"node": "Telegram: send digest", "type": "main", "index": 0}, {"node": "OPTIONAL: WhatsApp digest to owner", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}

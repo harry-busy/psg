@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Owner Command Dashboard</title>
+<style>
+:root{--red:#D2042D;--cream:#EAE5D4;--ink:#2A1A1D;--green:#1E7D34}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Calibri,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--red);color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+h1{font-size:20px}
+main{max-width:1200px;margin:0 auto;padding:18px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:#fff;border-radius:12px;padding:14px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.kpi b{display:block;font-size:24px;color:var(--red)}
+.kpi span{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#8a7f6d}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:860px){.row{grid-template-columns:1fr}}
+.panel{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.panel h2{font-size:13px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:var(--cream);text-align:left;padding:7px;font-size:11px;text-transform:uppercase}
+td{padding:7px;border-bottom:1px solid #f0ead9}
+tr.due{background:#fff3c4}
+.cfg{background:#fff8f4;border:1px dashed var(--red)}
+input{padding:8px;border:1px solid #d8cfc0;border-radius:8px;font-size:13px;width:100%;background:#fffdf7}
+.btn{background:var(--red);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-weight:600;cursor:pointer;font-size:13px;margin-top:8px}
+.btn.sec{background:var(--ink)}
+.note{font-size:11px;color:#8a7f6d;margin-top:8px;line-height:1.6}
+canvas{max-height:260px}
+</style>
+</head>
+<body>
+<header><h1>📊 Owner Command Dashboard</h1><div id="asof" style="font-size:12px;opacity:.9"></div></header>
+<main>
+<div class="kpis" id="kpis"></div>
+<div class="row">
+  <div class="panel"><h2>Enquiries — last 14 days</h2><canvas id="line"></canvas></div>
+  <div class="panel"><h2>Enquiries by source</h2><canvas id="bar"></canvas></div>
+</div>
+<div class="row">
+  <div class="panel"><h2>🔥 Top items by interest</h2><table id="top"></table></div>
+  <div class="panel"><h2>⏰ Follow-ups due</h2><table id="due"></table></div>
+</div>
+<div class="panel cfg">
+  <h2>Connect your data (once)</h2>
+  <div class="note">Keep a Google Sheet with columns: <b>Date, Type (Enquiry/Sale), Source, Item, Amount, Customer, Phone, FollowUp, Status</b>. In Sheets: File → Share → Publish to web → CSV → paste that link here. Staff just fills rows; this dashboard reads it live. Or click Demo to see it working now.</div>
+  <input id="url" placeholder="https://docs.google.com/spreadsheets/d/e/…/pub?output=csv">
+  <button class="btn" id="load">Load my sheet</button>
+  <button class="btn sec" id="demo">Load demo data</button>
+</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);let charts=[];
+const savedUrl=localStorage.getItem("dash_url");if(savedUrl)$("url").value=savedUrl;
+function parseCSV(t){const rows=[];let row=[],cur="",q=false;
+for(const ch of t){if(q){if(ch==='"')q=false;else cur+=ch}else if(ch==='"')q=true;else if(ch===","){row.push(cur);cur=""}else if(ch==="\n"||ch==="\r"){if(cur||row.length){row.push(cur);rows.push(row);row=[];cur=""}}else cur+=ch}
+if(cur||row.length){row.push(cur);rows.push(row)}
+const h=rows.shift().map(x=>x.trim().toLowerCase());
+return rows.filter(r=>r.length>1).map(r=>Object.fromEntries(h.map((k,i)=>[k,(r[i]||"").trim()])))}
+function demo(){const src=["WhatsApp","Instagram","Walk-in","Call","Justdial"];const items=["Bridal necklace set","Gold bangles","Antique jhumkas","Mangalsutra","Gold chain","Diamond ring","Silver anklets","Temple haram"];
+const out=[];const today=new Date();
+for(let d=13;d>=0;d--){const dt=new Date(today-d*864e5).toISOString().slice(0,10);const n=2+Math.floor(Math.random()*6);
+for(let i=0;i<n;i++){const sold=Math.random()<0.22;out.push({date:dt,type:sold?"Sale":"Enquiry",source:src[Math.floor(Math.random()*src.length)],item:items[Math.floor(Math.random()*items.length)],amount:sold?String(30000+Math.floor(Math.random()*220000)):"",customer:"Customer "+Math.floor(Math.random()*900),phone:"98"+Math.floor(10000000+Math.random()*89999999),followup:Math.random()<0.3?new Date(today-(-1+d%3)*864e5).toISOString().slice(0,10):"",status:sold?"Sold":["New","Contacted","Appointment"][Math.floor(Math.random()*3)]})}}
+return out}
+function render(data){charts.forEach(c=>c.destroy());charts=[];
+const today=new Date().toISOString().slice(0,10);const wk=new Date(Date.now()-6*864e5).toISOString().slice(0,10);
+const enq=data.filter(d=>(d.type||"").toLowerCase()!=="sale");
+const sales=data.filter(d=>(d.type||"").toLowerCase()==="sale");
+const enqWk=enq.filter(d=>d.date>=wk).length;
+const salesWk=sales.filter(d=>d.date>=wk);
+const rev=salesWk.reduce((s,d)=>s+(+String(d.amount).replace(/[^0-9]/g,"")||0),0);
+const dueRows=data.filter(d=>d.followup&&d.followup<=today&&(d.status||"")!=="Sold");
+const conv=enq.length?Math.round(sales.length/(enq.length+sales.length)*100):0;
+$("kpis").innerHTML=`<div class="kpi"><b>${enqWk}</b><span>Enquiries (7d)</span></div><div class="kpi"><b>${salesWk.length}</b><span>Sales (7d)</span></div><div class="kpi"><b>₹${rev.toLocaleString("en-IN")}</b><span>Revenue (7d)</span></div><div class="kpi"><b style="color:#C05621">${dueRows.length}</b><span>Follow-ups due</span></div><div class="kpi"><b>${conv}%</b><span>Overall conversion</span></div>`;
+$("asof").textContent="Updated "+new Date().toLocaleString("en-IN");
+// line chart
+const days=[...Array(14)].map((_,i)=>new Date(Date.now()-(13-i)*864e5).toISOString().slice(0,10));
+charts.push(new Chart($("line"),{type:"line",data:{labels:days.map(d=>d.slice(5)),datasets:[{label:"Enquiries",data:days.map(d=>enq.filter(x=>x.date===d).length),borderColor:"#D2042D",backgroundColor:"rgba(210,4,45,.12)",fill:true,tension:.35},{label:"Sales",data:days.map(d=>sales.filter(x=>x.date===d).length),borderColor:"#1E7D34",tension:.35}]},options:{plugins:{legend:{position:"bottom"}}}}));
+// bar by source
+const srcs={};enq.forEach(d=>{srcs[d.source||"Other"]=(srcs[d.source||"Other"]||0)+1});
+charts.push(new Chart($("bar"),{type:"bar",data:{labels:Object.keys(srcs),datasets:[{label:"Enquiries",data:Object.values(srcs),backgroundColor:"#D2042D"}]},options:{plugins:{legend:{display:false}}}}));
+// top items
+const it={};data.forEach(d=>{if(d.item)it[d.item]=(it[d.item]||0)+1});
+$("top").innerHTML="<tr><th>Item</th><th>Interest</th></tr>"+Object.entries(it).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,v])=>`<tr><td>${k}</td><td>${"▮".repeat(Math.min(v,12))} ${v}</td></tr>`).join("");
+$("due").innerHTML="<tr><th>Customer</th><th>Item</th><th>Due</th><th>Phone</th></tr>"+(dueRows.slice(0,10).map(d=>`<tr class="due"><td>${d.customer||"—"}</td><td>${d.item||"—"}</td><td>${d.followup}</td><td>${d.phone?`<a href="https://wa.me/91${String(d.phone).replace(/\D/g,"").slice(-10)}" target="_blank">💬 ${d.phone}</a>`:"—"}</td></tr>`).join("")||`<tr><td colspan="4" style="color:#8a7f6d">Nothing due — nice.</td></tr>`)}
+$("demo").onclick=()=>render(demo());
+$("load").onclick=async()=>{const u=$("url").value.trim();if(!u)return alert("Paste your published-CSV link first (or use Demo).");
+try{const t=await(await fetch(u)).text();localStorage.setItem("dash_url",u);render(parseCSV(t))}catch(e){alert("Could not load the sheet — check it's published as CSV and try again.")}};
+if(savedUrl)$("load").click();else render(demo());
+</script>
+</body>
+</html>

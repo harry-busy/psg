@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PSG Gold × Ospyr — The Growth Story</title>
+<style>
+  :root{
+    --maroon:#7A0B25; --crimson:#D2042D; --cream:#F4EFE1; --cream-2:#EAE5D4;
+    --gold:#C6A24E; --gold-soft:#E4C97E; --ink:#241016; --muted:#6d5f52; --white:#fffdf8;
+    --shadow:0 20px 60px rgba(60,10,25,.14);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:'Segoe UI',Calibri,system-ui,sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;overflow-x:hidden}
+  h1,h2,h3,.serif{font-family:Georgia,'Times New Roman',serif}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 26px}
+  section{padding:96px 0;position:relative}
+  .eyebrow{display:inline-block;text-transform:uppercase;letter-spacing:3px;font-size:12px;font-weight:700;color:var(--gold);margin-bottom:16px;font-family:'Segoe UI',sans-serif}
+  .lead{font-size:20px;color:var(--muted);max-width:720px}
+  .gold-line{width:70px;height:3px;background:linear-gradient(90deg,var(--gold),transparent);margin:18px 0 28px;border-radius:2px}
+
+  /* reveal */
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity .8s ease,transform .8s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* HERO */
+  .hero{min-height:100vh;display:flex;align-items:center;
+    background:radial-gradient(120% 90% at 80% 10%,#9A1130 0%,#7A0B25 40%,#4E0417 100%);
+    color:var(--cream);overflow:hidden}
+  .hero:before,.hero:after{content:"";position:absolute;border-radius:50%;filter:blur(2px);opacity:.5}
+  .hero:before{width:520px;height:520px;right:-140px;top:-120px;background:radial-gradient(circle,rgba(226,201,126,.35),transparent 65%)}
+  .hero:after{width:360px;height:360px;left:-120px;bottom:-100px;background:radial-gradient(circle,rgba(226,201,126,.22),transparent 65%)}
+  .hero .wrap{position:relative;z-index:2}
+  .hero .mark{font-size:13px;letter-spacing:5px;text-transform:uppercase;color:var(--gold-soft);margin-bottom:26px}
+  .hero h1{font-size:clamp(40px,7vw,78px);line-height:1.05;font-weight:700;letter-spacing:-1px}
+  .hero h1 .em{color:var(--gold-soft);font-style:italic}
+  .hero p.sub{font-size:clamp(18px,2.4vw,25px);margin-top:26px;max-width:760px;color:#f0e4d8}
+  .hero .who{margin-top:44px;font-size:14px;letter-spacing:1px;color:#e7d3bb;border-top:1px solid rgba(226,201,126,.3);display:inline-block;padding-top:16px}
+  .scroll-cue{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);color:var(--gold-soft);font-size:12px;letter-spacing:2px;text-transform:uppercase;opacity:.85;z-index:2}
+  .scroll-cue span{display:block;text-align:center;font-size:20px;animation:bob 1.8s infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+
+  /* stat band */
+  .band{background:var(--ink);color:var(--cream)}
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:30px;text-align:center}
+  .stat .num{font-family:Georgia,serif;font-size:clamp(38px,5vw,58px);color:var(--gold-soft);font-weight:700;line-height:1}
+  .stat .lab{margin-top:12px;font-size:14px;color:#cdbfb0;letter-spacing:.4px}
+
+  /* generic headings */
+  h2.big{font-size:clamp(30px,4.4vw,48px);line-height:1.12;letter-spacing:-.5px}
+  .maroon{color:var(--maroon)} .crimson{color:var(--crimson)}
+  p.body{font-size:18px;color:#4a3b33;max-width:760px;margin-top:6px}
+  p.body + p.body{margin-top:16px}
+
+  /* the leak cards */
+  .leak-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin-top:44px}
+  .leak{background:var(--white);border-radius:16px;padding:28px;box-shadow:var(--shadow);border-left:5px solid var(--crimson)}
+  .leak .k{font-family:Georgia,serif;font-size:40px;color:var(--crimson);font-weight:700}
+  .leak .d{margin-top:8px;color:var(--muted);font-size:15px}
+
+  /* quote */
+  .pull{background:linear-gradient(120% 100% at 0 0,#7A0B25,#4E0417);color:var(--cream);border-radius:22px;padding:56px 48px;text-align:center;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .pull:before{content:"\201C";position:absolute;top:-20px;left:24px;font-family:Georgia,serif;font-size:180px;color:rgba(226,201,126,.18)}
+  .pull q{font-family:Georgia,serif;font-size:clamp(24px,3.4vw,38px);line-height:1.3;font-style:italic;display:block;position:relative}
+  .pull .attr{margin-top:22px;color:var(--gold-soft);letter-spacing:2px;text-transform:uppercase;font-size:13px}
+
+  /* worked example */
+  .example{display:grid;grid-template-columns:1.1fr .9fr;gap:44px;align-items:center}
+  .flowbox{background:var(--white);border-radius:18px;padding:8px;box-shadow:var(--shadow)}
+  .flowrow{display:flex;align-items:center;gap:16px;padding:20px 22px;border-bottom:1px solid #efe7d6}
+  .flowrow:last-child{border-bottom:none}
+  .flowrow .ic{width:44px;height:44px;flex:0 0 44px;border-radius:12px;display:grid;place-items:center;background:var(--cream-2);color:var(--maroon);font-size:22px;font-weight:700;font-family:Georgia,serif}
+  .flowrow .t b{display:block;font-size:17px;color:var(--ink)}
+  .flowrow .t span{font-size:14px;color:var(--muted)}
+  .flowrow.win{background:linear-gradient(90deg,#7A0B25,#9A1130);border-radius:12px;color:var(--cream)}
+  .flowrow.win .ic{background:var(--gold-soft);color:var(--maroon)}
+  .flowrow.win .t b{color:var(--gold-soft)} .flowrow.win .t span{color:#f0ddc7}
+  .disclaimer{font-size:13px;color:var(--muted);margin-top:22px;font-style:italic;max-width:720px}
+
+  /* growth bars */
+  .growth{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:40px}
+  .gcard{background:var(--white);border-radius:16px;padding:30px 26px;box-shadow:var(--shadow);text-align:center;border-top:5px solid var(--gold)}
+  .gcard h4{font-size:14px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted)}
+  .gcard .big-n{font-family:Georgia,serif;font-size:46px;color:var(--maroon);font-weight:700;margin:12px 0 4px;line-height:1}
+  .gcard .cap{font-size:14px;color:var(--muted)}
+  .gcard.mid{border-top-color:var(--crimson);transform:scale(1.04)}
+  .gcard.mid .big-n{color:var(--crimson)}
+
+  /* playbook */
+  .giants{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;margin-top:40px}
+  .giant{background:var(--white);border-radius:14px;padding:24px;box-shadow:0 8px 24px rgba(60,10,25,.08)}
+  .giant b{color:var(--maroon);font-size:17px}
+  .giant p{font-size:14px;color:var(--muted);margin-top:8px}
+
+  /* services */
+  .tier{margin-top:40px;border-radius:18px;overflow:hidden;box-shadow:var(--shadow);background:var(--white)}
+  .tier-head{padding:24px 30px;display:flex;align-items:center;gap:16px;color:var(--cream)}
+  .tier-head .badge{font-family:Georgia,serif;font-size:22px;font-weight:700}
+  .tier-head h3{font-size:22px} .tier-head .sub{font-size:14px;opacity:.9;margin-left:auto;text-align:right}
+  .t-must .tier-head{background:linear-gradient(90deg,#7A0B25,#B0102F)}
+  .t-should .tier-head{background:linear-gradient(90deg,#9A6212,#C6A24E)}
+  .t-might .tier-head{background:linear-gradient(90deg,#4a3b33,#6d5f52)}
+  .tier-body{padding:14px 30px 30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:8px 30px}
+  .svc{padding:14px 0;border-bottom:1px solid #efe7d6;display:flex;gap:12px;align-items:flex-start}
+  .svc:last-child{border-bottom:none}
+  .svc .dot{color:var(--gold);font-size:18px;line-height:1.4}
+  .svc b{font-size:16px;color:var(--ink)} .svc span{font-size:14px;color:var(--muted);display:block}
+
+  /* built / proof */
+  .proof{background:var(--ink);color:var(--cream)}
+  .proof .eyebrow{color:var(--gold-soft)}
+  .tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin-top:40px}
+  .tool{background:#2f1720;border:1px solid rgba(226,201,126,.18);border-radius:14px;padding:22px;text-decoration:none;color:var(--cream);transition:.18s;display:block}
+  .tool:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:0 14px 30px rgba(0,0,0,.35)}
+  .tool .emo{font-size:26px}
+  .tool b{display:block;margin-top:10px;font-size:17px;color:var(--gold-soft)}
+  .tool p{font-size:13.5px;color:#d9c8bb;margin-top:6px}
+  .tool .go{margin-top:12px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--gold)}
+  .auto-note{margin-top:36px;background:#2f1720;border-radius:14px;padding:26px 30px;border-left:4px solid var(--gold)}
+  .auto-note b{color:var(--gold-soft)}
+
+  /* command screen mock */
+  .cmd{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:34px}
+  .tile{background:var(--white);border-radius:14px;padding:22px;box-shadow:0 8px 22px rgba(60,10,25,.08)}
+  .tile .lab{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+  .tile .v{font-family:Georgia,serif;font-size:30px;color:var(--maroon);font-weight:700;margin-top:6px}
+  .tile.msg{grid-column:1/3;background:linear-gradient(90deg,#25D366,#128C7E);color:#fff}
+  .tile.msg .lab{color:rgba(255,255,255,.85)} .tile.msg .v{color:#fff;font-size:17px;font-family:'Segoe UI',sans-serif;font-weight:400;line-height:1.5}
+
+  /* roadmap */
+  .road{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:40px}
+  .mo{background:var(--white);border-radius:16px;padding:28px;box-shadow:var(--shadow);border-top:5px solid var(--maroon)}
+  .mo .n{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);font-weight:700}
+  .mo h4{font-size:21px;color:var(--maroon);margin:8px 0 12px}
+  .mo p{font-size:14.5px;color:var(--muted)}
+
+  /* engagement */
+  .engage{background:linear-gradient(120% 100% at 100% 0,#7A0B25,#4E0417);color:var(--cream);border-radius:22px;padding:56px 48px;box-shadow:var(--shadow)}
+  .engage .two{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:34px}
+  .phase{background:rgba(255,255,255,.06);border:1px solid rgba(226,201,126,.25);border-radius:16px;padding:28px}
+  .phase .p-n{color:var(--gold-soft);letter-spacing:2px;text-transform:uppercase;font-size:12px;font-weight:700}
+  .phase h4{font-size:22px;margin:8px 0 10px;color:var(--cream)}
+  .phase p{color:#f0ddc7;font-size:15px}
+
+  /* CTA */
+  .cta{text-align:center}
+  .cta h2{font-size:clamp(30px,5vw,52px);color:var(--maroon)}
+  .btn{display:inline-flex;gap:10px;align-items:center;margin-top:30px;background:linear-gradient(90deg,#7A0B25,#B0102F);color:var(--cream);text-decoration:none;
+    padding:18px 40px;border-radius:50px;font-size:17px;font-weight:600;letter-spacing:.5px;box-shadow:0 14px 34px rgba(122,11,37,.35);transition:.18s}
+  .btn:hover{transform:translateY(-3px);box-shadow:0 20px 44px rgba(122,11,37,.45)}
+  .btn.gold{background:linear-gradient(90deg,#9A6212,#C6A24E);color:var(--ink);box-shadow:0 14px 34px rgba(198,162,78,.4)}
+
+  footer{background:var(--ink);color:#cbbcae;text-align:center;padding:40px 20px;font-size:13px}
+  footer .b{color:var(--gold-soft);font-family:Georgia,serif;font-size:20px;letter-spacing:2px}
+
+  @media(max-width:760px){
+    .example{grid-template-columns:1fr} .growth{grid-template-columns:1fr}
+    .gcard.mid{transform:none} .road{grid-template-columns:1fr} .cmd{grid-template-columns:1fr}
+    .tile.msg{grid-column:auto} .engage .two{grid-template-columns:1fr} section{padding:70px 0}
+    .pull,.engage{padding:38px 26px}
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="wrap">
+    <div class="mark">◆ PSG GOLD &nbsp;·&nbsp; MYSORE &nbsp;·&nbsp; SINCE GENERATIONS ◆</div>
+    <h1>You have <span class="em">1.1 million</span> reasons to grow.<br>Let's stop losing them.</h1>
+    <p class="sub">PSG Gold has the one thing every jeweller in India dreams of — a million people who already want you. This is the story of what happens when you finally answer them all.</p>
+    <div class="who">A growth vision prepared exclusively for PSG Gold &nbsp;·&nbsp; by Ospyr</div>
+  </div>
+  <div class="scroll-cue">scroll<span>⌄</span></div>
+</header>
+
+<!-- THE WIN -->
+<section class="band">
+  <div class="wrap reveal">
+    <div class="eyebrow" style="color:var(--gold-soft)">You already did the hardest part</div>
+    <h2 class="big" style="color:var(--cream);max-width:820px">Most jewellers spend a lifetime and a fortune chasing attention. You already command it.</h2>
+    <div class="stat-grid" style="margin-top:56px">
+      <div class="stat"><div class="num" data-count="1.1" data-suffix="M">0</div><div class="lab">Instagram followers</div></div>
+      <div class="stat"><div class="num" data-count="30" data-suffix="K">0</div><div class="lab">Average views per post</div></div>
+      <div class="stat"><div class="num" data-count="1000" data-suffix="+">0</div><div class="lab">New people messaging daily</div></div>
+      <div class="stat"><div class="num" data-count="750" data-suffix="">0</div><div class="lab">Phone calls every day</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- THE LEAK -->
+<section>
+  <div class="wrap reveal">
+    <div class="eyebrow">But here's the leak</div>
+    <h2 class="big maroon" style="max-width:820px">The demand is real. The showroom has two hands.</h2>
+    <div class="gold-line"></div>
+    <p class="body">Every day, over a thousand new people ask about your jewellery — and most never hear back. Not because you don't care, but because no human being can answer a thousand messages and a thousand calls a day while running a showroom. So the enquiries pile up.</p>
+    <div class="leak-grid">
+      <div class="leak"><div class="k">10,000+</div><div class="d">Unread messages — real customers, asking about real pieces, waiting.</div></div>
+      <div class="leak"><div class="k">~1,000</div><div class="d">Brand-new enquiries every single day that go unanswered.</div></div>
+      <div class="leak"><div class="k">500–1,000</div><div class="d">Calls a day — the ones that ring out are simply gone.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SPEED TO LEAD -->
+<section class="band">
+  <div class="wrap reveal">
+    <div class="eyebrow" style="color:var(--gold-soft)">What an unanswered message really is</div>
+    <h2 class="big" style="color:var(--cream);max-width:840px">A customer who is about to buy — from whoever replies first.</h2>
+    <p class="body" style="color:#d9c8bb;margin-top:22px">This isn't opinion, it's how buying works everywhere:</p>
+    <div class="stat-grid" style="margin-top:44px">
+      <div class="stat"><div class="num">78%</div><div class="lab">of buyers purchase from the business that responds first</div></div>
+      <div class="stat"><div class="num">8–21×</div><div class="lab">more likely to convert when you reply in 5 minutes vs an hour</div></div>
+      <div class="stat"><div class="num">391%</div><div class="lab">jump in conversion when the reply comes in the first minute</div></div>
+    </div>
+    <p class="disclaimer" style="color:#b7a99b">Right now, for most of those thousand daily enquiries, the reply time isn't five minutes or an hour. It's never.</p>
+  </div>
+</section>
+
+<!-- PULL QUOTE -->
+<section>
+  <div class="wrap reveal">
+    <div class="pull">
+      <q>You are not short of customers.<br>You are drowning in them — and every unanswered message is a sale walking to another shop.</q>
+      <div class="attr">The one problem worth solving</div>
+    </div>
+  </div>
+</section>
+
+<!-- WORKED EXAMPLE -->
+<section>
+  <div class="wrap reveal">
+    <div class="eyebrow">What can happen — one simple example</div>
+    <h2 class="big maroon">Imagine catching just a sliver of one day.</h2>
+    <div class="gold-line"></div>
+    <p class="body" style="margin-bottom:40px">You don't need to convert everyone. Watch what happens to a <b>single day's</b> new messages when every one of them gets an instant, on-brand answer, a price, and a booked visit — automatically.</p>
+    <div class="example">
+      <div class="flowbox">
+        <div class="flowrow"><div class="ic">1</div><div class="t"><b>1,000 new enquiries in a day</b><span>the people already messaging you</span></div></div>
+        <div class="flowrow"><div class="ic">↳</div><div class="t"><b>~150 are serious buyers</b><span>asking price, purity, availability</span></div></div>
+        <div class="flowrow"><div class="ic">⚡</div><div class="t"><b>All answered in seconds, 24/7</b><span>catalog sent, quote given, visit offered</span></div></div>
+        <div class="flowrow"><div class="ic">📅</div><div class="t"><b>A handful book a showroom visit</b><span>the system never forgets to follow up</span></div></div>
+        <div class="flowrow win"><div class="ic">✦</div><div class="t"><b>Even 3–5 extra sales — from ONE day</b><span>multiplied across every day of the year</span></div></div>
+      </div>
+      <div>
+        <h3 class="maroon" style="font-size:26px">The math isn't the point.<br>The multiplier is.</h3>
+        <p class="body" style="margin-top:16px">A few extra sales a day, from messages you're <i>already receiving for free</i>, compounds into a growth curve most businesses would spend crores to chase.</p>
+        <p class="body">And this is <b>before</b> a single new follower, reel, or ad — pure recovery of demand that exists today.</p>
+      </div>
+    </div>
+    <p class="disclaimer">Illustrative example to show the shape of the opportunity, built only from your own numbers. Actual results depend on the pieces, the season, and execution — we'll track the real figures from day one.</p>
+  </div>
+</section>
+
+<!-- GROWTH RATE -->
+<section class="band">
+  <div class="wrap reveal">
+    <div class="eyebrow" style="color:var(--gold-soft)">The growth we build toward</div>
+    <h2 class="big" style="color:var(--cream)">Three honest scenarios — you choose the ambition.</h2>
+    <p class="body" style="color:#d9c8bb">The same audience, the same shop — just how much of the existing demand we successfully catch and convert.</p>
+    <div class="growth">
+      <div class="gcard"><h4>Conservative</h4><div class="big-n">2–3×</div><div class="cap">growth in qualified enquiries reaching the showroom</div></div>
+      <div class="gcard mid"><h4>Momentum</h4><div class="big-n">4–6×</div><div class="cap">as content, try-on & festive engines switch on</div></div>
+      <div class="gcard"><h4>Full engine</h4><div class="big-n">8×+</div><div class="cap">omnichannel — the audience fully monetised</div></div>
+    </div>
+    <p class="disclaimer" style="color:#b7a99b;text-align:center;margin:34px auto 0">Directional targets, not guarantees. We report the real curve every week so you always see exactly what's working.</p>
+  </div>
+</section>
+
+<!-- GIANTS -->
+<section>
+  <div class="wrap reveal">
+    <div class="eyebrow">This is exactly how the giants do it</div>
+    <h2 class="big maroon" style="max-width:820px">Tanishq, CaratLane, Malabar, Mejuri — they all run the same machine.</h2>
+    <div class="gold-line"></div>
+    <p class="body">Content builds desire → transparency builds trust → WhatsApp &amp; Instagram capture the demand → the showroom closes the sale. <b>PSG Gold already has the desire and the audience.</b> We're simply adding the capture layer the big brands paid millions to build.</p>
+    <div class="giants">
+      <div class="giant"><b>Mejuri</b><p>Community & influencer-led from day one. → We run your micro-influencer + UGC engine.</p></div>
+      <div class="giant"><b>CaratLane</b><p>Transparency, try-at-home, AR try-on (+200% app usage). → We add live pricing & virtual try-on.</p></div>
+      <div class="giant"><b>Tanishq / Malabar</b><p>Festive calendars, gold-savings, omnichannel trust. → We own your festive calendar & CRM.</p></div>
+      <div class="giant"><b>Blue Nile</b><p>Education-first buying & occasion campaigns. → We build your content & occasion engine.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- THE FIX / SERVICES -->
+<section>
+  <div class="wrap reveal">
+    <div class="eyebrow">Everything we'll provide</div>
+    <h2 class="big maroon">The full system — in the order that matters.</h2>
+    <div class="gold-line"></div>
+    <p class="body">First we stop the bleeding. Then we multiply. Then we expand. Nothing wasted, nothing before its time.</p>
+
+    <!-- MUST -->
+    <div class="tier t-must">
+      <div class="tier-head"><span class="badge">★</span><h3>Must-have — "Capture Everything"</h3><span class="sub">Weeks 1–4 · fixes the leak</span></div>
+      <div class="tier-body">
+        <div class="svc"><span class="dot">◆</span><div><b>WhatsApp catalog + in-chat selling</b><span>Your whole collection, browsable and priced, inside chat.</span></div></div>
+        <div class="svc"><span class="dot">◆</span><div><b>24/7 AI auto-reply (Instagram + WhatsApp)</b><span>Price, purity, availability — answered in seconds, in Kannada &amp; English.</span></div></div>
+        <div class="svc"><span class="dot">◆</span><div><b>Comment → auto-DM</b><span>Every comment on a 30K-view reel becomes a captured lead.</span></div></div>
+        <div class="svc"><span class="dot">◆</span><div><b>Enquiry → appointment + never-drop CRM</b><span>All 1,000/day logged and followed up until closed.</span></div></div>
+        <div class="svc"><span class="dot">◆</span><div><b>AI Kannada call agent</b><span>Answers the 500–1,000 daily calls and books visits, round the clock.</span></div></div>
+        <div class="svc"><span class="dot">◆</span><div><b>Live gold rate + instant quote</b><span>Fast, transparent pricing with a calculator &amp; branded cards.</span></div></div>
+        <div class="svc"><span class="dot">◆</span><div><b>Review &amp; referral engine</b><span>Turn happy buyers into 5-star trust and fresh reach.</span></div></div>
+        <div class="svc"><span class="dot">◆</span><div><b>Owner dashboard + daily digest</b><span>Enquiries, appointments, sales &amp; rate — one screen, one morning message.</span></div></div>
+      </div>
+    </div>
+
+    <!-- SHOULD -->
+    <div class="tier t-should">
+      <div class="tier-head"><span class="badge">◆</span><h3>Multiply — build on the demand</h3><span class="sub">Months 2–3 · pours on fuel</span></div>
+      <div class="tier-body">
+        <div class="svc"><span class="dot">◆</span><div><b>Reels engine + AI content factory</b><span>Feed your 1.1M audience consistently, effortlessly.</span></div></div>
+        <div class="svc"><span class="dot">◆</span><div><b>Virtual / AR try-on</b><span>AR lifts purchase likelihood up to +27–65%.</span></div></div>
+        <div class="svc"><span class="dot">◆</span><div><b>Festive campaign engine</b><span>Own Akshaya Tritiya, Dhanteras &amp; wedding season.</span></div></div>
+        <div class="svc"><span class="dot">◆</span><div><b>Bridal 6-month nurture pipeline</b><span>Your highest-ticket journey, on autopilot.</span></div></div>
+        <div class="svc"><span class="dot">◆</span><div><b>Catalog website + live rate</b><span>A digital front door with book-an-appointment.</span></div></div>
+        <div class="svc"><span class="dot">◆</span><div><b>Gold-savings scheme + digital gold</b><span>Recurring commitment and lead capture.</span></div></div>
+        <div class="svc"><span class="dot">◆</span><div><b>Micro-influencer &amp; UGC engine</b><span>Extend the reach that's already working.</span></div></div>
+      </div>
+    </div>
+
+    <!-- MIGHT -->
+    <div class="tier t-might">
+      <div class="tier-head"><span class="badge">○</span><h3>Expand — when you're ready</h3><span class="sub">Later · scale &amp; new revenue</span></div>
+      <div class="tier-body">
+        <div class="svc"><span class="dot">○</span><div><b>D2C store + marketplaces</b><span>Amazon, Flipkart, Meesho, ONDC &amp; social shops.</span></div></div>
+        <div class="svc"><span class="dot">○</span><div><b>NRI shipping &amp; try-at-home</b><span>Insured delivery for diaspora and city buyers.</span></div></div>
+        <div class="svc"><span class="dot">○</span><div><b>Offline reach</b><span>OOH, radio, print, cinema, expos &amp; trunk shows.</span></div></div>
+        <div class="svc"><span class="dot">○</span><div><b>Inventory, GST &amp; BIS-HUID suite</b><span>Compliance and stock, handled cleanly.</span></div></div>
+        <div class="svc"><span class="dot">○</span><div><b>Loyalty program &amp; smart mirror</b><span>Tiers, points and an in-store AR experience.</span></div></div>
+        <div class="svc"><span class="dot">○</span><div><b>Multi-branch rollout</b><span>A playbook to open the next showrooms.</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FESTIVE -->
+<section class="band">
+  <div class="wrap reveal">
+    <div class="eyebrow" style="color:var(--gold-soft)">The festive goldmine</div>
+    <h2 class="big" style="color:var(--cream);max-width:840px">A few festival days decide a huge slice of the year.</h2>
+    <div class="stat-grid" style="margin-top:48px">
+      <div class="stat"><div class="num">15–18%</div><div class="lab">of annual jewellery revenue comes from Akshaya Tritiya alone</div></div>
+      <div class="stat"><div class="num">20–30%</div><div class="lab">of yearly revenue lands across the festive days</div></div>
+      <div class="stat"><div class="num">South-led</div><div class="lab">South India leads Akshaya Tritiya buying — your home turf</div></div>
+    </div>
+    <p class="body" style="color:#d9c8bb;text-align:center;max-width:760px;margin:34px auto 0">We build a campaign engine that plans, creates and broadcasts every festive push automatically — so you never miss the days that matter most.</p>
+  </div>
+</section>
+
+<!-- PROOF / BUILT -->
+<section class="proof">
+  <div class="wrap reveal">
+    <div class="eyebrow">The unfair advantage</div>
+    <h2 class="big" style="color:var(--cream);max-width:860px">Most agencies show slides. We're handing you working software — already built.</h2>
+    <p class="body" style="color:#d9c8bb;margin-top:20px">Eight white-label tools and <b style="color:var(--gold-soft)">52 production-ready automations</b> are done and ready. Click any tool below to open the real thing — running in your browser, no login needed.</p>
+    <div class="tools">
+      <a class="tool" href="../tools/studio-photo.html"><div class="emo">📸</div><b>Studio Photo</b><p>Any phone photo → a pro studio image with premium backdrops, shadow &amp; watermark.</p><div class="go">Open tool →</div></a>
+      <a class="tool" href="../tools/product-card.html"><div class="emo">🏷️</div><b>Product Card Maker</b><p>Photo + price/purity/weight → branded catalog cards for WhatsApp &amp; Instagram.</p><div class="go">Open tool →</div></a>
+      <a class="tool" href="../tools/gold-calculator.html"><div class="emo">🪙</div><b>Gold Price Calculator</b><p>Weight × karat × rate + making + GST → instant quote with a WhatsApp share.</p><div class="go">Open tool →</div></a>
+      <a class="tool" href="../tools/enquiry-crm.html"><div class="emo">📇</div><b>Enquiry CRM</b><p>Log every enquiry, move it through the pipeline, never miss a follow-up.</p><div class="go">Open tool →</div></a>
+      <a class="tool" href="../tools/festive-calendar.html"><div class="emo">📅</div><b>Festive Calendar</b><p>The full 2026–27 festival calendar with T-minus campaign plans &amp; post ideas.</p><div class="go">Open tool →</div></a>
+      <a class="tool" href="../tools/review-qr.html"><div class="emo">⭐</div><b>Review QR Kit</b><p>Printable branded QR posters &amp; cards that turn happy customers into 5-star reviews.</p><div class="go">Open tool →</div></a>
+      <a class="tool" href="../tools/savings-scheme.html"><div class="emo">💰</div><b>Savings Scheme Calculator</b><p>Customer-facing gold-savings calculator that shows maturity value &amp; captures leads.</p><div class="go">Open tool →</div></a>
+      <a class="tool" href="../tools/owner-dashboard.html"><div class="emo">📊</div><b>Owner Dashboard</b><p>One screen: enquiries, sales, revenue, follow-ups, top items &amp; source charts.</p><div class="go">Open tool →</div></a>
+    </div>
+    <div class="auto-note">
+      <b>Plus 52 automations across 21 groups</b> — lead capture, 24/7 WhatsApp selling, AI content, festive campaigns, bridal drip, reviews, inventory, money, loyalty, AI sales intelligence, Kannada voice agent, and the owner intelligence layer. Every one is import-ready with setup instructions built in. <a href="../tools/index.html" style="color:var(--gold-soft)">Open the full toolkit hub →</a>
+    </div>
+  </div>
+</section>
+
+<!-- COMMAND SCREEN -->
+<section>
+  <div class="wrap reveal">
+    <div class="eyebrow">Run it all in an hour a day</div>
+    <h2 class="big maroon">One command screen. One morning message.</h2>
+    <div class="gold-line"></div>
+    <p class="body">Everything above rolls up into a single owner's dashboard and a daily WhatsApp digest — so you spend your time on customers, designs and trust, while the system handles the rest.</p>
+    <div class="cmd">
+      <div class="tile"><div class="lab">Enquiries today</div><div class="v">1,024</div></div>
+      <div class="tile"><div class="lab">Appointments booked</div><div class="v">18</div></div>
+      <div class="tile"><div class="lab">Sales · this week</div><div class="v">₹— </div></div>
+      <div class="tile"><div class="lab">22K gold rate</div><div class="v">live</div></div>
+      <div class="tile msg"><div class="lab">☀ 8:00 AM · Your morning digest</div><div class="v">Yesterday: 1,024 enquiries (142 bridal), 18 visits booked for today, 6 sales, gold rate steady, Akshaya campaign tracking ahead. One bestseller low on stock — reorder ready to approve.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ROADMAP -->
+<section class="band">
+  <div class="wrap reveal">
+    <div class="eyebrow" style="color:var(--gold-soft)">The 90-day plan</div>
+    <h2 class="big" style="color:var(--cream)">Catch, build, scale.</h2>
+    <div class="road">
+      <div class="mo"><div class="n">Month 1</div><h4>Catch the demand</h4><p>WhatsApp catalog, 24/7 auto-reply, call agent, CRM &amp; dashboard live. The leak stops — every enquiry gets answered.</p></div>
+      <div class="mo"><div class="n">Month 2</div><h4>Build the engine</h4><p>Reels &amp; AI content, virtual try-on, comment-to-DM at scale, review engine, bridal &amp; retention flows switch on.</p></div>
+      <div class="mo"><div class="n">Month 3</div><h4>Scale &amp; prove</h4><p>A full festive campaign, influencer &amp; UGC reach, and a documented growth curve you can see every week.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ENGAGEMENT -->
+<section>
+  <div class="wrap reveal">
+    <div class="engage">
+      <div class="eyebrow" style="color:var(--gold-soft)">How we work together</div>
+      <h2 class="big" style="color:var(--cream)">Full build, then we run it with you.</h2>
+      <div class="two">
+        <div class="phase">
+          <div class="p-n">Phase 1 · Build</div>
+          <h4>We build your entire capture system</h4>
+          <p>WhatsApp, auto-reply, call agent, CRM, dashboard, content &amp; festive engines — set up, connected to your channels, and switched on. A one-time build that turns demand you're losing into demand you keep.</p>
+        </div>
+        <div class="phase">
+          <div class="p-n">Phase 2 · Retainer</div>
+          <h4>We run &amp; grow it every month</h4>
+          <p>Ospyr operates the machine, creates the content, runs the campaigns and reports the numbers — as your ongoing growth partner. You focus on the craft and the customers.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="wrap reveal">
+    <div class="eyebrow">The invitation</div>
+    <h2>The trust is yours.<br>Let's bring you the customers you're already earning.</h2>
+    <p class="body" style="margin:22px auto 0;text-align:center">A million people are already listening. Let's make sure PSG Gold answers every one of them.</p>
+    <a class="btn gold" href="https://wa.me/psggold916">Let's build it together →</a>
+  </div>
+</section>
+
+<footer>
+  <div class="b">OSPYR</div>
+  <p style="margin-top:10px">The team behind the jeweller. &nbsp;·&nbsp; Prepared for PSG Gold, Mysore.</p>
+</footer>
+
+<script>
+  // scroll reveal
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // count-up
+  const fmt=(v)=>{ if(v>=1&&v<10&&!Number.isInteger(v)) return v.toFixed(1); return Math.round(v).toLocaleString('en-IN'); };
+  const cio=new IntersectionObserver((es)=>{es.forEach(e=>{
+    if(!e.isIntersecting) return; const el=e.target; cio.unobserve(el);
+    const target=parseFloat(el.dataset.count), suf=el.dataset.suffix||''; let s=null;
+    const dur=1400; requestAnimationFrame(function step(t){ if(!s)s=t; const p=Math.min((t-s)/dur,1);
+      const eased=1-Math.pow(1-p,3); el.textContent=fmt(target*eased)+suf; if(p<1)requestAnimationFrame(step); else el.textContent=fmt(target)+suf; });
+  })},{threshold:.6});
+  document.querySelectorAll('[data-count]').forEach(el=>cio.observe(el));
+</script>
+</body>
+</html>

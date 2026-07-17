@@ -1,0 +1,40 @@
+{
+  "name": "2 · WhatsApp auto-reply — price/catalog/appointment (Meta Cloud API)",
+  "nodes": [
+    {
+      "parameters": {"httpMethod": "POST", "path": "whatsapp-in", "responseMode": "onReceived", "options": {}},
+      "id": "wh", "name": "Webhook: WhatsApp message in", "type": "n8n-nodes-base.webhook", "typeVersion": 2, "position": [0, 0],
+      "notes": "Set this webhook URL in Meta App → WhatsApp → Configuration → Callback URL. Also handle the GET verify challenge (n8n: add a second webhook with GET returning hub.challenge)."
+    },
+    {
+      "parameters": {
+        "jsCode": "const msg = $json.body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];\nif (!msg) return [];\nconst from = msg.from;\nconst text = (msg.text?.body || '').toLowerCase();\nlet reply = `Namaste! 🙏 Welcome to ${$env.BRAND_NAME || 'our showroom'}. Reply:\\n1️⃣ PRICE — today's gold rate\\n2️⃣ CATALOG — see designs\\n3️⃣ VISIT — book an appointment`;\nif (/price|rate|1/.test(text)) reply = `Today's rate (per gram):\\n22K: ₹${$env.RATE_22K || '—'}\\n24K: ₹${$env.RATE_24K || '—'}\\n3% GST extra. Making charges vary by design. Reply VISIT to book a viewing.`;\nelse if (/catalog|design|2/.test(text)) reply = `Browse our latest designs here: ${$env.CATALOG_LINK || 'https://instagram.com/yourbrand'}\\nTell us what you like — we will keep it ready at the showroom. 💛`;\nelse if (/visit|appoint|book|3/.test(text)) reply = `We would love to welcome you! Share a day & time that suits you, and our team will confirm your private viewing. 🪑✨`;\nreturn [{ json: { from, reply } }];"
+      },
+      "id": "route", "name": "Understand & route", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [220, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v21.0/{{$env.WA_PHONE_NUMBER_ID}}/messages",
+        "authentication": "genericCredentialType", "genericAuthType": "httpHeaderAuth",
+        "sendBody": true, "specifyBody": "json",
+        "jsonBody": "={ \"messaging_product\": \"whatsapp\", \"to\": \"{{$json.from}}\", \"type\": \"text\", \"text\": { \"body\": {{ JSON.stringify($json.reply) }} } }",
+        "options": {}
+      },
+      "id": "send", "name": "WhatsApp: send reply", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [440, 0],
+      "credentials": {"httpHeaderAuth": {"id": "REPLACE", "name": "Meta Bearer Token"}},
+      "notes": "Header credential: Authorization = Bearer <META_ACCESS_TOKEN>. Env vars: WA_PHONE_NUMBER_ID, BRAND_NAME, RATE_22K, RATE_24K, CATALOG_LINK."
+    },
+    {
+      "parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "=🆕 WhatsApp enquiry from {{$json.from}} — auto-replied.", "additionalFields": {}},
+      "id": "notify", "name": "Telegram: notify owner", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [660, 0],
+      "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}
+    }
+  ],
+  "connections": {
+    "Webhook: WhatsApp message in": {"main": [[{"node": "Understand & route", "type": "main", "index": 0}]]},
+    "Understand & route": {"main": [[{"node": "WhatsApp: send reply", "type": "main", "index": 0}]]},
+    "WhatsApp: send reply": {"main": [[{"node": "Telegram: notify owner", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}

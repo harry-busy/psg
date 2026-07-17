@@ -1,0 +1,35 @@
+{
+  "name": "B3·4 Intelligence & Backup — weekly market watch + monthly AI business review + daily backup (3 automations combined)",
+  "nodes": [
+    {
+      "parameters": {"content": "## ⚙️ SETUP — step by step\n1. Variables: **GEMINI_API_KEY, TG_OWNER_CHAT_ID, BRAND_NAME**. Attach Telegram + Sheets + Drive credentials.\n2. Replace REPLACE_SHEET_ID (your master spreadsheet) and REPLACE_BACKUP_FOLDER_ID (a Drive folder named 'Backups').\n3. That's it — three timers, zero webhooks.\n\n## HOW IT RUNS\n• **Mon 08:00 — Market watch:** Gemini briefs you on gold price direction, jewellery retail news and one competitor tactic to copy this week.\n• **1st of month 08:00 — AI business review:** reads your whole Enquiries tab → Gemini writes a plain-language monthly review (what grew, best source, conversion, 3 concrete actions) → Telegram.\n• **Daily 23:30 — Backup:** copies the master spreadsheet into the Backups folder with the date in the name. 30 seconds of insurance for your whole business data.\n\n## 🔧 FIX\n• Review too generic → keep Item/Source/Amount columns filled; more data = sharper review.\n• Backup duplicates → that's intended (one per day); prune old ones monthly.\n• Want the review as PDF/email? Chain a Gmail node after 'Telegram: monthly review'.", "height": 540, "width": 480},
+      "id": "note", "name": "Sticky Note", "type": "n8n-nodes-base.stickyNote", "typeVersion": 1, "position": [-560, -160]
+    },
+    {"parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "0 8 * * 1"}]}}, "id": "cr1", "name": "Mon 8:00", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, -120]},
+    {
+      "parameters": {"method": "POST", "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={{$env.GEMINI_API_KEY}}", "sendBody": true, "specifyBody": "json", "jsonBody": "={ \"contents\": [{ \"parts\": [{ \"text\": \"Weekly brief for the owner of {{$env.BRAND_NAME}}, a gold jewellery showroom in Mysore, India. Cover in under 250 words: (1) gold price direction & what to tell customers, (2) one jewellery retail trend in India this month, (3) one tactic big jewellers (Tanishq/CaratLane/Malabar) are using that a single showroom can copy cheaply, (4) one WhatsApp/Instagram content idea for this week.\" }] }] }", "options": {}},
+      "id": "mw", "name": "Gemini: market watch", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [200, -120]
+    },
+    {"parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "=🧠 Monday market watch:\n\n{{$json.candidates[0].content.parts[0].text}}", "additionalFields": {}}, "id": "tg1", "name": "Telegram: market watch", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [400, -120], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}},
+    {"parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "0 8 1 * *"}]}}, "id": "cr2", "name": "1st of month 8:00", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, 80]},
+    {"parameters": {"documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "Enquiries", "mode": "name"}, "options": {}}, "id": "rd", "name": "Read all data", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [200, 80], "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}}},
+    {"parameters": {"jsCode": "const ym = new Date(Date.now()-5*864e5).toISOString().slice(0,7);\nconst prev = new Date(new Date().setMonth(new Date().getMonth()-2)).toISOString().slice(0,7);\nconst rows = items.map(i=>i.json);\nreturn [{ json: { month: ym, thisMonth: rows.filter(r=>(r.Date||'').startsWith(ym)), lastMonth: rows.filter(r=>(r.Date||'').startsWith(prev)) } }];"}, "id": "prep", "name": "Split months", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [400, 80]},
+    {
+      "parameters": {"method": "POST", "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={{$env.GEMINI_API_KEY}}", "sendBody": true, "specifyBody": "json", "jsonBody": "={ \"contents\": [{ \"parts\": [{ \"text\": \"You are a retail analyst. Write a plain-language monthly review (max 300 words) for {{$env.BRAND_NAME}} jewellery showroom comparing this month vs last: enquiries, sales count & value, best source, best items, conversion, follow-up discipline. End with exactly 3 concrete actions for next month. THIS MONTH: {{ JSON.stringify($json.thisMonth).slice(0,6000) }} LAST MONTH: {{ JSON.stringify($json.lastMonth).slice(0,4000) }}\" }] }] }", "options": {}},
+      "id": "rev", "name": "Gemini: monthly review", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [600, 80]
+    },
+    {"parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "=📅 Monthly business review ({{ $('Split months').item.json.month }}):\n\n{{$json.candidates[0].content.parts[0].text.slice(0,3800)}}", "additionalFields": {}}, "id": "tg2", "name": "Telegram: monthly review", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [800, 80], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}},
+    {"parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "30 23 * * *"}]}}, "id": "cr3", "name": "Daily 23:30", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, 300]},
+    {"parameters": {"operation": "copy", "fileId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "name": "=Backup-{{ $now.toISO().slice(0,10) }}-master-sheet", "sameFolder": false, "folderId": {"__rl": true, "value": "REPLACE_BACKUP_FOLDER_ID", "mode": "id"}, "options": {}}, "id": "bk", "name": "Drive: copy sheet to Backups", "type": "n8n-nodes-base.googleDrive", "typeVersion": 3, "position": [200, 300], "credentials": {"googleDriveOAuth2Api": {"id": "REPLACE", "name": "Google Drive"}}}
+  ],
+  "connections": {
+    "Mon 8:00": {"main": [[{"node": "Gemini: market watch", "type": "main", "index": 0}]]},
+    "Gemini: market watch": {"main": [[{"node": "Telegram: market watch", "type": "main", "index": 0}]]},
+    "1st of month 8:00": {"main": [[{"node": "Read all data", "type": "main", "index": 0}]]},
+    "Read all data": {"main": [[{"node": "Split months", "type": "main", "index": 0}]]},
+    "Split months": {"main": [[{"node": "Gemini: monthly review", "type": "main", "index": 0}]]},
+    "Gemini: monthly review": {"main": [[{"node": "Telegram: monthly review", "type": "main", "index": 0}]]},
+    "Daily 23:30": {"main": [[{"node": "Drive: copy sheet to Backups", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}

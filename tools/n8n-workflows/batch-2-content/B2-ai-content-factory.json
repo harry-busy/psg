@@ -1,0 +1,40 @@
+{
+  "name": "B2·3 AI Content Factory — weekly captions + best-post recycler + trend research (3 automations combined)",
+  "nodes": [
+    {
+      "parameters": {"content": "## ⚙️ SETUP — step by step\n1. Variables: **GEMINI_API_KEY**, **TG_OWNER_CHAT_ID**, **BRAND_NAME**. Attach Telegram + Google Sheets credentials.\n2. Spreadsheet tabs needed:\n   • **Products** (Name, Purity, Weight, Price, Notes) — your catalog rows.\n   • **ContentBank** (Date, Caption, Used) — generated captions land here.\n   • **BestPosts** (Caption, Link, LastUsed) — paste your all-time best posts once.\n3. Replace REPLACE_SHEET_ID in all Sheets nodes. Activate.\n\n## HOW IT RUNS\n• **Mon 10:00** — takes 5 products → Gemini writes a week of captions (EN + Kannada mix, hashtags) → saved to ContentBank + sent to Telegram.\n• **Thu 10:00** — picks the oldest BestPost not used in 60 days → sends to Telegram: 'repost this today' (evergreen recycler).\n• **Sat 10:00** — Gemini researches current jewellery content trends/hooks → 5 reel ideas to Telegram.\n\n## 🔧 FIX\n• Empty captions → Products tab empty or GEMINI key invalid.\n• Kannada odd → tweak the prompt language line.\n• Want auto-posting? Chain ContentBank into B2·2 Omni Publisher.", "height": 560, "width": 480},
+      "id": "note", "name": "Sticky Note", "type": "n8n-nodes-base.stickyNote", "typeVersion": 1, "position": [-560, -160]
+    },
+    {"parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "0 10 * * 1"}]}}, "id": "mon", "name": "Mon 10:00", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, -160]},
+    {"parameters": {"documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "Products", "mode": "name"}, "options": {}}, "id": "pr", "name": "Read products", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [190, -160], "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}}},
+    {
+      "parameters": {"method": "POST", "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={{$env.GEMINI_API_KEY}}", "sendBody": true, "specifyBody": "json", "jsonBody": "={ \"contents\": [{ \"parts\": [{ \"text\": \"Brand: {{$env.BRAND_NAME}} — Indian gold jewellery showroom (Mysore). Write 7 Instagram captions (one per day, Mon-Sun) using these products: {{ JSON.stringify(items.slice(0,5).map(i=>i.json)) }}. Mix English with occasional Kannada warmth. Each: 2 lines + 6 hashtags. Number them 1-7.\" }] }] }", "options": {}},
+      "id": "cap", "name": "Gemini: week of captions", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [380, -160]
+    },
+    {"parameters": {"jsCode": "const text = $json.candidates[0].content.parts[0].text;\nreturn text.split(/\\n(?=\\d[\\).:])/).filter(x=>x.trim()).map(c => ({ json: { Date: new Date().toISOString().slice(0,10), Caption: c.trim(), Used: 'no' } }));"}, "id": "split", "name": "Split into rows", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [570, -160]},
+    {"parameters": {"operation": "append", "documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "ContentBank", "mode": "name"}, "columns": {"mappingMode": "autoMapInputData"}, "options": {}}, "id": "bank", "name": "Save to ContentBank", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [760, -220], "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}}},
+    {"parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "=📝 This week's captions are ready in ContentBank:\n\n{{ $('Gemini: week of captions').item.json.candidates[0].content.parts[0].text.slice(0,3500) }}", "additionalFields": {}}, "id": "tgc", "name": "Telegram: captions", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [760, -100], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}},
+    {"parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "0 10 * * 4"}]}}, "id": "thu", "name": "Thu 10:00", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, 60]},
+    {"parameters": {"documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "BestPosts", "mode": "name"}, "options": {}}, "id": "bp", "name": "Read BestPosts", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [190, 60], "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}}},
+    {"parameters": {"jsCode": "const cut = new Date(Date.now()-60*864e5).toISOString().slice(0,10);\nconst r = items.map(i=>i.json).filter(x=>!x.LastUsed || x.LastUsed < cut).sort((a,b)=>(a.LastUsed||'0').localeCompare(b.LastUsed||'0'))[0];\nreturn r ? [{ json: r }] : [];"}, "id": "old", "name": "Oldest evergreen", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [380, 60]},
+    {"parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "=♻️ Recycler: repost this proven winner today:\n{{$json.Caption}}\n{{$json.Link || ''}}\n(Then update LastUsed in BestPosts)", "additionalFields": {}}, "id": "tgr", "name": "Telegram: repost prompt", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [570, 60], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}},
+    {"parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "0 10 * * 6"}]}}, "id": "sat", "name": "Sat 10:00", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, 260]},
+    {
+      "parameters": {"method": "POST", "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={{$env.GEMINI_API_KEY}}", "sendBody": true, "specifyBody": "json", "jsonBody": "={ \"contents\": [{ \"parts\": [{ \"text\": \"You are a social strategist for Indian jewellery brands. List 5 reel ideas working RIGHT NOW for gold jewellery pages (hooks, formats, audio style), 1 line each, plus 10 trending jewellery hashtags for India this week.\" }] }] }", "options": {}},
+      "id": "trend", "name": "Gemini: trend research", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [190, 260]
+    },
+    {"parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "=📈 Weekend trend brief:\n\n{{$json.candidates[0].content.parts[0].text.slice(0,3800)}}", "additionalFields": {}}, "id": "tgt", "name": "Telegram: trend brief", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [380, 260], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}}
+  ],
+  "connections": {
+    "Mon 10:00": {"main": [[{"node": "Read products", "type": "main", "index": 0}]]},
+    "Read products": {"main": [[{"node": "Gemini: week of captions", "type": "main", "index": 0}]]},
+    "Gemini: week of captions": {"main": [[{"node": "Split into rows", "type": "main", "index": 0}]]},
+    "Split into rows": {"main": [[{"node": "Save to ContentBank", "type": "main", "index": 0}, {"node": "Telegram: captions", "type": "main", "index": 0}]]},
+    "Thu 10:00": {"main": [[{"node": "Read BestPosts", "type": "main", "index": 0}]]},
+    "Read BestPosts": {"main": [[{"node": "Oldest evergreen", "type": "main", "index": 0}]]},
+    "Oldest evergreen": {"main": [[{"node": "Telegram: repost prompt", "type": "main", "index": 0}]]},
+    "Sat 10:00": {"main": [[{"node": "Gemini: trend research", "type": "main", "index": 0}]]},
+    "Gemini: trend research": {"main": [[{"node": "Telegram: trend brief", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}

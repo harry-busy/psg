@@ -1,0 +1,33 @@
+{
+  "name": "B1·3 Reputation Engine — new review alert + AI reply draft + weekly report (3 automations combined)",
+  "nodes": [
+    {
+      "parameters": {"content": "## ⚙️ SETUP — step by step\n1. Get your Google **Place ID**: developers.google.com/maps/documentation/places → 'Place ID Finder' → search your showroom → copy ID → set variable **PLACE_ID**.\n2. Get a **Google Maps API key** (Places API enabled, free tier fine) → variable **MAPS_API_KEY**.\n3. Set **GEMINI_API_KEY** (aistudio.google.com) and **TG_OWNER_CHAT_ID**; attach Telegram credential.\n4. Attach Google Sheets credential; make a tab **Reviews** (Time, Author, Rating, Text, Replied).\n5. Activate. It checks reviews every 6 h; new ones → Telegram alert with an AI-drafted reply you can paste into Google. Sunday 19:00 → weekly reputation report.\n\n## 🔧 FIX\n• Empty result → Places API not enabled on the key, or wrong PLACE_ID.\n• Only 5 reviews visible → Google API limit; newest still detected via 'time' field.\n• AI reply too long → edit the prompt in 'Gemini: draft reply'.", "height": 480, "width": 470},
+      "id": "note", "name": "Sticky Note", "type": "n8n-nodes-base.stickyNote", "typeVersion": 1, "position": [-540, -140]
+    },
+    {"parameters": {"rule": {"interval": [{"field": "hours", "hoursInterval": 6}]}}, "id": "cr", "name": "Every 6 hours", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, -80]},
+    {"parameters": {"url": "=https://maps.googleapis.com/maps/api/place/details/json?place_id={{$env.PLACE_ID}}&fields=reviews,rating,user_ratings_total&key={{$env.MAPS_API_KEY}}", "options": {}}, "id": "get", "name": "Fetch Google reviews", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [200, -80]},
+    {
+      "parameters": {"jsCode": "const seen = $getWorkflowStaticData('global');\nseen.ids = seen.ids || [];\nconst out = [];\nfor (const r of ($json.result?.reviews || [])) {\n  if (!seen.ids.includes(r.time)) { seen.ids.push(r.time); out.push({ json: { Time: new Date(r.time*1000).toISOString(), Author: r.author_name, Rating: r.rating, Text: r.text || '', rating_total: $json.result.rating } }); }\n}\nseen.ids = seen.ids.slice(-100);\nreturn out;"},
+      "id": "newr", "name": "Only NEW reviews", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [400, -80]
+    },
+    {
+      "parameters": {"method": "POST", "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={{$env.GEMINI_API_KEY}}", "sendBody": true, "specifyBody": "json", "jsonBody": "={ \"contents\": [{ \"parts\": [{ \"text\": \"You are the owner of an Indian family gold jewellery showroom. Write a warm 2-3 sentence public reply to this Google review. If rating <= 3, be apologetic, invite them back, no excuses. Review by {{$json.Author}} ({{$json.Rating}}/5): {{ JSON.stringify($json.Text) }}\" }] }] }", "options": {}},
+      "id": "ai", "name": "Gemini: draft reply", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [600, -80]
+    },
+    {"parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "={{ $('Only NEW reviews').item.json.Rating >= 4 ? '⭐' : '⚠️' }} New {{$('Only NEW reviews').item.json.Rating}}/5 review by {{$('Only NEW reviews').item.json.Author}}:\n\"{{$('Only NEW reviews').item.json.Text}}\"\n\n✍️ Suggested reply (paste in Google):\n{{ $json.candidates[0].content.parts[0].text }}", "additionalFields": {}}, "id": "tg", "name": "Telegram: alert + draft", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [800, -80], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}},
+    {"parameters": {"operation": "append", "documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "Reviews", "mode": "name"}, "columns": {"mappingMode": "autoMapInputData"}, "options": {}}, "id": "log", "name": "Log to Reviews sheet", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [800, 100], "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}}},
+    {"parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "0 19 * * 0"}]}}, "id": "crw", "name": "Sunday 19:00", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, 260]},
+    {"parameters": {"url": "=https://maps.googleapis.com/maps/api/place/details/json?place_id={{$env.PLACE_ID}}&fields=rating,user_ratings_total&key={{$env.MAPS_API_KEY}}", "options": {}}, "id": "wk", "name": "Fetch rating snapshot", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [200, 260]},
+    {"parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "=📈 Weekly reputation: {{$json.result.rating}}★ from {{$json.result.user_ratings_total}} reviews. Keep asking happy customers — the QR kit is in the Suite!", "additionalFields": {}}, "id": "tgw", "name": "Telegram: weekly report", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [400, 260], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}}
+  ],
+  "connections": {
+    "Every 6 hours": {"main": [[{"node": "Fetch Google reviews", "type": "main", "index": 0}]]},
+    "Fetch Google reviews": {"main": [[{"node": "Only NEW reviews", "type": "main", "index": 0}]]},
+    "Only NEW reviews": {"main": [[{"node": "Gemini: draft reply", "type": "main", "index": 0}, {"node": "Log to Reviews sheet", "type": "main", "index": 0}]]},
+    "Gemini: draft reply": {"main": [[{"node": "Telegram: alert + draft", "type": "main", "index": 0}]]},
+    "Sunday 19:00": {"main": [[{"node": "Fetch rating snapshot", "type": "main", "index": 0}]]},
+    "Fetch rating snapshot": {"main": [[{"node": "Telegram: weekly report", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}

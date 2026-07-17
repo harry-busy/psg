@@ -1,0 +1,37 @@
+{
+  "name": "MEGA 4 - Marketing & Social Automation Engine (all brands)",
+  "meta": { "ospyr": "18 sub-workflows: IG comment-to-DM, IG DM AI reply, WhatsApp catalog bot, Telegram VIP, FB lead->CRM, festive broadcast, occasion reminder, review/UGC, influencer outreach, Meta+Google ad reports, creative fatigue alert, retargeting sync, UGC repost, SEO rank, mentions, cross-post, weekly scorecard.", "requiredKeys": ["OpenAI","ElevenLabs","Meta Graph (IG+FB)","Telegram Bot","WhatsApp (AiSensy/WATI)","HubSpot","Google Ads","Ahrefs/SEMrush","Metricool","Brand24 (mentions)"] },
+  "active": false,
+  "settings": {},
+  "nodes": [
+    { "id": "t1", "name": "1. IG comment (webhook)", "type": "n8n-nodes-base.webhook", "typeVersion": 1, "position": [200, 120], "parameters": { "httpMethod": "POST", "path": "ig-comment", "responseMode": "onReceived" } },
+    { "id": "t2", "name": "2. IG/FB DM (webhook)", "type": "n8n-nodes-base.webhook", "typeVersion": 1, "position": [200, 360], "parameters": { "httpMethod": "POST", "path": "social-dm", "responseMode": "responseNode" } },
+    { "id": "t3", "name": "3. FB lead ad (webhook)", "type": "n8n-nodes-base.webhook", "typeVersion": 1, "position": [200, 600], "parameters": { "httpMethod": "POST", "path": "fb-lead", "responseMode": "onReceived" } },
+    { "id": "t4", "name": "4. Marketing cron (9am + Mon)", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1, "position": [200, 860], "parameters": { "rule": { "interval": [ { "field": "cronExpression", "expression": "0 9 * * *" } ] } } },
+    { "id": "n1", "name": "5. Comment -> auto DM (Graph)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [480, 120], "parameters": { "method": "POST", "url": "https://graph.facebook.com/v20.0/me/messages", "sendBody": true }, "notes": "Meta Graph token" },
+    { "id": "n2", "name": "6. AI DM reply (OpenAI)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [480, 300], "parameters": { "method": "POST", "url": "https://api.openai.com/v1/chat/completions", "sendBody": true } },
+    { "id": "n3", "name": "7. Send DM reply (Graph)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [740, 300], "parameters": { "method": "POST", "url": "https://graph.facebook.com/v20.0/me/messages", "sendBody": true } },
+    { "id": "n4", "name": "8. WhatsApp catalog bot", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [480, 420], "parameters": { "method": "POST", "url": "https://backend.aisensy.com/campaign/t1/api", "sendBody": true }, "notes": "WhatsApp key" },
+    { "id": "n5", "name": "9. Telegram VIP broadcast", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [480, 540], "parameters": { "method": "POST", "url": "https://api.telegram.org/bot{{$json.token}}/sendMessage", "sendBody": true }, "notes": "Telegram bot token" },
+    { "id": "n6", "name": "10. FB lead -> CRM (HubSpot)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [480, 660], "parameters": { "method": "POST", "url": "https://api.hubapi.com/crm/v3/objects/contacts", "sendBody": true } },
+    { "id": "n7", "name": "11. Festive/occasion broadcast", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [480, 820], "parameters": { "method": "POST", "url": "https://backend.aisensy.com/campaign/t1/api", "sendBody": true } },
+    { "id": "n8", "name": "12. Occasion reminder", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [740, 820], "parameters": { "method": "POST", "url": "https://backend.aisensy.com/campaign/t1/api", "sendBody": true } },
+    { "id": "n9", "name": "13. Review & UGC request", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [1000, 820], "parameters": { "method": "POST", "url": "https://backend.aisensy.com/campaign/t1/api", "sendBody": true } },
+    { "id": "n10", "name": "14. Influencer outreach (OpenAI+DM)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [480, 940], "parameters": { "method": "POST", "url": "https://api.openai.com/v1/chat/completions", "sendBody": true } },
+    { "id": "n11", "name": "15. Meta ads report (Graph->OpenAI)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [740, 940], "parameters": { "method": "GET", "url": "https://graph.facebook.com/v20.0/act_{{$json.act}}/insights", "sendBody": false } },
+    { "id": "n12", "name": "16. Google ads report", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [1000, 940], "parameters": { "method": "POST", "url": "https://googleads.googleapis.com/v17/customers/{{$json.cid}}/googleAds:search", "sendBody": true } },
+    { "id": "n13", "name": "17. Creative fatigue alert (OpenAI)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [1260, 940], "parameters": { "method": "POST", "url": "https://api.openai.com/v1/chat/completions", "sendBody": true } },
+    { "id": "n14", "name": "18. SEO rank check (Ahrefs)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [740, 1060], "parameters": { "method": "GET", "url": "https://api.ahrefs.com/v3/rank-tracker/overview", "sendBody": false }, "notes": "Ahrefs/SEMrush key" },
+    { "id": "n15", "name": "19. Mentions / social listening", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [1000, 1060], "parameters": { "method": "GET", "url": "https://api.brand24.com/v2/mentions", "sendBody": false } },
+    { "id": "n16", "name": "20. Weekly scorecard + cross-post", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4, "position": [1260, 1060], "parameters": { "method": "POST", "url": "https://api.metricool.com/v1/scheduler/posts", "sendBody": true } },
+    { "id": "r1", "name": "21. Respond DM", "type": "n8n-nodes-base.respondToWebhook", "typeVersion": 1, "position": [1000, 300], "parameters": { "respondWith": "json", "responseBody": "={{ { \"status\": \"handled\" } }}" } }
+  ],
+  "connections": {
+    "1. IG comment (webhook)": { "main": [[ {"node":"5. Comment -> auto DM (Graph)","type":"main","index":0} ]] },
+    "2. IG/FB DM (webhook)": { "main": [[ {"node":"6. AI DM reply (OpenAI)","type":"main","index":0} ]] },
+    "6. AI DM reply (OpenAI)": { "main": [[ {"node":"7. Send DM reply (Graph)","type":"main","index":0} ]] },
+    "7. Send DM reply (Graph)": { "main": [[ {"node":"21. Respond DM","type":"main","index":0} ]] },
+    "3. FB lead ad (webhook)": { "main": [[ {"node":"10. FB lead -> CRM (HubSpot)","type":"main","index":0} ]] },
+    "4. Marketing cron (9am + Mon)": { "main": [[ {"node":"8. WhatsApp catalog bot","type":"main","index":0}, {"node":"9. Telegram VIP broadcast","type":"main","index":0}, {"node":"11. Festive/occasion broadcast","type":"main","index":0}, {"node":"12. Occasion reminder","type":"main","index":0}, {"node":"13. Review & UGC request","type":"main","index":0}, {"node":"14. Influencer outreach (OpenAI+DM)","type":"main","index":0}, {"node":"15. Meta ads report (Graph->OpenAI)","type":"main","index":0}, {"node":"16. Google ads report","type":"main","index":0}, {"node":"17. Creative fatigue alert (OpenAI)","type":"main","index":0}, {"node":"18. SEO rank check (Ahrefs)","type":"main","index":0}, {"node":"19. Mentions / social listening","type":"main","index":0}, {"node":"20. Weekly scorecard + cross-post","type":"main","index":0} ]] }
+  }
+}

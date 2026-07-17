@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gold Savings Scheme Calculator</title>
+<style>
+:root{--red:#D2042D;--cream:#EAE5D4;--ink:#2A1A1D;--gold:#c9a227}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Calibri,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--red);color:#fff;padding:14px 22px}h1{font-size:20px}
+main{max-width:920px;margin:0 auto;padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:760px){main{grid-template-columns:1fr}}
+.panel{background:#fff;border-radius:12px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.panel h2{font-size:13px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;border-bottom:2px solid var(--cream);padding-bottom:6px}
+label{font-size:12px;font-weight:600;display:block;margin:10px 0 3px}
+input,select{width:100%;padding:9px;border:1px solid #d8cfc0;border-radius:8px;font-size:14px;background:#fffdf7}
+.big{font-size:34px;font-weight:800;color:var(--red);text-align:center;margin:10px 0 2px}
+.sub{text-align:center;font-size:12px;color:#8a7f6d}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+td{padding:7px 4px;border-bottom:1px solid #f0ead9}td:last-child{text-align:right;font-weight:600}
+.btn{background:#25D366;color:#fff;border:none;border-radius:8px;padding:12px;font-weight:700;cursor:pointer;width:100%;margin-top:12px;font-size:15px}
+.btn.red{background:var(--red)}
+.owner{grid-column:1/-1;background:#fff8f4;border:1px dashed var(--red)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:600px){.grid3{grid-template-columns:1fr}}
+.note{font-size:11px;color:#8a7f6d;margin-top:8px}
+#leads{font-size:12px;margin-top:8px;max-height:140px;overflow:auto}
+</style>
+</head>
+<body>
+<header><h1>💰 Gold Savings Scheme</h1></header>
+<main>
+<div class="panel">
+  <h2>Calculate your savings</h2>
+  <label>Monthly amount (₹)</label><input type="number" id="amt" value="5000" min="500" step="500">
+  <div class="big" id="mat">₹ 60,000</div>
+  <div class="sub" id="matSub"></div>
+  <table id="out"></table>
+  <label style="margin-top:14px">Your name</label><input id="lname" placeholder="Name">
+  <label>Phone</label><input id="lphone" placeholder="Phone number">
+  <button class="btn" id="join">📲 I'm interested — send my details on WhatsApp</button>
+  <div class="note">Estimate only. Scheme terms & final benefit as per showroom policy and prevailing gold rate at redemption.</div>
+</div>
+<div class="panel">
+  <h2>How the scheme works</h2>
+  <table id="how"></table>
+  <div class="note" id="benefitLine"></div>
+  <h2 style="margin-top:16px">Why customers love it</h2>
+  <div style="font-size:13.5px;line-height:1.7">
+  ✅ Small monthly amounts become a big festive/wedding purchase<br>
+  ✅ Bonus month paid by the showroom — better than keeping cash idle<br>
+  ✅ Beat gold-price stress by accumulating through the year<br>
+  ✅ Redeem as ANY jewellery of your choice at maturity</div>
+</div>
+<div class="panel owner">
+  <h2>Owner settings (saved on this device)</h2>
+  <div class="grid3">
+    <div><label>Customer pays (months)</label><input type="number" id="months" value="11" min="1"></div>
+    <div><label>Bonus months added by showroom</label><input type="number" id="bonus" value="1" min="0" step="0.5"></div>
+    <div><label>Showroom WhatsApp (91…)</label><input id="waNum" placeholder="919876543210"></div>
+  </div>
+  <div class="grid3">
+    <div><label>Brand name</label><input id="brand" value="PSG Gold"></div>
+    <div><label>Approx gold rate ₹/g (22K, for grams shown)</label><input type="number" id="rate" value="6800"></div>
+    <div><label>Leads captured here</label><button class="btn red" id="expLeads" style="margin-top:2px">⬇ Export leads CSV</button></div>
+  </div>
+  <div id="leads"></div>
+</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);const fmt=n=>"₹ "+Math.round(n).toLocaleString("en-IN");
+const KEYS=["months","bonus","waNum","brand","rate"];KEYS.forEach(k=>{const v=localStorage.getItem("ss_"+k);if(v)$(k).value=v});
+let leads=JSON.parse(localStorage.getItem("ss_leads")||"[]");
+function calc(){KEYS.forEach(k=>localStorage.setItem("ss_"+k,$(k).value));
+const amt=+$("amt").value||0,m=+$("months").value||11,b=+$("bonus").value||0,rate=+$("rate").value||0;
+const paid=amt*m,bonusAmt=amt*b,total=paid+bonusAmt,grams=rate?total/rate:0;
+$("mat").textContent=fmt(total);
+$("matSub").textContent=`maturity value after ${m} months (≈ ${grams.toFixed(1)} g of 22K gold at today's rate)`;
+$("out").innerHTML=`<tr><td>You pay ${m} × ${fmt(amt)}</td><td>${fmt(paid)}</td></tr><tr><td>${$("brand").value} adds ${b} month${b===1?"":"s"} bonus</td><td>+ ${fmt(bonusAmt)}</td></tr><tr><td><b>Jewellery you can buy</b></td><td><b>${fmt(total)}</b></td></tr>`;
+$("how").innerHTML=`<tr><td>1 · Join</td><td>choose monthly amount</td></tr><tr><td>2 · Save</td><td>pay for ${m} months</td></tr><tr><td>3 · Bonus</td><td>we add ${b} month${b===1?"":"s"} free</td></tr><tr><td>4 · Redeem</td><td>buy any jewellery worth the total</td></tr>`;
+$("benefitLine").textContent=`Effective benefit ≈ ${(b/m*100).toFixed(1)}% extra on your savings.`;
+renderLeads()}
+function renderLeads(){$("leads").innerHTML=leads.length?("<b>"+leads.length+" lead(s):</b> "+leads.map(l=>`${l.n} (${l.p}, ₹${l.a}/mo)`).join(" · ")):"No leads captured yet."}
+document.querySelectorAll("input").forEach(el=>el.oninput=calc);
+$("join").onclick=()=>{const n=$("lname").value.trim(),p=$("lphone").value.trim();if(!n||!p)return alert("Please enter name and phone");
+leads.push({n,p,a:$("amt").value,d:new Date().toISOString().slice(0,10)});localStorage.setItem("ss_leads",JSON.stringify(leads));
+const wa=($("waNum").value||"").replace(/\D/g,"");
+const txt=encodeURIComponent(`Namaste! I'm ${n} (${p}). I'm interested in the ${$("brand").value} gold savings scheme at ₹${$("amt").value}/month. Please share details.`);
+window.open("https://wa.me/"+wa+"?text="+txt);calc()};
+$("expLeads").onclick=()=>{const csv=["Name,Phone,Monthly,Date"].concat(leads.map(l=>`"${l.n}","${l.p}",${l.a},${l.d}`)).join("\n");
+const a=document.createElement("a");a.download="scheme-leads.csv";a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));a.click()};
+calc();
+</script>
+</body>
+</html>

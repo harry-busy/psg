@@ -1,0 +1,32 @@
+{
+  "name": "B4·3 Bridal Pipeline — long-nurture drip + wedding countdown + trousseau checklist (3 automations combined)",
+  "nodes": [
+    {
+      "parameters": {"content": "## ⚙️ SETUP — step by step\n1. Tab **Bridal**: Name, Phone, WeddingDate (YYYY-MM-DD), Stage, Budget, LastTouch, Notes. Move any 'Wedding/Engagement' enquiry from the CRM here.\n2. Variables: GEMINI_API_KEY, TG_OWNER_CHAT_ID, BRAND_NAME. Attach Telegram + Sheets credentials; replace REPLACE_SHEET_ID.\n\n## WHY THIS EXISTS\nBridal = the biggest tickets, decided over 3-6 months. Whoever stays warmly present without pestering wins the trousseau. This runs the whole courtship automatically.\n\n## HOW IT RUNS (daily 09:00)\nFor each bride, days-to-wedding decides the touch:\n• **T-180/150/120** (monthly): inspiration touch — AI writes a personalised style/lookbook message.\n• **T-90:** trousseau checklist message (necklace set, bangles, earrings, maang tikka, waist belt, groom's chain…) + invite for a private preview.\n• **T-60:** booking push — reserve pieces / customisation deadline reminder (karigar lead time!).\n• **T-30:** final-fitting + gold-rate-lock offer.\n• **T-7:** warm 'we are with you' + emergency-service note.\n• **T+15 (after):** congratulations + review/photo request + anniversary capture.\nEach touch = one-tap wa.me link on your Telegram; LastTouch prevents duplicates.\n\n## 🔧 FIX\n• Nothing fires → WeddingDate format must be YYYY-MM-DD.\n• Too frequent → edit the DAYS map in 'Compute touches'.", "height": 600, "width": 500},
+      "id": "note", "name": "Sticky Note", "type": "n8n-nodes-base.stickyNote", "typeVersion": 1, "position": [-580, -180]
+    },
+    {"parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "0 9 * * *"}]}}, "id": "cr", "name": "Daily 9:00", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, 0]},
+    {"parameters": {"documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "Bridal", "mode": "name"}, "options": {}}, "id": "rd", "name": "Read brides", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [190, 0], "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}}},
+    {
+      "parameters": {"jsCode": "const today = new Date().toISOString().slice(0,10);\nconst MAP = {180:'inspire',150:'inspire',120:'inspire',90:'trousseau',60:'booking',30:'ratelock',7:'support','-15':'after'};\nconst out = [];\nfor (const it of items) {\n  const r = it.json; if (!r.WeddingDate || !r.Phone) continue;\n  const d = Math.round((new Date(r.WeddingDate) - new Date(today)) / 864e5);\n  const key = Object.keys(MAP).find(k => Number(k) === d);\n  if (!key) continue;\n  if (r.LastTouch === today) continue;\n  out.push({ json: { ...r, days: d, touch: MAP[key] } });\n}\nreturn out;"},
+      "id": "comp", "name": "Compute touches", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [380, 0]
+    },
+    {
+      "parameters": {"method": "POST", "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={{$env.GEMINI_API_KEY}}", "sendBody": true, "specifyBody": "json", "jsonBody": "={ \"contents\": [{ \"parts\": [{ \"text\": \"Write ONE warm WhatsApp message (2-4 lines, no pressure, Indian family-jeweller tone, address as '{{$json.Name}} ji') for {{$env.BRAND_NAME}}. Bride: wedding in {{$json.days}} days, budget {{$json.Budget||'unknown'}}, notes: {{$json.Notes||'none'}}. Touch type: {{$json.touch}} — inspire=style inspiration & invite to browse; trousseau=share the classic South-Indian bridal checklist & offer a private preview; booking=gently remind customisation/karigar lead-times & reserving pieces; ratelock=final fittings + today's-rate booking benefit; support=warm 'we are ready for your big week' note; after=congratulations + request a photo/review + note their anniversary. Return only the message text.\" }] }] }", "options": {}},
+      "id": "ai", "name": "Gemini: personalised touch", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [570, 0]
+    },
+    {
+      "parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "=💍 Bridal touch ({{ $('Compute touches').item.json.touch }}, T{{ $('Compute touches').item.json.days>=0?'-':'+' }}{{ Math.abs($('Compute touches').item.json.days) }}) — {{ $('Compute touches').item.json.Name }}:\n\n\"{{ $json.candidates[0].content.parts[0].text.trim() }}\"\n\n👉 https://wa.me/{{ String($('Compute touches').item.json.Phone).replace(/\\D/g,'') }}?text={{ encodeURIComponent($json.candidates[0].content.parts[0].text.trim()) }}\n\n(then set LastTouch = today in Bridal sheet)", "additionalFields": {}},
+      "id": "tg", "name": "Telegram: one-tap bridal touch", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [760, 0], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}
+    },
+    {"parameters": {"operation": "update", "documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "Bridal", "mode": "name"}, "columns": {"mappingMode": "defineBelow", "value": {"row_number": "={{ $('Compute touches').item.json.row_number }}", "LastTouch": "={{ $now.toISO().slice(0,10) }}"}, "matchingColumns": ["row_number"]}, "options": {}}, "id": "mk", "name": "Mark LastTouch", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [950, 0], "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}}}
+  ],
+  "connections": {
+    "Daily 9:00": {"main": [[{"node": "Read brides", "type": "main", "index": 0}]]},
+    "Read brides": {"main": [[{"node": "Compute touches", "type": "main", "index": 0}]]},
+    "Compute touches": {"main": [[{"node": "Gemini: personalised touch", "type": "main", "index": 0}]]},
+    "Gemini: personalised touch": {"main": [[{"node": "Telegram: one-tap bridal touch", "type": "main", "index": 0}]]},
+    "Telegram: one-tap bridal touch": {"main": [[{"node": "Mark LastTouch", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}

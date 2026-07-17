@@ -1,0 +1,34 @@
+{
+  "name": "B3·1 Inventory & Rate Ops — low-stock → one-tap PO approval + gold-rate threshold alerts (3 automations combined)",
+  "nodes": [
+    {
+      "parameters": {"content": "## ⚙️ SETUP — step by step\n1. Tab **Stock**: Item, Karat, WeightG, Qty, MinQty, Supplier, SupplierPhone. Tab **Rates** as in B2·1.\n2. Variables: TG_OWNER_CHAT_ID, RATE_ALERT_ABOVE (e.g. 7600), RATE_ALERT_BELOW (e.g. 7100). Attach Telegram + Sheets credentials.\n3. **One-tap approval:** the low-stock alert arrives in Telegram with ✅ Approve / ❌ Skip buttons. The `po-approve` webhook receives the tap → drafts the supplier WhatsApp message → sends you the wa.me link to fire it. Activate the workflow FIRST, then copy the `po-approve` Production URL — it is already embedded in the buttons.\n\n## HOW IT RUNS\n• Daily 09:15 — every item with Qty ≤ MinQty → Telegram card with approve buttons.\n• Tap ✅ → PO text drafted → you get a one-tap wa.me link to the supplier.\n• Daily 09:00 + 15:00 — latest rate vs your thresholds → 📈/📉 alert (good for buying decisions & customer messaging).\n\n## 🔧 FIX\n• Buttons do nothing → workflow not Active, or webhook URL changed after re-import (re-check the callback_data URL in 'Low-stock alert').\n• No rate alerts → Rates tab missing today's row.", "height": 560, "width": 490},
+      "id": "note", "name": "Sticky Note", "type": "n8n-nodes-base.stickyNote", "typeVersion": 1, "position": [-570, -170]
+    },
+    {"parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "15 9 * * *"}]}}, "id": "cr1", "name": "Daily 9:15", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, -120]},
+    {"parameters": {"documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "Stock", "mode": "name"}, "options": {}}, "id": "st", "name": "Read stock", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [190, -120], "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}}},
+    {"parameters": {"jsCode": "return items.filter(i => Number(i.json.Qty) <= Number(i.json.MinQty||0)).map(i=>({json:i.json}));"}, "id": "low", "name": "Low items", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [380, -120]},
+    {
+      "parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "=📦 LOW STOCK: {{$json.Item}} ({{$json.Karat}}, {{$json.WeightG}}g) — {{$json.Qty}} left (min {{$json.MinQty}})\nSupplier: {{$json.Supplier}}", "additionalFields": {"reply_markup": "={\"inline_keyboard\":[[{\"text\":\"✅ Approve PO\",\"url\":\"{{$env.N8N_BASE_URL}}/webhook/po-approve?item={{ encodeURIComponent($json.Item) }}&sup={{ encodeURIComponent($json.SupplierPhone||'') }}&qty=5\"},{\"text\":\"❌ Skip\",\"url\":\"{{$env.N8N_BASE_URL}}/webhook/po-approve?skip=1\"}]]}"}},
+      "id": "alert", "name": "Low-stock alert (approve buttons)", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [570, -120], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}
+    },
+    {"parameters": {"httpMethod": "GET", "path": "po-approve", "responseMode": "responseNode", "options": {}}, "id": "wh", "name": "Webhook: PO tap", "type": "n8n-nodes-base.webhook", "typeVersion": 2, "position": [0, 80]},
+    {"parameters": {"jsCode": "const q = $json.query || {};\nif (q.skip) return [{ json: { html: '<h2>Skipped ✔</h2>' } }];\nconst msg = `Namaste! Please arrange: ${q.item} — qty ${q.qty||5}. Confirm price and delivery date. — ${$env.BRAND_NAME||'PSG Gold'}`;\nconst wa = 'https://wa.me/' + String(q.sup||'').replace(/\\D/g,'') + '?text=' + encodeURIComponent(msg);\nreturn [{ json: { html: `<h2>PO drafted ✔</h2><p><a style=\"font-size:22px\" href=\"${wa}\">👉 Tap to send to supplier on WhatsApp</a></p><p>${msg}</p>` } }];"}, "id": "po", "name": "Draft PO", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [190, 80]},
+    {"parameters": {"respondWith": "text", "responseBody": "={{$json.html}}", "options": {"responseHeaders": {"entries": [{"name": "Content-Type", "value": "text/html"}]}}}, "id": "resp", "name": "Respond: PO page", "type": "n8n-nodes-base.respondToWebhook", "typeVersion": 1.1, "position": [380, 80]},
+    {"parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "0 9,15 * * *"}]}}, "id": "cr2", "name": "9:00 & 15:00", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, 280]},
+    {"parameters": {"documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "Rates", "mode": "name"}, "options": {}}, "id": "rt", "name": "Read rates", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [190, 280], "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}}},
+    {"parameters": {"jsCode": "const r = items.at(-1)?.json || {};\nconst rate = Number(r.Rate24K||0);\nconst hi = Number($env.RATE_ALERT_ABOVE||999999), lo = Number($env.RATE_ALERT_BELOW||0);\nif (rate >= hi) return [{ json: { text: `📈 Gold 24K crossed ₹${hi}: now ₹${rate}/g. Consider messaging fence-sitters ('rates rising — book now') & review stock pricing.` } }];\nif (rate && rate <= lo) return [{ json: { text: `📉 Gold 24K dipped below ₹${lo}: now ₹${rate}/g. Good buying window — alert scheme members & bargain hunters.` } }];\nreturn [];"}, "id": "thr", "name": "Threshold check", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [380, 280]},
+    {"parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "={{$json.text}}", "additionalFields": {}}, "id": "tga", "name": "Telegram: rate alert", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [570, 280], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}}
+  ],
+  "connections": {
+    "Daily 9:15": {"main": [[{"node": "Read stock", "type": "main", "index": 0}]]},
+    "Read stock": {"main": [[{"node": "Low items", "type": "main", "index": 0}]]},
+    "Low items": {"main": [[{"node": "Low-stock alert (approve buttons)", "type": "main", "index": 0}]]},
+    "Webhook: PO tap": {"main": [[{"node": "Draft PO", "type": "main", "index": 0}]]},
+    "Draft PO": {"main": [[{"node": "Respond: PO page", "type": "main", "index": 0}]]},
+    "9:00 & 15:00": {"main": [[{"node": "Read rates", "type": "main", "index": 0}]]},
+    "Read rates": {"main": [[{"node": "Threshold check", "type": "main", "index": 0}]]},
+    "Threshold check": {"main": [[{"node": "Telegram: rate alert", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}

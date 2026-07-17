@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gold Price Calculator</title>
+<style>
+:root{--red:#D2042D;--cream:#EAE5D4;--ink:#2A1A1D}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Calibri,sans-serif;background:var(--cream);color:var(--ink)}
+header{background:var(--red);color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
+h1{font-size:20px}#rateHead{font-size:13px;background:rgba(255,255,255,.15);padding:5px 12px;border-radius:20px}
+main{max-width:880px;margin:0 auto;padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:760px){main{grid-template-columns:1fr}}
+.panel{background:#fff;border-radius:12px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
+.panel h2{font-size:13px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;border-bottom:2px solid var(--cream);padding-bottom:6px}
+label{font-size:12px;font-weight:600;display:block;margin:10px 0 3px}
+input,select{width:100%;padding:9px;border:1px solid #d8cfc0;border-radius:8px;font-size:14px;background:#fffdf7}
+.btn{background:#25D366;color:#fff;border:none;border-radius:8px;padding:12px;font-weight:700;cursor:pointer;width:100%;margin-top:12px;font-size:15px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:6px}
+td{padding:8px 4px;border-bottom:1px solid #f0ead9}
+td:last-child{text-align:right;font-weight:600}
+tr.total td{border-top:3px double var(--red);font-size:19px;color:var(--red);font-weight:800;padding-top:12px}
+.note{font-size:11px;color:#8a7f6d;margin-top:10px}
+.owner{grid-column:1/-1;background:#fff8f4;border:1px dashed var(--red)}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:600px){.grid3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>🪙 Gold Price Calculator</h1><div id="rateHead">Set today's rate ↓</div></header>
+<main>
+<div class="panel">
+  <h2>Item</h2>
+  <label>Metal / purity</label>
+  <select id="karat">
+    <option value="0.916">Gold 22K (916)</option>
+    <option value="1">Gold 24K (995/999)</option>
+    <option value="0.75">Gold 18K (750)</option>
+    <option value="0.585">Gold 14K (585)</option>
+    <option value="silver">Silver (925/pure)</option>
+  </select>
+  <label>Weight (grams)</label><input type="number" id="wt" value="10" min="0" step="0.01">
+  <label>Making charge</label>
+  <div class="grid3" style="grid-template-columns:2fr 1fr">
+    <input type="number" id="mk" value="12" min="0" step="0.1">
+    <select id="mkType"><option value="pct">% of gold value</option><option value="pg">₹ per gram</option><option value="flat">₹ flat</option></select>
+  </div>
+  <label>Wastage % (optional)</label><input type="number" id="waste" value="0" min="0" step="0.1">
+  <label>Old-gold exchange value to deduct (₹, optional)</label><input type="number" id="oldg" value="0" min="0">
+</div>
+<div class="panel">
+  <h2>Estimate</h2>
+  <table id="out"></table>
+  <button class="btn" id="share">📲 Share estimate on WhatsApp</button>
+  <div class="note">Estimate only — final price at billing. GST 3% applied on gold + making as per Indian jewellery GST.</div>
+</div>
+<div class="panel owner">
+  <h2>Owner settings — today's rates (saved on this device)</h2>
+  <div class="grid3">
+    <div><label>24K gold rate ₹/gram</label><input type="number" id="rate24" value="7400"></div>
+    <div><label>Silver rate ₹/gram</label><input type="number" id="rateAg" value="110"></div>
+    <div><label>Showroom WhatsApp (91…)</label><input type="text" id="waNum" placeholder="919876543210"></div>
+  </div>
+  <div class="note">Update once each morning. 22K/18K/14K auto-derive from the 24K rate. Brand name: <input id="brand" value="PSG Gold" style="width:160px;display:inline-block;padding:4px 8px"></div>
+</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);const fmt=n=>"₹ "+Math.round(n).toLocaleString("en-IN");
+const KEYS=["rate24","rateAg","waNum","brand","mk","mkType"];
+KEYS.forEach(k=>{const v=localStorage.getItem("gc_"+k);if(v)$(k).value=v});
+function save(){KEYS.forEach(k=>localStorage.setItem("gc_"+k,$(k).value))}
+function calc(){save();
+const k=$("karat").value,wt=+$("wt").value||0,r24=+$("rate24").value||0,rAg=+$("rateAg").value||0;
+const rate=k==="silver"?rAg:r24*(+k);
+const wasteG=wt*(+$("waste").value||0)/100;
+const metal=(wt+wasteG)*rate;
+let making=+$("mk").value||0;const mt=$("mkType").value;
+making=mt==="pct"?metal*making/100:mt==="pg"?making*wt:making;
+const sub=metal+making,gst=sub*0.03,old=+$("oldg").value||0,total=sub+gst-old;
+$("rateHead").textContent=(k==="silver"?"Silver":"Gold "+$("karat").selectedOptions[0].text.match(/\d+K/))+" today: "+fmt(rate)+"/g";
+const rows=[["Rate ("+(k==="silver"?"silver":$("karat").selectedOptions[0].text)+")",fmt(rate)+" /g"],["Metal value ("+wt+" g"+(wasteG?" + "+wasteG.toFixed(2)+" g wastage":"")+")",fmt(metal)],["Making charges",fmt(making)],["GST (3%)",fmt(gst)]];
+if(old)rows.push(["Old gold exchange","− "+fmt(old)]);
+$("out").innerHTML=rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join("")+`<tr class="total"><td>Total</td><td>${fmt(total)}</td></tr>`;
+return{total,rate,wt,making,gst,metal}}
+document.querySelectorAll("input,select").forEach(el=>el.oninput=el.onchange=calc);
+$("share").onclick=()=>{const c=calc();const b=$("brand").value||"our showroom";
+const txt=`*${b} — Gold Estimate*%0A${$("karat").selectedOptions[0].text}, ${c.wt} g%0AMetal: ${fmt(c.metal)}%0AMaking: ${fmt(c.making)}%0AGST 3%25: ${fmt(c.gst)}%0A*Total: ${fmt(c.total)}*%0A_Estimate only — visit us for exact billing._`;
+const n=($("waNum").value||"").replace(/\D/g,"");
+window.open("https://wa.me/"+(n?n:"")+"?text="+txt)};
+calc();
+</script>
+</body>
+</html>

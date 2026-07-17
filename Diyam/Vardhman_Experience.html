@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vardhman Jewels × Ospyr — The Revival &amp; Growth Blueprint</title>
+<style>
+  :root{
+    --ink:#1A0E10; --ink2:#251417; --ink3:#32191E;
+    --wine:#5A1524; --wine-l:#7C1F32; --wine-d:#3C0D18;
+    --gold:#C9A227; --gold-l:#E7CE7C; --gold-2:#B8860B;
+    --bg:#F6F0E6; --bg2:#EDE3D2; --white:#FFFDF8;
+    --muted:#6b5a52; --ink-soft:#3a2a26;
+    --shadow:0 24px 70px rgba(60,13,24,.16);
+    --shadow-d:0 24px 70px rgba(0,0,0,.5);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:'Segoe UI',Calibri,system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;overflow-x:hidden}
+  h1,h2,h3,.serif{font-family:Georgia,'Times New Roman',serif}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 30px}
+  section{padding:100px 0;position:relative}
+  .eyebrow{display:inline-block;text-transform:uppercase;letter-spacing:3.5px;font-size:12px;font-weight:700;color:var(--gold-2);margin-bottom:16px}
+  .hair{width:64px;height:2px;background:linear-gradient(90deg,var(--gold),transparent);margin:18px 0 28px;border-radius:2px}
+  h2.big{font-size:clamp(30px,4.4vw,50px);line-height:1.1;letter-spacing:-.6px;color:var(--wine)}
+  p.body{font-size:18px;color:var(--ink-soft);max-width:780px;margin-top:6px}
+  p.body + p.body{margin-top:16px}
+  .reveal{opacity:0;transform:translateY(32px);transition:opacity .8s ease,transform .8s ease}
+  .reveal.in{opacity:1;transform:none}
+  .dark{background:var(--ink);color:#d8c6bf}
+  .dark h2.big{color:var(--gold-l)} .dark p.body{color:#c3 afa6;color:#c9b3aa} .dark .eyebrow{color:var(--gold-l)}
+
+  #progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:120;background:linear-gradient(90deg,var(--gold),var(--gold-l))}
+
+  /* NAV */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;
+    padding:16px 30px;background:rgba(26,14,16,.74);backdrop-filter:blur(14px);border-bottom:1px solid rgba(201,162,39,.2);transition:.3s}
+  nav .logo{font-family:Georgia,serif;color:var(--gold-l);font-size:20px;letter-spacing:3px;font-weight:700}
+  nav .logo b{color:#fff;font-weight:400;font-size:12px;letter-spacing:2px}
+  nav .links{display:flex;gap:24px}
+  nav .links a{color:#d8c6bf;text-decoration:none;font-size:13.5px;letter-spacing:.5px;transition:.2s}
+  nav .links a:hover{color:var(--gold-l)}
+  nav .cta{background:linear-gradient(90deg,var(--gold-2),var(--gold));color:var(--ink);text-decoration:none;padding:10px 22px;border-radius:40px;font-size:13.5px;font-weight:700;transition:.2s}
+  nav .cta:hover{transform:translateY(-2px)}
+  @media(max-width:940px){nav .links{display:none}}
+
+  /* SIDE NAV */
+  #sidenav{position:fixed;left:22px;top:50%;transform:translateY(-50%);z-index:90;display:flex;flex-direction:column;gap:15px}
+  #sidenav a{display:flex;align-items:center;text-decoration:none}
+  #sidenav .dot{width:11px;height:11px;border-radius:50%;border:2px solid #9a877f;background:transparent;transition:.25s;flex:0 0 11px}
+  #sidenav .lbl{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#9a877f;opacity:0;transform:translateX(-6px);transition:.25s;white-space:nowrap;margin-left:12px;background:rgba(26,14,16,.82);padding:3px 9px;border-radius:20px}
+  #sidenav a:hover .lbl{opacity:1;transform:none}
+  #sidenav a.active .dot{border-color:var(--gold);background:var(--gold);box-shadow:0 0 0 4px rgba(201,162,39,.22);transform:scale(1.2)}
+  #sidenav a.active .lbl{opacity:1;transform:none;color:var(--gold-l)}
+  @media(max-width:1200px){#sidenav{display:none}}
+
+  /* HERO */
+  .hero{min-height:100vh;display:flex;align-items:center;color:#f3e6d9;overflow:hidden;
+    background:radial-gradient(130% 100% at 78% 6%,#7C1F32 0%,#4A1120 42%,#230A10 100%)}
+  .hero:before,.hero:after{content:"";position:absolute;border-radius:50%;opacity:.6;pointer-events:none}
+  .hero:before{width:560px;height:560px;right:-160px;top:-140px;background:radial-gradient(circle,rgba(231,206,124,.24),transparent 62%)}
+  .hero:after{width:420px;height:420px;left:-140px;bottom:-130px;background:radial-gradient(circle,rgba(231,206,124,.16),transparent 64%)}
+  .hero .wrap{position:relative;z-index:2}
+  .hero .mark{font-size:12.5px;letter-spacing:5px;text-transform:uppercase;color:var(--gold-l);margin-bottom:26px}
+  .hero h1{font-size:clamp(40px,7.2vw,80px);line-height:1.03;font-weight:700;letter-spacing:-1.5px;
+    background:linear-gradient(180deg,#FFF7EC,#D9B98F);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero h1 .em{font-style:italic;background:linear-gradient(90deg,var(--gold-l),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.sub{font-size:clamp(18px,2.3vw,25px);margin-top:28px;max-width:800px;color:#e7d6c6}
+  .hero .who{margin-top:44px;font-size:14px;letter-spacing:1px;color:#d3bfb0;border-top:1px solid rgba(201,162,39,.3);display:inline-block;padding-top:16px}
+  .scroll-cue{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);color:var(--gold-l);font-size:12px;letter-spacing:2px;text-transform:uppercase;z-index:2}
+  .scroll-cue span{display:block;text-align:center;font-size:20px;animation:bob 1.8s infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(175px,1fr));gap:28px;text-align:center}
+  .stat .num{font-family:Georgia,serif;font-size:clamp(34px,4.6vw,52px);color:var(--gold-l);font-weight:700;line-height:1}
+  .stat .lab{margin-top:11px;font-size:13.5px;color:#c9b3aa;letter-spacing:.3px}
+  .stat .sub{font-size:12px;color:#9a877f;margin-top:4px}
+
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:54px;align-items:center}
+  @media(max-width:820px){.split{grid-template-columns:1fr;gap:34px}}
+  .crest{aspect-ratio:1;border-radius:20px;background:radial-gradient(120% 120% at 30% 20%,#7C1F32,#230A10);border:1px solid rgba(201,162,39,.3);display:grid;place-items:center;box-shadow:var(--shadow-d);position:relative;overflow:hidden}
+  .crest:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 70% 80%,rgba(231,206,124,.16),transparent 55%)}
+  .crest .c-in{text-align:center;position:relative;z-index:2}
+  .crest .glyph{font-family:Georgia,serif;font-size:70px;color:var(--gold-l);letter-spacing:3px;line-height:1}
+  .crest .est{margin-top:14px;color:#e7d6c6;letter-spacing:5px;font-size:13px;text-transform:uppercase}
+  .crest .pure{margin-top:6px;color:#9a877f;letter-spacing:2px;font-size:12px}
+  .note{font-size:12.5px;color:var(--muted);font-style:italic;margin-top:18px;background:var(--bg2);border-left:3px solid var(--gold);padding:10px 14px;border-radius:8px}
+
+  /* name error callout */
+  .err{margin-top:44px;background:linear-gradient(120% 100% at 0 0,#7C1F32,#3C0D18);border:1px solid rgba(231,206,124,.3);border-radius:20px;padding:40px 42px;color:#f3e6d9;box-shadow:var(--shadow-d)}
+  .err .tag{display:inline-block;background:var(--gold);color:var(--ink);font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase;padding:5px 14px;border-radius:20px}
+  .err h3{font-family:Georgia,serif;font-size:26px;color:var(--gold-l);margin:16px 0 10px}
+  .err .vs{display:flex;gap:16px;flex-wrap:wrap;margin:22px 0}
+  .err .chip{background:rgba(255,255,255,.06);border:1px solid rgba(231,206,124,.25);border-radius:12px;padding:14px 20px;flex:1;min-width:200px}
+  .err .chip small{display:block;color:#c9b3aa;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+  .err .chip b{font-family:Georgia,serif;font-size:22px;color:#fff}
+  .err .chip.a b{color:var(--gold-l)}
+  .err p{color:#e7d6c6;font-size:15px}
+
+  .cmp{margin-top:44px;display:flex;flex-direction:column;gap:26px}
+  .crow .ctop{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+  .crow .cname{font-size:15px;color:var(--gold-l);font-weight:600}
+  .crow .cname small{color:#9a877f;font-weight:400}
+  .crow .cval{font-family:Georgia,serif;font-size:20px;color:var(--gold-l);font-weight:700}
+  .track{height:16px;background:rgba(255,255,255,.06);border-radius:20px;overflow:hidden}
+  .fill{height:100%;border-radius:20px;width:0;transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
+  .fill.you{background:linear-gradient(90deg,#7C1F32,#B85C6E)}
+  .fill.comp{background:linear-gradient(90deg,var(--gold-2),var(--gold-l))}
+  .cmp-note{margin-top:8px;font-size:13px;color:#9a877f}
+
+  .diag{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:18px;margin-top:44px}
+  .dcard{background:var(--white);border-radius:16px;padding:26px;box-shadow:0 10px 30px rgba(60,13,24,.08);border-left:4px solid var(--gold)}
+  .dcard .x{color:#B23A48;font-weight:700;font-size:14px;letter-spacing:.5px}
+  .dcard h4{font-size:17px;color:var(--wine);margin:6px 0 8px}
+  .dcard p{font-size:14.5px;color:var(--muted)}
+  .dcard .fix{margin-top:12px;font-size:13.5px;color:#0E7C57;font-weight:600}
+
+  .pull{background:linear-gradient(120% 100% at 0 0,#3C0D18,#1A0E10);color:#f3e6d9;border-radius:24px;padding:60px 50px;text-align:center;box-shadow:var(--shadow-d);position:relative;overflow:hidden;border:1px solid rgba(201,162,39,.22)}
+  .pull:before{content:"\201C";position:absolute;top:-14px;left:28px;font-family:Georgia,serif;font-size:170px;color:rgba(231,206,124,.14)}
+  .pull q{font-family:Georgia,serif;font-size:clamp(23px,3.3vw,38px);line-height:1.3;font-style:italic;display:block;position:relative}
+  .pull .attr{margin-top:22px;color:var(--gold-l);letter-spacing:2px;text-transform:uppercase;font-size:13px}
+
+  .engine{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;margin-top:44px}
+  .ecard{background:var(--white);border-radius:18px;padding:30px;box-shadow:0 12px 34px rgba(60,13,24,.09);border-top:4px solid var(--wine);transition:.2s}
+  .ecard:hover{transform:translateY(-5px);box-shadow:var(--shadow);border-top-color:var(--gold)}
+  .ecard .ico{font-size:26px}
+  .ecard h3{font-size:19px;color:var(--wine);margin:12px 0 8px}
+  .ecard p{font-size:14.5px;color:var(--muted);margin-bottom:12px}
+  .ecard ul{list-style:none;padding:0}
+  .ecard li{font-size:14px;color:var(--ink-soft);padding:5px 0 5px 20px;position:relative}
+  .ecard li:before{content:"◆";color:var(--gold);position:absolute;left:0;font-size:10px;top:8px}
+
+  /* website refs */
+  .refs{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:34px}
+  .ref{background:var(--white);border:1px solid rgba(201,162,39,.3);border-radius:14px;padding:20px;text-decoration:none;color:var(--wine);transition:.18s;display:block}
+  .ref:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:var(--gold)}
+  .ref b{font-size:15.5px;display:block}
+  .ref span{font-size:12.5px;color:var(--muted);display:block;margin-top:5px}
+  .ref .go{margin-top:10px;font-size:11.5px;letter-spacing:1px;text-transform:uppercase;color:var(--gold-2);font-weight:700}
+  .domains{margin-top:30px;background:var(--bg2);border-radius:14px;padding:24px 28px;border-left:4px solid var(--gold)}
+  .domains b{color:var(--wine)} .domains code{background:#fff;border:1px solid #e3d4bd;border-radius:6px;padding:3px 9px;margin:3px;display:inline-block;font-size:13px;color:var(--wine-l)}
+
+  .auto-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px;margin-top:44px}
+  .acard{background:var(--ink2);border:1px solid rgba(201,162,39,.18);border-radius:14px;padding:22px;transition:.2s}
+  .acard:hover{border-color:var(--gold);transform:translateY(-4px)}
+  .acard .t{font-size:22px}
+  .acard b{display:block;margin-top:10px;color:var(--gold-l);font-size:16px}
+  .acard p{font-size:13.5px;color:#b7a49b;margin-top:6px}
+
+  .sprint{margin-top:44px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  @media(max-width:820px){.sprint{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.sprint{grid-template-columns:1fr}}
+  .wk{background:var(--white);border-radius:16px;padding:24px;box-shadow:var(--shadow);border-top:5px solid var(--gold)}
+  .wk .wn{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gold-2);font-weight:700}
+  .wk h4{font-size:18px;color:var(--wine);margin:8px 0 10px}
+  .wk ul{list-style:none;padding:0}
+  .wk li{font-size:13.5px;color:var(--muted);padding:4px 0 4px 16px;position:relative}
+  .wk li:before{content:"›";position:absolute;left:0;color:var(--gold);font-weight:700}
+
+  .sflow{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-top:40px}
+  .snode{background:var(--ink2);border:1px solid rgba(201,162,39,.2);border-radius:14px;padding:22px 18px;text-align:center}
+  .snode .sn{font-family:Georgia,serif;color:var(--gold-l);font-size:15px;font-weight:700}
+  .snode b{display:block;color:#f3e6d9;margin-top:8px;font-size:15px}
+  .snode span{font-size:12.5px;color:#b7a49b;display:block;margin-top:4px}
+
+  .growth{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:44px}
+  @media(max-width:760px){.growth{grid-template-columns:1fr}}
+  .gcard{background:var(--white);border-radius:16px;padding:32px 24px;box-shadow:var(--shadow);text-align:center;border-top:5px solid var(--wine)}
+  .gcard h4{font-size:13px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted)}
+  .gcard .big-n{font-family:Georgia,serif;font-size:42px;color:var(--wine);font-weight:700;margin:12px 0 4px;line-height:1}
+  .gcard .cap{font-size:14px;color:var(--muted)}
+  .gcard.mid{border-top-color:var(--gold);transform:scale(1.04)} .gcard.mid .big-n{color:var(--gold-2)}
+  @media(max-width:760px){.gcard.mid{transform:none}}
+
+  /* group */
+  .grp{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:44px}
+  @media(max-width:760px){.grp{grid-template-columns:1fr}}
+  .house{border-radius:18px;padding:34px;color:#fff;text-decoration:none;display:block;transition:.2s;box-shadow:var(--shadow)}
+  .house:hover{transform:translateY(-5px)}
+  .house.gold{background:linear-gradient(130% 100% at 20% 10%,#7C1F32,#3C0D18)}
+  .house.silver{background:linear-gradient(130% 100% at 20% 10%,#2A323C,#0F1319)}
+  .house small{letter-spacing:3px;text-transform:uppercase;font-size:11px;opacity:.8}
+  .house h3{font-family:Georgia,serif;font-size:26px;margin:8px 0 6px}
+  .house p{font-size:14px;opacity:.88}
+  .house .go{margin-top:16px;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--gold-l)}
+
+  .tools{display:grid;grid-template-columns:repeat(auto-fit,minmax(235px,1fr));gap:16px;margin-top:44px}
+  .tool{background:var(--ink2);border:1px solid rgba(201,162,39,.18);border-radius:14px;padding:22px;text-decoration:none;color:#d8c6bf;transition:.18s;display:block}
+  .tool:hover{transform:translateY(-4px);border-color:var(--gold);box-shadow:var(--shadow-d)}
+  .tool .emo{font-size:25px} .tool b{display:block;margin-top:10px;font-size:16.5px;color:var(--gold-l)}
+  .tool p{font-size:13px;color:#b7a49b;margin-top:6px}
+  .tool .go{margin-top:11px;font-size:11.5px;letter-spacing:1px;text-transform:uppercase;color:var(--gold-2)}
+  .auto-note{margin-top:34px;background:var(--ink2);border-radius:14px;padding:26px 30px;border-left:4px solid var(--gold)}
+  .auto-note b{color:var(--gold-l)}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:34px}
+  @media(max-width:760px){.two{grid-template-columns:1fr}}
+  .phase{background:rgba(255,255,255,.05);border:1px solid rgba(201,162,39,.25);border-radius:16px;padding:30px}
+  .phase .p-n{color:var(--gold-l);letter-spacing:2px;text-transform:uppercase;font-size:12px;font-weight:700}
+  .phase h4{font-size:22px;margin:8px 0 10px;color:#f3e6d9}
+  .phase p{color:#c9b3aa;font-size:15px}
+
+  .cta{text-align:center}
+  .cta h2{font-size:clamp(30px,5vw,54px)}
+  .btn{display:inline-flex;gap:10px;align-items:center;margin-top:30px;text-decoration:none;padding:18px 42px;border-radius:50px;font-size:17px;font-weight:700;transition:.18s;background:linear-gradient(90deg,var(--gold-2),var(--gold));color:var(--ink);box-shadow:0 14px 34px rgba(201,162,39,.4)}
+  .btn:hover{transform:translateY(-3px);box-shadow:0 20px 46px rgba(201,162,39,.5)}
+
+  footer{background:#140A0C;color:#8a746c;text-align:center;padding:44px 20px;font-size:13px}
+  footer .b{color:var(--gold-l);font-family:Georgia,serif;font-size:21px;letter-spacing:3px}
+  @media(max-width:760px){section{padding:72px 0}.pull,.phase,.err{padding:34px 24px}}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<nav id="nav">
+  <div class="logo">VARDHMAN <b>SINCE 1985</b></div>
+  <div class="links">
+    <a href="#legacy">Legacy</a>
+    <a href="#today">Today</a>
+    <a href="#gap">The Gap</a>
+    <a href="#fix">What's Broken</a>
+    <a href="#engine">The Engine</a>
+    <a href="#web">Website</a>
+    <a href="#sprint">30 Days</a>
+    <a href="#group">The Group</a>
+  </div>
+  <a class="cta" href="https://api.whatsapp.com/send?phone=917996998896">Let's grow →</a>
+</nav>
+
+<div id="sidenav">
+  <a href="#home" data-sec="home"><span class="dot"></span><span class="lbl">Home</span></a>
+  <a href="#legacy" data-sec="legacy"><span class="dot"></span><span class="lbl">Legacy</span></a>
+  <a href="#today" data-sec="today"><span class="dot"></span><span class="lbl">Today</span></a>
+  <a href="#gap" data-sec="gap"><span class="dot"></span><span class="lbl">The Gap</span></a>
+  <a href="#fix" data-sec="fix"><span class="dot"></span><span class="lbl">What's Broken</span></a>
+  <a href="#engine" data-sec="engine"><span class="dot"></span><span class="lbl">The Engine</span></a>
+  <a href="#web" data-sec="web"><span class="dot"></span><span class="lbl">Website</span></a>
+  <a href="#automations" data-sec="automations"><span class="dot"></span><span class="lbl">Automations</span></a>
+  <a href="#sprint" data-sec="sprint"><span class="dot"></span><span class="lbl">30 Days</span></a>
+  <a href="#targets" data-sec="targets"><span class="dot"></span><span class="lbl">Targets</span></a>
+  <a href="#group" data-sec="group"><span class="dot"></span><span class="lbl">The Group</span></a>
+  <a href="#start" data-sec="start"><span class="dot"></span><span class="lbl">Start</span></a>
+</div>
+
+<!-- HERO -->
+<header class="hero" id="home">
+  <div class="wrap">
+    <div class="mark">◆ VARDHMAN JEWELS &nbsp;·&nbsp; SINCE 1985 &nbsp;·&nbsp; JAYANAGAR, BENGALURU ◆</div>
+    <h1>A 40-year legacy<br>deserves to <span class="em">lead</span> — not fade.</h1>
+    <p class="sub">Vardhman Jewels has four decades of gold, trust and craft behind it. But online, the legacy is going quiet — reach halved, views down 61%, growth at zero. This is the plan to revive it, unify it, and make it the digital name Bangalore searches for.</p>
+    <div class="who">A revival, growth &amp; sales blueprint prepared for Vardhman Jewels &nbsp;·&nbsp; by Ospyr</div>
+  </div>
+  <div class="scroll-cue">scroll<span>⌄</span></div>
+</header>
+
+<!-- LEGACY -->
+<section id="legacy">
+  <div class="wrap reveal">
+    <div class="eyebrow">The house &amp; its founder</div>
+    <h2 class="big">Four decades of gold. A name families trust.</h2>
+    <div class="hair"></div>
+    <div class="split">
+      <div>
+        <p class="body">Since <b>1985</b>, Vardhman Jewels has been part of Jayanagar's story — temple jewellery, bridal gold, and the kind of trust that only time can build. Four decades of families who came for a wedding and came back for the next generation's.</p>
+        <p class="body">That heritage is a moat no new brand can copy. Yet online, almost none of it shows. The founder's story, the craft, the meaning behind temple and bridal gold — the most valuable assets you own — are invisible. We put the legacy at the centre: a founder's film, the "since 1985" mark on everything, and a brand that finally feels as premium online as it does in person.</p>
+        <div class="note">Draft narrative — we'll build this around your real founder's name, the family story, and the true milestones of the house before it goes live. Give us the details and we'll script the founder's film.</div>
+      </div>
+      <div class="crest">
+        <div class="c-in">
+          <div class="glyph">V</div>
+          <div class="est">Vardhman Jewels</div>
+          <div class="pure">·  EST. 1985  ·</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TODAY -->
+<section class="dark" id="today">
+  <div class="wrap reveal">
+    <div class="eyebrow">Where you stand today — the real numbers</div>
+    <h2 class="big">A legacy that's going quiet online.</h2>
+    <p class="body" style="margin-bottom:14px">Straight from your Instagram analytics (18 Jun – 17 Jul). Every arrow is pointing down — and that's exactly what we reverse.</p>
+    <div class="stat-grid" style="margin-top:48px">
+      <div class="stat"><div class="num" data-count="4973">0</div><div class="lab">Followers</div><div class="sub">0% growth — flat</div></div>
+      <div class="stat"><div class="num" data-count="12">0</div><div class="lab">Posts this month</div><div class="sub">down from 18</div></div>
+      <div class="stat"><div class="num" data-count="105">0</div><div class="lab">Total engagement</div><div class="sub">▼ 72% · ~3.5/day</div></div>
+      <div class="stat"><div class="num" data-count="3">0</div><div class="lab">Comments — all month</div><div class="sub">102 likes total</div></div>
+      <div class="stat"><div class="num" data-count="6372">0</div><div class="lab">Reach</div><div class="sub">▼ 53%</div></div>
+      <div class="stat"><div class="num" data-count="8130">0</div><div class="lab">Views</div><div class="sub">▼ 61% · video 19K→3.5K</div></div>
+    </div>
+    <p class="body" style="margin-top:40px;color:#c9b3aa">You have a 5,000-strong audience built over years — but it's asleep. Posting has slowed, reels aren't reaching, and not one new follower joined this month. The good news: an established audience wakes up far faster than a cold one. The foundation is already paid for.</p>
+  </div>
+</section>
+
+<!-- GAP -->
+<section id="gap">
+  <div class="wrap reveal">
+    <div class="eyebrow">The gap — you vs the field</div>
+    <h2 class="big">A 40-year house, being out-marketed by newcomers.</h2>
+    <div class="hair"></div>
+    <p class="body">Same month. A younger brand with barely 2× your followers earns nearly 200× your engagement — purely on system, content and consistency.</p>
+    <div class="cmp">
+      <div class="crow"><div class="ctop"><span class="cname">Vardhman <small>· 4,973 followers, 12 posts</small></span><span class="cval">105</span></div><div class="track"><div class="fill you" data-w="0.5"></div></div><div class="cmp-note">Total monthly engagement · ~3.5 a day</div></div>
+      <div class="crow"><div class="ctop"><span class="cname">OnnMe <small>· 11.2K followers, 60 posts</small></span><span class="cval">20,100</span></div><div class="track"><div class="fill comp" data-w="34"></div></div><div class="cmp-note">~191× your engagement — offers, trends, creators, 6 PM timing</div></div>
+      <div class="crow"><div class="ctop"><span class="cname">PSG Gold <small>· 1.18M followers, 190 posts</small></span><span class="cval">59,900</span></div><div class="track"><div class="fill comp" data-w="100"></div></div><div class="cmp-note">Where a fully-run gold house reaches</div></div>
+    </div>
+    <p class="body" style="margin-top:40px">Your reels already beat your images (12.8 vs 5 engagement) and you post best on Monday 6 PM — but you're publishing Thursday 4 PM. Small, data-clear fixes with outsized payoff.</p>
+  </div>
+</section>
+
+<!-- WHAT'S BROKEN -->
+<section class="dark" id="fix">
+  <div class="wrap reveal">
+    <div class="eyebrow">What's actually broken</div>
+    <h2 class="big">Six leaks — all fixable, some in a single day.</h2>
+
+    <!-- NAME ERROR -->
+    <div class="err">
+      <span class="tag">⚠ Brand-name split — fix this first</span>
+      <h3>Is it "Vardhaman" or "Vardhman"? Right now, it's both.</h3>
+      <div class="vs">
+        <div class="chip a"><small>Instagram · Website · Showroom board</small><b>VARDHMAN</b></div>
+        <div class="chip"><small>Google · Justdial · your own captions</small><b>VARDHAMAN</b></div>
+      </div>
+      <p>Your handle, website and the board outside the showroom say <b>VARDHMAN</b> — but Google, Justdial and even your own posts say <b>VARDHAMAN</b> (with the extra "a"). One missing letter splits your search results, your reviews and your brand in two. Customers searching one spelling never find the other. <b>Step one: pick one official spelling, unify it everywhere</b> — board, bio, website, listings, hashtags — and secure the matching domains and handles so no one else can.</p>
+    </div>
+
+    <div class="diag">
+      <div class="dcard"><div class="x">✕ WHATSAPP</div><h4>Chat dies after "hello"</h4><p>Your WhatsApp stops at Meta's welcome message — no catalog, no real reply. Every enquiry hits a wall.</p><div class="fix">→ Full WhatsApp Business API + catalog</div></div>
+      <div class="dcard"><div class="x">✕ META SUITE</div><h4>No Meta Business Suite</h4><p>No proper business manager, no ad account structure, no pixel — so no ads, no retargeting, no scale.</p><div class="fix">→ Meta Business Suite fully set up</div></div>
+      <div class="dcard"><div class="x">✕ GOOGLE</div><h4>No Google Business Suite</h4><p>Profile unmanaged, few reviews, not ranking in the Jayanagar map pack where buyers search.</p><div class="fix">→ Google Business + Workspace managed</div></div>
+      <div class="dcard"><div class="x">✕ WEBSITE</div><h4>Website is thin &amp; invisible</h4><p>vardhmanjewels.in exists but barely — no catalog, no story, no capture, no SEO. See our builds below.</p><div class="fix">→ A premium new website</div></div>
+      <div class="dcard"><div class="x">✕ REVIEWS</div><h4>Too few reviews</h4><p>Four decades of happy families, almost none of it online. Low review count = lost trust &amp; ranking.</p><div class="fix">→ Automated reviews engine</div></div>
+      <div class="dcard"><div class="x">✕ MOMENTUM</div><h4>Posting &amp; reach declining</h4><p>Fewer posts, wrong timing, no ads, no automations — the account is drifting, not driving.</p><div class="fix">→ The full engine below</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PULL -->
+<section>
+  <div class="wrap reveal">
+    <div class="pull">
+      <q>You spent 40 years earning the trust.<br>Give us one month to make the internet finally show it.</q>
+      <div class="attr">The Vardhman opportunity, in one line</div>
+    </div>
+  </div>
+</section>
+
+<!-- ENGINE -->
+<section id="engine">
+  <div class="wrap reveal">
+    <div class="eyebrow">Everything we build &amp; run for you</div>
+    <h2 class="big">The complete growth engine.</h2>
+    <div class="hair"></div>
+    <p class="body">A full high-end marketing department for Vardhman — heritage brought online, and every channel working together.</p>
+    <div class="engine">
+      <div class="ecard"><div class="ico">📱</div><h3>Social Media, All Pages</h3><p>Every platform, one premium brand.</p><ul><li>Instagram, Facebook, Threads, Pinterest, YouTube</li><li>Strategy, calendar &amp; daily posting (right timing)</li><li>Community &amp; DM management</li><li>Profile &amp; bio unified under one name</li></ul></div>
+      <div class="ecard"><div class="ico">🎯</div><h3>Google &amp; Meta Ads</h3><p>Reach ready buyers, profitably.</p><ul><li>Meta ads (Instagram/Facebook) — enquiry, catalog, traffic</li><li>Google Search + Maps + Shopping ads</li><li>Retargeting &amp; festive campaign bursts</li><li>Creative + profit tracking</li></ul></div>
+      <div class="ecard"><div class="ico">🏢</div><h3>Meta Business Suite</h3><p>The engine room, set up right.</p><ul><li>Business manager, ad accounts &amp; pixel</li><li>Catalog, shops &amp; lead forms</li><li>Roles, permissions &amp; safety</li><li>Everything ads need to run &amp; scale</li></ul></div>
+      <div class="ecard"><div class="ico">⚙️</div><h3>Google Workspace &amp; Automation</h3><p>The back office, organised.</p><ul><li>Google Workspace setup &amp; management</li><li>Business email, drive, shared catalog sheets</li><li>Workspace automations (leads → sheets → alerts)</li><li>One master system feeding everything</li></ul></div>
+      <div class="ecard"><div class="ico">🎬</div><h3>Content &amp; Creative</h3><p>Heritage gold, made irresistible.</p><ul><li>Macro &amp; on-model bridal / temple jewellery</li><li>Reels growth engine — hook-first, right timing</li><li>Festive &amp; wedding lookbooks</li><li>Trending-audio &amp; styling formats</li></ul></div>
+      <div class="ecard"><div class="ico">🤖</div><h3>AI Image &amp; Video Studio</h3><p>Endless content from one photo.</p><ul><li>Product photo → studio-grade image</li><li>Photo → AI 360° / showcase video</li><li>AI on-model shots without shoots</li><li>AI UGC-style ad videos at scale</li></ul></div>
+      <div class="ecard"><div class="ico">🗣️</div><h3>Founder &amp; Brand Growth</h3><p>Make the founder the face.</p><ul><li>Founder's film &amp; personal brand</li><li>Behind-the-craft &amp; "since 1985" series</li><li>Customer stories &amp; testimonials</li><li>A premium legacy brand voice</li></ul></div>
+      <div class="ecard"><div class="ico">💬</div><h3>WhatsApp Commerce (fixed)</h3><p>From dead chat to selling channel.</p><ul><li>WhatsApp Business API + full catalog</li><li>Instant price / purity / stock replies</li><li>Click-to-WhatsApp on every post &amp; ad</li><li>Broadcast lists for drops &amp; festivals</li></ul></div>
+      <div class="ecard"><div class="ico">📍</div><h3>Get Found — Local &amp; SEO</h3><p>Own the map and the search bar.</p><ul><li>Google Business Profile &amp; Maps managed</li><li>Justdial &amp; listings unified under one name</li><li>Local SEO: "gold / bridal jewellery Jayanagar"</li><li>Reviews engine — grow from a handful to hundreds</li></ul></div>
+      <div class="ecard"><div class="ico">🔗</div><h3>Jewellery-Software Integration</h3><p>Connect what you already run.</p><ul><li>Link billing/inventory to catalog &amp; site</li><li>Auto-sync stock, designs &amp; gold rate</li><li>Sales &amp; customers into the CRM</li><li>One source of truth, no double entry</li></ul></div>
+      <div class="ecard"><div class="ico">📇</div><h3>CRM, Retention &amp; Loyalty</h3><p>Wake the sleeping customer base.</p><ul><li>Every past &amp; new customer in one database</li><li>Occasion &amp; festival reminders</li><li>Bridal nurture &amp; gold-savings scheme</li><li>Win-back &amp; referral flows</li></ul></div>
+      <div class="ecard"><div class="ico">📊</div><h3>Owner Command Dashboard</h3><p>Run it all from one screen.</p><ul><li>Enquiries, sales, ads, reviews in one view</li><li>8 AM WhatsApp digest daily</li><li>Weekly scorecard vs targets</li><li>Ask-your-business AI assistant</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- WEBSITE + REFERENCES -->
+<section class="dark" id="web">
+  <div class="wrap reveal">
+    <div class="eyebrow">Your new digital front door</div>
+    <h2 class="big">A website worthy of a 40-year house.</h2>
+    <p class="body">Your current site is thin and invisible. We build premium, fast, modern sites — here are live examples of the calibre we deliver (open any of them):</p>
+    <div class="refs">
+      <a class="ref" href="https://ring-flame.vercel.app/" target="_blank"><b>Ring Flame ✨ 3D</b><span>Immersive 3D jewellery experience</span><div class="go">View live →</div></a>
+      <a class="ref" href="https://chainshield-eta.vercel.app/" target="_blank"><b>ChainShield</b><span>Sleek product &amp; brand site</span><div class="go">View live →</div></a>
+      <a class="ref" href="https://divaa-ecommerce.vercel.app/" target="_blank"><b>Divaa</b><span>Full e-commerce storefront</span><div class="go">View live →</div></a>
+      <a class="ref" href="https://aurora-spa-one.vercel.app/" target="_blank"><b>Aurora Spa</b><span>Elegant premium service site</span><div class="go">View live →</div></a>
+      <a class="ref" href="https://aetherclothing-phi.vercel.app/" target="_blank"><b>Aether Clothing</b><span>Modern fashion / retail brand</span><div class="go">View live →</div></a>
+      <a class="ref" href="https://beanlore-five.vercel.app/" target="_blank"><b>Beanlore</b><span>Storytelling brand site</span><div class="go">View live →</div></a>
+      <a class="ref" href="https://bangalore-bites-bakery.vercel.app/" target="_blank"><b>Bangalore Bites</b><span>Local business storefront</span><div class="go">View live →</div></a>
+    </div>
+    <div class="domains">
+      <b>Secure the brand before someone else does.</b> These matching domains are available now — we recommend locking them alongside unifying the name:
+      <div style="margin-top:12px">
+        <code>vardhamanjewels.com</code><code>vardhmangems.com</code><code>diyamjewels.com</code><code>diyamhouseofsilver.com</code>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- AUTOMATIONS -->
+<section id="automations">
+  <div class="wrap reveal dark" style="background:transparent;color:var(--ink-soft)">
+    <div class="eyebrow">The automation suite</div>
+    <h2 class="big">Every routine job, on autopilot.</h2>
+    <p class="body">The work that's impossible by hand — answered instantly, 24/7, in Kannada &amp; English.</p>
+    <div class="auto-grid" style="filter:none">
+      <div class="acard"><div class="t">💬</div><b>WhatsApp auto-reply</b><p>Catalog, price, purity &amp; stock in seconds — no more dead chat.</p></div>
+      <div class="acard"><div class="t">📩</div><b>Instagram auto-DM</b><p>Every DM answered &amp; turned into a lead.</p></div>
+      <div class="acard"><div class="t">💭</div><b>Comment → auto-DM</b><p>Keyword comment triggers an instant DM + link.</p></div>
+      <div class="acard"><div class="t">📞</div><b>AI voice agent (Kannada)</b><p>Answers calls, quotes, books visits 24/7.</p></div>
+      <div class="acard"><div class="t">🖼️</div><b>Photo → branded image</b><p>Send a photo, get a catalog visual back.</p></div>
+      <div class="acard"><div class="t">🎥</div><b>Photo → showcase video</b><p>One photo becomes a reel-ready video.</p></div>
+      <div class="acard"><div class="t">🚀</div><b>New design → everywhere</b><p>Auto-posted + broadcast to VIP buyers.</p></div>
+      <div class="acard"><div class="t">🎉</div><b>Festive broadcasts</b><p>Akshaya Tritiya, Dhanteras, weddings — automatic.</p></div>
+      <div class="acard"><div class="t">⭐</div><b>Review &amp; referral</b><p>Auto-ask after every sale — reviews on autopilot.</p></div>
+      <div class="acard"><div class="t">🔥</div><b>AI lead scoring</b><p>Hot buyers flagged with the next action.</p></div>
+      <div class="acard"><div class="t">💍</div><b>Bridal nurture drip</b><p>6-month automated journey for high-ticket bridal.</p></div>
+      <div class="acard"><div class="t">☀️</div><b>Daily owner digest</b><p>Enquiries, sales, ads &amp; rate — one morning message.</p></div>
+    </div>
+    <div class="auto-note" style="background:var(--bg2);color:var(--ink-soft)"><b style="color:var(--wine)">52 automations across 21 groups are already built</b> and import-ready — Vardhman gets the whole library, configured to your channels and your gold catalog.</div>
+  </div>
+</section>
+
+<!-- SPRINT -->
+<section id="sprint">
+  <div class="wrap reveal">
+    <div class="eyebrow">The first 30 days</div>
+    <h2 class="big">One month to revive the legacy online.</h2>
+    <div class="hair"></div>
+    <p class="body">You asked for growth in the next month. Here's exactly how we spend it.</p>
+    <div class="sprint">
+      <div class="wk"><div class="wn">Week 1</div><h4>Unify &amp; fix</h4><ul><li>Lock one official brand name everywhere</li><li>Secure domains &amp; handles</li><li>WhatsApp Business API + catalog live</li><li>Meta Business Suite + Google Business set up</li><li>Profile &amp; bio revamp</li></ul></div>
+      <div class="wk"><div class="wn">Week 2</div><h4>Content &amp; automation</h4><ul><li>Reels engine at full flow (Mon 6 PM)</li><li>AI image + video automations on</li><li>Auto-DM + comment-to-DM live</li><li>Reviews engine switched on</li><li>Founder story shoot</li></ul></div>
+      <div class="wk"><div class="wn">Week 3</div><h4>Ads &amp; reach</h4><ul><li>Meta + Google ads live</li><li>Retargeting the sleeping 5K audience</li><li>Local creators &amp; UGC</li><li>New premium website launched</li><li>SEO &amp; listings unified</li></ul></div>
+      <div class="wk"><div class="wn">Week 4</div><h4>Prove &amp; scale</h4><ul><li>Festive / wedding-season push</li><li>WhatsApp enquiries → sales</li><li>Owner dashboard + daily digest</li><li>Reviews climbing</li><li>Growth curve reported</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- SALES -->
+<section class="dark" id="sales">
+  <div class="wrap reveal">
+    <div class="eyebrow">From followers to sales</div>
+    <h2 class="big">Reach is nice. We're here for revenue.</h2>
+    <p class="body">Every part of the engine points at gold in the till — bridal, festive and repeat. The path a single reel now takes:</p>
+    <div class="sflow">
+      <div class="snode"><div class="sn">01</div><b>Reel + ad reach</b><span>hook · timing · targeting</span></div>
+      <div class="snode"><div class="sn">02</div><b>Comment / DM</b><span>auto-answered instantly</span></div>
+      <div class="snode"><div class="sn">03</div><b>WhatsApp catalog</b><span>price, purity, booking</span></div>
+      <div class="snode"><div class="sn">04</div><b>Showroom visit / order</b><span>bridal · festive · wholesale</span></div>
+      <div class="snode"><div class="sn">05</div><b>Review + repeat</b><span>referral &amp; occasion nurture</span></div>
+    </div>
+    <p class="body" style="margin-top:40px;color:#c9b3aa">Gold's advantage: high ticket, occasion-driven (bridal, Akshaya Tritiya, Dhanteras, wedding season) and a 5,000-strong warm base to re-activate. One recovered bridal customer can outweigh a month of ad spend.</p>
+  </div>
+</section>
+
+<!-- TARGETS -->
+<section id="targets">
+  <div class="wrap reveal">
+    <div class="eyebrow">The growth we build toward</div>
+    <h2 class="big">From flat to climbing — fast.</h2>
+    <div class="hair"></div>
+    <p class="body">Honest, directional targets. An established, warm audience revives quicker than a cold one — that's your head start.</p>
+    <div class="growth">
+      <div class="gcard"><h4>30 days</h4><div class="big-n">8K+</div><div class="cap">followers reactivated, reach &amp; enquiries climbing, ads live</div></div>
+      <div class="gcard mid"><h4>90 days</h4><div class="big-n">20K+</div><div class="cap">a leading Jayanagar gold name online, steady bridal enquiries</div></div>
+      <div class="gcard"><h4>12 months</h4><div class="big-n">100K+</div><div class="cap">a recognised Bangalore gold house across every channel</div></div>
+    </div>
+    <p class="body" style="text-align:center;max-width:720px;margin:30px auto 0;font-style:italic;font-size:14px;color:var(--muted)">Targets, not guarantees. Reported weekly, always transparent.</p>
+  </div>
+</section>
+
+<!-- THE GROUP -->
+<section class="dark" id="group">
+  <div class="wrap reveal">
+    <div class="eyebrow">One family · two houses</div>
+    <h2 class="big">Vardhman &amp; Diyam — grown together.</h2>
+    <p class="body">Two identities, one standard of trust: Vardhman Jewels for gold, Diyam House of Silver for 925 sterling. We grow both in parallel — shared systems, separate brands — so each speaks to its own customer while the group compounds.</p>
+    <div class="grp">
+      <a class="house gold" href="./Vardhman_Experience.html"><small>Gold · Since 1985</small><h3>Vardhman Jewels</h3><p>The heritage gold house — bridal, temple &amp; festive. Revive, unify, lead.</p><div class="go">You're here →</div></a>
+      <a class="house silver" href="./Diyam_Experience.html"><small>925 Sterling Silver</small><h3>Diyam House of Silver</h3><p>The modern silver brand — giftable, trend-led, wholesale &amp; retail.</p><div class="go">Open Diyam's blueprint →</div></a>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF -->
+<section id="proof">
+  <div class="wrap reveal dark" style="background:transparent;color:var(--ink-soft)">
+    <div class="eyebrow">The unfair advantage</div>
+    <h2 class="big">Most agencies show slides. We hand you working software.</h2>
+    <p class="body">Eight white-label tools and 52 automations, already built — configured for Vardhman. Click any tool to open the real thing.</p>
+    <div class="tools">
+      <a class="tool" href="./tools/studio-photo.html"><div class="emo">📸</div><b>Studio Photo</b><p>Any phone photo → a pro studio image.</p><div class="go">Open tool →</div></a>
+      <a class="tool" href="./tools/product-card.html"><div class="emo">🏷️</div><b>Product Card Maker</b><p>Photo + details → branded catalog cards.</p><div class="go">Open tool →</div></a>
+      <a class="tool" href="./tools/gold-calculator.html"><div class="emo">🪙</div><b>Gold Calculator</b><p>Weight × rate + making + GST → instant quote.</p><div class="go">Open tool →</div></a>
+      <a class="tool" href="./tools/enquiry-crm.html"><div class="emo">📇</div><b>Enquiry CRM</b><p>Log &amp; track every enquiry to close.</p><div class="go">Open tool →</div></a>
+      <a class="tool" href="./tools/festive-calendar.html"><div class="emo">📅</div><b>Festive Calendar</b><p>Every festival with campaign plans.</p><div class="go">Open tool →</div></a>
+      <a class="tool" href="./tools/review-qr.html"><div class="emo">⭐</div><b>Review QR Kit</b><p>Turn happy families into 5-stars.</p><div class="go">Open tool →</div></a>
+      <a class="tool" href="./tools/savings-scheme.html"><div class="emo">💰</div><b>Savings Scheme</b><p>Gold savings-scheme calculator.</p><div class="go">Open tool →</div></a>
+      <a class="tool" href="./tools/owner-dashboard.html"><div class="emo">📊</div><b>Owner Dashboard</b><p>Your whole shop on one screen.</p><div class="go">Open tool →</div></a>
+    </div>
+    <div class="auto-note" style="background:var(--bg2);color:var(--ink-soft)">All eight tools are white-label — brand name, colours &amp; WhatsApp number configure to Vardhman in seconds. <a href="./tools/index.html" style="color:var(--gold-2)">Open the full toolkit hub →</a></div>
+  </div>
+</section>
+
+<!-- START -->
+<section id="start">
+  <div class="wrap reveal">
+    <div class="pull" style="text-align:left">
+      <div class="eyebrow">How we work together</div>
+      <h2 class="big" style="color:#f3e6d9">Full build, then we run it with you.</h2>
+      <div class="two">
+        <div class="phase"><div class="p-n">Phase 1 · Build</div><h4>We build &amp; fix your entire engine</h4><p>Name unified, WhatsApp fixed, Meta &amp; Google suites, ads, website, workspace, software integration, automations, dashboard — set up in the first 30 days.</p></div>
+        <div class="phase"><div class="p-n">Phase 2 · Grow</div><h4>We run &amp; grow it every month</h4><p>Ospyr creates the content, runs the ads, manages every page &amp; channel across Vardhman and Diyam, and reports the numbers — your full marketing department.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap reveal">
+    <div class="eyebrow">The invitation</div>
+    <h2 class="big">40 years of trust. One month to make the world see it.</h2>
+    <p class="body" style="margin:22px auto 0;text-align:center">Let's unify the name, revive the legacy, and turn Vardhman Jewels into the digital gold house it has always deserved to be.</p>
+    <a class="btn" href="https://api.whatsapp.com/send?phone=917996998896">Let's revive Vardhman →</a>
+  </div>
+</section>
+
+<footer>
+  <div class="b">OSPYR</div>
+  <p style="margin-top:10px">The team behind the jeweller. &nbsp;·&nbsp; Prepared for Vardhman Jewels, Jayanagar, Bengaluru.</p>
+</footer>
+
+<script>
+  const prog=document.getElementById('progress');
+  addEventListener('scroll',()=>{const h=document.documentElement;prog.style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%';});
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  const fmt=v=>Math.round(v).toLocaleString('en-IN');
+  const cio=new IntersectionObserver((es)=>{es.forEach(e=>{
+    if(!e.isIntersecting)return; const el=e.target; cio.unobserve(el);
+    const t=parseFloat(el.dataset.count); let s=null; const dur=1500;
+    requestAnimationFrame(function step(ts){if(!s)s=ts;const p=Math.min((ts-s)/dur,1);const ea=1-Math.pow(1-p,3);el.textContent=fmt(t*ea);if(p<1)requestAnimationFrame(step);else el.textContent=fmt(t);});
+  })},{threshold:.6});
+  document.querySelectorAll('[data-count]').forEach(el=>cio.observe(el));
+  const bio=new IntersectionObserver((es)=>{es.forEach(e=>{if(!e.isIntersecting)return;const f=e.target;bio.unobserve(f);setTimeout(()=>{f.style.width=Math.max(parseFloat(f.dataset.w),1)+'%';},150);})},{threshold:.5});
+  document.querySelectorAll('.fill').forEach(f=>bio.observe(f));
+  const links={}; document.querySelectorAll('#sidenav a').forEach(a=>links[a.dataset.sec]=a);
+  const sio=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){Object.values(links).forEach(a=>a.classList.remove('active'));const id=e.target.id;if(links[id])links[id].classList.add('active');}})},{threshold:.4,rootMargin:'-20% 0px -30% 0px'});
+  document.querySelectorAll('section[id],header[id]').forEach(s=>sio.observe(s));
+</script>
+</body>
+</html>

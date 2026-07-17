@@ -1,0 +1,45 @@
+{
+  "name": "6 · New design broadcast — one photo → Telegram channel + VIP WhatsApp list",
+  "nodes": [
+    {
+      "parameters": {"updates": ["message"], "additionalFields": {"download": true}},
+      "id": "tg-in", "name": "Telegram: owner sends photo + caption '#new …'", "type": "n8n-nodes-base.telegramTrigger", "typeVersion": 1.1, "position": [0, 0],
+      "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}
+    },
+    {
+      "parameters": {"conditions": {"options": {"caseSensitive": false}, "conditions": [{"leftValue": "={{ $json.message.caption || '' }}", "rightValue": "#new", "operator": {"type": "string", "operation": "contains"}}], "combinator": "and"}, "options": {}},
+      "id": "if", "name": "Caption contains #new?", "type": "n8n-nodes-base.if", "typeVersion": 2.2, "position": [200, 0]
+    },
+    {
+      "parameters": {"operation": "sendPhoto", "chatId": "={{$env.TG_CHANNEL_ID}}", "binaryData": true, "binaryPropertyName": "data", "additionalFields": {"caption": "={{ ($json.message.caption || '').replace('#new','✨ NEW ARRIVAL') }}"}},
+      "id": "tg-ch", "name": "Post to Telegram channel", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [420, -100],
+      "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}},
+      "notes": "Make the bot an admin of your public/VIP Telegram channel; TG_CHANNEL_ID like @yourbrand or -100xxxxxxx."
+    },
+    {
+      "parameters": {"documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "VIPList", "mode": "name"}, "options": {}},
+      "id": "vip", "name": "Read VIP WhatsApp list", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [420, 100],
+      "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}},
+      "notes": "VIPList sheet: Name, Phone (only customers who opted in!)."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v21.0/{{$env.WA_PHONE_NUMBER_ID}}/messages",
+        "authentication": "genericCredentialType", "genericAuthType": "httpHeaderAuth",
+        "sendBody": true, "specifyBody": "json",
+        "jsonBody": "={ \"messaging_product\": \"whatsapp\", \"to\": \"{{ String($json.Phone).replace(/\\\\D/g,'') }}\", \"type\": \"template\", \"template\": { \"name\": \"new_design_alert\", \"language\": { \"code\": \"en\" }, \"components\": [ { \"type\": \"body\", \"parameters\": [ { \"type\": \"text\", \"text\": \"{{$json.Name}}\" } ] } ] } }",
+        "options": {"batching": {"batch": {"batchSize": 10, "batchInterval": 2000}}}
+      },
+      "id": "wa", "name": "WhatsApp VIPs (template, batched)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [640, 100],
+      "credentials": {"httpHeaderAuth": {"id": "REPLACE", "name": "Meta Bearer Token"}},
+      "notes": "Approved template new_design_alert: 'Namaste {{1}}! ✨ A new design just arrived at the showroom — reply YES and we will send you the photo & details first.'"
+    }
+  ],
+  "connections": {
+    "Telegram: owner sends photo + caption '#new …'": {"main": [[{"node": "Caption contains #new?", "type": "main", "index": 0}]]},
+    "Caption contains #new?": {"main": [[{"node": "Post to Telegram channel", "type": "main", "index": 0}, {"node": "Read VIP WhatsApp list", "type": "main", "index": 0}], []]},
+    "Read VIP WhatsApp list": {"main": [[{"node": "WhatsApp VIPs (template, batched)", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}

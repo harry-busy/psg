@@ -1,0 +1,65 @@
+{
+  "name": "Ospyr - Founder Daily Digest",
+  "nodes": [
+    {
+      "parameters": { "rule": { "interval": [ { "field": "cronExpression", "expression": "0 8 * * *" } ] } },
+      "id": "cron4",
+      "name": "Every day 8am",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://YOUR-STORE/admin/api/orders-summary",
+        "options": {}
+      },
+      "id": "sales4",
+      "name": "Pull sales + stock",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [480, 300],
+      "notes": "Point at store/CRM/ads endpoints (Shopify, Meta, CRM). Merge multiple sources as needed."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": { "parameters": [ { "name": "model", "value": "gpt-4o-mini" }, { "name": "messages", "value": "=[{\"role\":\"system\",\"content\":\"Write a short friendly WhatsApp morning digest with emojis from this JSON.\"},{\"role\":\"user\",\"content\":\"{{JSON.stringify($json)}}\"}]" } ] },
+        "options": {}
+      },
+      "id": "sum4",
+      "name": "Summarise (LLM)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [740, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR-WHATSAPP-PROVIDER/api/send",
+        "sendBody": true,
+        "bodyParameters": { "parameters": [ { "name": "to", "value": "OWNER_NUMBER" }, { "name": "message", "value": "={{$json.choices[0].message.content}}" } ] },
+        "options": {}
+      },
+      "id": "send4",
+      "name": "Send to owner",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1000, 300],
+      "notes": "Add WhatsApp/Telegram provider credential + owner number."
+    }
+  ],
+  "connections": {
+    "Every day 8am": { "main": [[{ "node": "Pull sales + stock", "type": "main", "index": 0 }]] },
+    "Pull sales + stock": { "main": [[{ "node": "Summarise (LLM)", "type": "main", "index": 0 }]] },
+    "Summarise (LLM)": { "main": [[{ "node": "Send to owner", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": {},
+  "meta": { "ospyr": "Founder daily digest - schedule fires 8am; wire your data sources + messaging channel + LLM key." }
+}

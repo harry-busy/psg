@@ -1,0 +1,80 @@
+{
+  "name": "Ospyr - Lead Qualifier & Booking Bot",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "lead-qualify", "responseMode": "responseNode", "options": {} },
+      "id": "wh2",
+      "name": "Chat message in",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "conditions": { "number": [ { "value1": "={{$json.body.score}}", "operation": "largerEqual", "value2": 2 } ] }
+      },
+      "id": "if2",
+      "name": "Qualified?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [500, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.hubapi.com/crm/v3/objects/contacts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "bodyParameters": { "parameters": [ { "name": "properties", "value": "={{ { \"email\": $json.body.email, \"lead_intent\": $json.body.intent, \"budget\": $json.body.budget } }}" } ] },
+        "options": {}
+      },
+      "id": "crm2",
+      "name": "Save lead to CRM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [780, 220],
+      "notes": "Add CRM API credential (HubSpot/Zoho). Swap URL for your CRM."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://YOUR-WHATSAPP-PROVIDER/api/send",
+        "sendBody": true,
+        "bodyParameters": { "parameters": [ { "name": "to", "value": "={{$json.body.phone}}" }, { "name": "message", "value": "Your appointment is booked ✅ We'll see you soon." } ] },
+        "options": {}
+      },
+      "id": "wa2",
+      "name": "Send confirmation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1040, 220],
+      "notes": "Add WhatsApp Business API provider (AiSensy/WATI/Interakt) credential + endpoint."
+    },
+    {
+      "parameters": { "respondWith": "json", "responseBody": "={{ { \"reply\": \"Booked! Confirmation sent and saved as a qualified lead.\" } }}", "options": {} },
+      "id": "resp2",
+      "name": "Reply (qualified)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1300, 220]
+    },
+    {
+      "parameters": { "respondWith": "json", "responseBody": "={{ { \"reply\": \"Thanks! Tell me a bit more so I can help.\" } }}", "options": {} },
+      "id": "resp2b",
+      "name": "Reply (nurture)",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [780, 420]
+    }
+  ],
+  "connections": {
+    "Chat message in": { "main": [[{ "node": "Qualified?", "type": "main", "index": 0 }]] },
+    "Qualified?": { "main": [ [{ "node": "Save lead to CRM", "type": "main", "index": 0 }], [{ "node": "Reply (nurture)", "type": "main", "index": 0 }] ] },
+    "Save lead to CRM": { "main": [[{ "node": "Send confirmation", "type": "main", "index": 0 }]] },
+    "Send confirmation": { "main": [[{ "node": "Reply (qualified)", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": {},
+  "meta": { "ospyr": "Lead qualifier - front-end sends {intent,budget,timeline,score,email,phone}. Add CRM + WhatsApp creds to go live." }
+}

@@ -1,0 +1,34 @@
+{
+  "name": "B2·2 Omni Publisher — one Telegram photo → Instagram + Facebook + Pinterest (3 automations combined)",
+  "nodes": [
+    {
+      "parameters": {"content": "## ⚙️ SETUP — step by step\n1. **Cloudinary (free):** cloudinary.com → account → copy cloud name → Settings → Upload → add an **unsigned upload preset** → variables **CLOUDINARY_CLOUD**, **CLOUDINARY_PRESET**. (Meta/Pinterest need a public image URL; this provides it free.)\n2. **Meta:** app with instagram_content_publish + pages_manage_posts → long-lived token → variables **META_ACCESS_TOKEN**, **IG_USER_ID** (IG business account id), **FB_PAGE_ID**.\n3. **Pinterest (optional):** developers.pinterest.com app → token → variables **PIN_TOKEN**, **PIN_BOARD_ID**; else delete the Pinterest node.\n4. Attach Telegram credential. Activate.\n5. USE: send the bot a photo with caption `#post your caption text…` → it uploads → publishes to IG (2-step create+publish), FB page, Pinterest → replies with links.\n\n## 🔧 FIX\n• IG error 'media not ready' → increase Wait to 30 s.\n• 'Invalid image URL' → Cloudinary preset must be UNSIGNED.\n• IG needs a BUSINESS account linked to the FB page.\n• Rate limits: IG allows ~25 posts/day per account.", "height": 520, "width": 480},
+      "id": "note", "name": "Sticky Note", "type": "n8n-nodes-base.stickyNote", "typeVersion": 1, "position": [-560, -140]
+    },
+    {"parameters": {"updates": ["message"], "additionalFields": {"download": true, "imageSize": "extraLarge"}}, "id": "tgin", "name": "Telegram: photo with #post", "type": "n8n-nodes-base.telegramTrigger", "typeVersion": 1.1, "position": [0, 0], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}},
+    {"parameters": {"conditions": {"options": {"caseSensitive": false}, "conditions": [{"leftValue": "={{ $json.message.caption || '' }}", "rightValue": "#post", "operator": {"type": "string", "operation": "contains"}}], "combinator": "and"}, "options": {}}, "id": "if", "name": "Has #post?", "type": "n8n-nodes-base.if", "typeVersion": 2.2, "position": [200, 0]},
+    {
+      "parameters": {"method": "POST", "url": "=https://api.cloudinary.com/v1_1/{{$env.CLOUDINARY_CLOUD}}/image/upload", "contentType": "multipart-form-data", "sendBody": true, "bodyParameters": {"parameters": [{"name": "file", "parameterType": "formBinaryData", "inputDataFieldName": "data"}, {"name": "upload_preset", "value": "={{$env.CLOUDINARY_PRESET}}"}]}, "options": {}},
+      "id": "cld", "name": "Cloudinary: get public URL", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [400, 0]
+    },
+    {"parameters": {"jsCode": "return [{ json: { url: $json.secure_url, caption: ($('Telegram: photo with #post').item.json.message.caption || '').replace('#post','').trim() || '✨ New arrival' } }];"}, "id": "prep", "name": "Prepare", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [600, 0]},
+    {"parameters": {"method": "POST", "url": "=https://graph.facebook.com/v21.0/{{$env.IG_USER_ID}}/media", "sendBody": true, "specifyBody": "json", "jsonBody": "={ \"image_url\": {{ JSON.stringify($json.url) }}, \"caption\": {{ JSON.stringify($json.caption) }}, \"access_token\": \"{{$env.META_ACCESS_TOKEN}}\" }", "options": {}}, "id": "igc", "name": "IG: create container", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [800, -140]},
+    {"parameters": {"amount": 15}, "id": "wait", "name": "Wait 15s", "type": "n8n-nodes-base.wait", "typeVersion": 1.1, "position": [980, -140]},
+    {"parameters": {"method": "POST", "url": "=https://graph.facebook.com/v21.0/{{$env.IG_USER_ID}}/media_publish", "sendBody": true, "specifyBody": "json", "jsonBody": "={ \"creation_id\": \"{{$json.id}}\", \"access_token\": \"{{$env.META_ACCESS_TOKEN}}\" }", "options": {}}, "id": "igp", "name": "IG: publish", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [1160, -140]},
+    {"parameters": {"method": "POST", "url": "=https://graph.facebook.com/v21.0/{{$env.FB_PAGE_ID}}/photos", "sendBody": true, "specifyBody": "json", "jsonBody": "={ \"url\": {{ JSON.stringify($('Prepare').item.json.url) }}, \"caption\": {{ JSON.stringify($('Prepare').item.json.caption) }}, \"access_token\": \"{{$env.META_ACCESS_TOKEN}}\" }", "options": {}}, "id": "fb", "name": "Facebook page: post", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [800, 0]},
+    {"parameters": {"method": "POST", "url": "https://api.pinterest.com/v5/pins", "authentication": "genericCredentialType", "genericAuthType": "httpHeaderAuth", "sendBody": true, "specifyBody": "json", "jsonBody": "={ \"board_id\": \"{{$env.PIN_BOARD_ID}}\", \"title\": {{ JSON.stringify($('Prepare').item.json.caption.slice(0,90)) }}, \"media_source\": { \"source_type\": \"image_url\", \"url\": {{ JSON.stringify($('Prepare').item.json.url) }} } }", "options": {}}, "id": "pin", "name": "Pinterest: create pin (optional)", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [800, 140], "credentials": {"httpHeaderAuth": {"id": "REPLACE", "name": "Pinterest Bearer"}}},
+    {"parameters": {"operation": "sendMessage", "chatId": "={{ $('Telegram: photo with #post').item.json.message.chat.id }}", "text": "=✅ Published!\nIG: {{ $('IG: publish').item?.json?.id ? 'posted' : 'check' }} · FB: posted · Pinterest: {{ $('Pinterest: create pin (optional)').item?.json?.id ? 'pinned' : 'skipped' }}\nImage: {{ $('Prepare').item.json.url }}", "additionalFields": {}}, "id": "done", "name": "Telegram: confirm", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [1340, 0], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}}
+  ],
+  "connections": {
+    "Telegram: photo with #post": {"main": [[{"node": "Has #post?", "type": "main", "index": 0}]]},
+    "Has #post?": {"main": [[{"node": "Cloudinary: get public URL", "type": "main", "index": 0}], []]},
+    "Cloudinary: get public URL": {"main": [[{"node": "Prepare", "type": "main", "index": 0}]]},
+    "Prepare": {"main": [[{"node": "IG: create container", "type": "main", "index": 0}, {"node": "Facebook page: post", "type": "main", "index": 0}, {"node": "Pinterest: create pin (optional)", "type": "main", "index": 0}]]},
+    "IG: create container": {"main": [[{"node": "Wait 15s", "type": "main", "index": 0}]]},
+    "Wait 15s": {"main": [[{"node": "IG: publish", "type": "main", "index": 0}]]},
+    "IG: publish": {"main": [[{"node": "Telegram: confirm", "type": "main", "index": 0}]]},
+    "Facebook page: post": {"main": [[{"node": "Telegram: confirm", "type": "main", "index": 0}]]},
+    "Pinterest: create pin (optional)": {"main": [[{"node": "Telegram: confirm", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}

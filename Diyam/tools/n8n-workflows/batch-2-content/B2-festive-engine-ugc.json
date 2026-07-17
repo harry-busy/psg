@@ -1,0 +1,29 @@
+{
+  "name": "B2·4 Festive Engine + UGC Collector — auto campaign kickoff + customer-content saver (2 automations combined)",
+  "nodes": [
+    {
+      "parameters": {"content": "## ⚙️ SETUP — step by step\n1. Variables: **GEMINI_API_KEY, TG_OWNER_CHAT_ID, BRAND_NAME**. Attach Telegram + Sheets + Google Drive credentials.\n2. Tab **Festivals** in your sheet: Name, Date (YYYY-MM-DD), Major (yes/no). Paste from the Suite's Calendar CSV export.\n3. Drive: create folder 'UGC' → copy its folder ID into the Drive node.\n4. UGC intake: Activate → copy the `ugc-in` webhook Production URL → give customers a QR/link to a small form (name, phone, photo upload) OR wire ManyChat 'story-mention' to POST here.\n\n## HOW IT RUNS\n• Daily 08:30 — if any festival is exactly 14 days away → Gemini generates the full campaign brief (teaser/push/reminder posts, WhatsApp broadcast text, offer idea) → Telegram. You get a ready campaign 2 weeks early, every time.\n• UGC webhook — photo saved to Drive, logged, owner alerted, and a thank-you + permission request text is prepared.\n\n## 🔧 FIX\n• No campaign brief → check Festivals dates are YYYY-MM-DD.\n• Drive upload fails → re-share folder with connected account.\n• Binary missing → the form must POST multipart with the file field named 'photo'.", "height": 560, "width": 480},
+      "id": "note", "name": "Sticky Note", "type": "n8n-nodes-base.stickyNote", "typeVersion": 1, "position": [-560, -160]
+    },
+    {"parameters": {"rule": {"interval": [{"field": "cronExpression", "expression": "30 8 * * *"}]}}, "id": "cr", "name": "Daily 8:30", "type": "n8n-nodes-base.scheduleTrigger", "typeVersion": 1.2, "position": [0, -120]},
+    {"parameters": {"documentId": {"__rl": true, "value": "REPLACE_SHEET_ID", "mode": "id"}, "sheetName": {"__rl": true, "value": "Festivals", "mode": "name"}, "options": {}}, "id": "fs", "name": "Read festivals", "type": "n8n-nodes-base.googleSheets", "typeVersion": 4.5, "position": [190, -120], "credentials": {"googleSheetsOAuth2Api": {"id": "REPLACE", "name": "Google Sheets"}}},
+    {"parameters": {"jsCode": "const target = new Date(Date.now()+14*864e5).toISOString().slice(0,10);\nreturn items.filter(i => (i.json.Date||'').startsWith(target)).map(i=>({json:i.json}));"}, "id": "t14", "name": "Festival in exactly 14 days?", "type": "n8n-nodes-base.code", "typeVersion": 2, "position": [380, -120]},
+    {
+      "parameters": {"method": "POST", "url": "=https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={{$env.GEMINI_API_KEY}}", "sendBody": true, "specifyBody": "json", "jsonBody": "={ \"contents\": [{ \"parts\": [{ \"text\": \"Create a complete 14-day festive campaign for {{$env.BRAND_NAME}} (Indian gold jewellery showroom, Mysore) for {{$json.Name}} on {{$json.Date}}. Include: (1) offer idea with margin sense, (2) 3 teaser post captions for T-14 to T-8, (3) 3 main-push captions T-7 to T-3, (4) 1 last-call caption T-2, (5) a WhatsApp broadcast message, (6) an in-store display line. Keep captions short with hashtags.\" }] }] }", "options": {}},
+      "id": "brief", "name": "Gemini: full campaign brief", "type": "n8n-nodes-base.httpRequest", "typeVersion": 4.2, "position": [570, -120]
+    },
+    {"parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "=🪔 {{ $('Festival in exactly 14 days?').item.json.Name }} is in 14 days — full campaign ready:\n\n{{ $json.candidates[0].content.parts[0].text.slice(0,3800) }}", "additionalFields": {}}, "id": "tgb", "name": "Telegram: campaign brief", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [760, -120], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}},
+    {"parameters": {"httpMethod": "POST", "path": "ugc-in", "responseMode": "onReceived", "options": {"binaryPropertyName": "photo"}}, "id": "wh", "name": "Webhook: UGC photo in", "type": "n8n-nodes-base.webhook", "typeVersion": 2, "position": [0, 140]},
+    {"parameters": {"name": "=UGC-{{ $json.body?.name || 'customer' }}-{{ $now.toISO().slice(0,10) }}.jpg", "driveId": {"__rl": true, "value": "My Drive", "mode": "list"}, "folderId": {"__rl": true, "value": "REPLACE_UGC_FOLDER_ID", "mode": "id"}, "inputDataFieldName": "photo", "options": {}}, "id": "drv", "name": "Drive: save UGC", "type": "n8n-nodes-base.googleDrive", "typeVersion": 3, "position": [190, 140], "credentials": {"googleDriveOAuth2Api": {"id": "REPLACE", "name": "Google Drive"}}},
+    {"parameters": {"operation": "sendMessage", "chatId": "={{$env.TG_OWNER_CHAT_ID}}", "text": "=📸 New customer photo (UGC) from {{ $('Webhook: UGC photo in').item.json.body?.name || 'a customer' }} {{ $('Webhook: UGC photo in').item.json.body?.phone || '' }} — saved to Drive.\n\nSend them: \"Namaste! Thank you for sharing 💛 May we feature your beautiful photo on our page? Reply YES to bless us!\"", "additionalFields": {}}, "id": "tgu", "name": "Telegram: UGC alert + permission text", "type": "n8n-nodes-base.telegram", "typeVersion": 1.2, "position": [380, 140], "credentials": {"telegramApi": {"id": "REPLACE", "name": "Jeweller Bot"}}}
+  ],
+  "connections": {
+    "Daily 8:30": {"main": [[{"node": "Read festivals", "type": "main", "index": 0}]]},
+    "Read festivals": {"main": [[{"node": "Festival in exactly 14 days?", "type": "main", "index": 0}]]},
+    "Festival in exactly 14 days?": {"main": [[{"node": "Gemini: full campaign brief", "type": "main", "index": 0}]]},
+    "Gemini: full campaign brief": {"main": [[{"node": "Telegram: campaign brief", "type": "main", "index": 0}]]},
+    "Webhook: UGC photo in": {"main": [[{"node": "Drive: save UGC", "type": "main", "index": 0}]]},
+    "Drive: save UGC": {"main": [[{"node": "Telegram: UGC alert + permission text", "type": "main", "index": 0}]]}
+  },
+  "settings": {"executionOrder": "v1"}
+}

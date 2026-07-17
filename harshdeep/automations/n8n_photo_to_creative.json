@@ -1,0 +1,71 @@
+{
+  "name": "Ospyr - Photo to Branded Creative + Video",
+  "nodes": [
+    {
+      "parameters": { "httpMethod": "POST", "path": "photo-to-creative", "responseMode": "responseNode", "options": {} },
+      "id": "wh3",
+      "name": "Photo in",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [220, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://image-api.example/enhance",
+        "sendBody": true,
+        "bodyParameters": { "parameters": [ { "name": "image_url", "value": "={{$json.body.image_url}}" }, { "name": "brand", "value": "={{$json.body.brand}}" }, { "name": "action", "value": "clean_background_and_brand" } ] },
+        "options": {}
+      },
+      "id": "img3",
+      "name": "Make branded image",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [500, 220],
+      "notes": "Connect your image tool (Photoroom/AI image API)."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://video-api.example/image-to-video",
+        "sendBody": true,
+        "bodyParameters": { "parameters": [ { "name": "image_url", "value": "={{$json.branded_url}}" }, { "name": "style", "value": "showcase_360" } ] },
+        "options": {}
+      },
+      "id": "vid3",
+      "name": "Make showcase video",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [780, 220],
+      "notes": "Connect your image-to-video tool."
+    },
+    {
+      "parameters": {
+        "values": { "string": [ { "name": "caption", "value": "=New in ✨ {{$json.body.product}} — DM to reserve." } ] },
+        "options": {}
+      },
+      "id": "cap3",
+      "name": "Auto caption",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [1040, 220]
+    },
+    {
+      "parameters": { "respondWith": "json", "responseBody": "={{ { \"image\": $json.branded_url, \"video\": $json.video_url, \"caption\": $json.caption } }}", "options": {} },
+      "id": "resp3",
+      "name": "Return assets",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1300, 220]
+    }
+  ],
+  "connections": {
+    "Photo in": { "main": [[{ "node": "Make branded image", "type": "main", "index": 0 }]] },
+    "Make branded image": { "main": [[{ "node": "Make showcase video", "type": "main", "index": 0 }]] },
+    "Make showcase video": { "main": [[{ "node": "Auto caption", "type": "main", "index": 0 }]] },
+    "Auto caption": { "main": [[{ "node": "Return assets", "type": "main", "index": 0 }]] }
+  },
+  "active": false,
+  "settings": {},
+  "meta": { "ospyr": "Photo to creative - add image + image-to-video tool creds; optionally add a 'post to socials' node before Return assets." }
+}
