@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { StudioReferences } from "@/components/StudioReferences";
 import {
   Camera, Gem, Calculator, Users, CalendarDays, Star, Wallet, LayoutDashboard,
   ArrowRight, ChevronDown, Check, Workflow, Sparkles, Film, Search, MessageCircle,
@@ -393,6 +394,8 @@ export default function PadmavathiStory() {
           ))}
         </div>
       </BandSection>
+
+      <StudioReferences />
 
       {/* ── PROOF / TOOLS (red band) ─────────────────────────────────────── */}
       <div className="px-5 py-16 sm:px-6 sm:py-24" style={{ background: redWash, color: "#fbf5ec" }}>

@@ -1,12 +1,12 @@
 import { Card, CardTitle } from "@/components/ui";
 import { Sparkles } from "lucide-react";
+import { REFERENCE_IMAGES as REFS } from "@/lib/references";
 
 /**
  * Studio reference gallery - real jewellery shots created by our creative team,
  * shown across every creator/studio page as the quality bar and inspiration.
- * Images live in public/references (ref1..ref11).
+ * Image list lives in lib/references.ts (public/references).
  */
-const REFS = Array.from({ length: 11 }, (_, i) => `/references/ref${i + 1}.png`);
 
 export function ReferenceGallery({ className = "" }: { className?: string }) {
   return (

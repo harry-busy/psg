@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { StudioReferences } from "@/components/StudioReferences";
 import {
   Camera, Gem, Calculator, Users, CalendarDays, Star, Wallet, LayoutDashboard,
   ArrowRight, ArrowDown, Zap, CalendarCheck, Sparkles, Check, Workflow, ChevronDown,
@@ -376,6 +377,8 @@ export default function GrowthStory() {
           miss the days that matter most.
         </p>
       </BandSection>
+
+      <StudioReferences />
 
       {/* ── PROOF / TOOLS (red band) ─────────────────────────────────────── */}
       <div className="px-5 py-16 sm:px-6 sm:py-24" style={{ background: redWash, color: "#fbf5ec" }}>
