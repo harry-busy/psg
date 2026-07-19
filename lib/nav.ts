@@ -2,7 +2,7 @@ import {
   Home, Camera, Gem, Calculator, Users, Wallet, Heart, CalendarDays,
   Sparkles, Mail, Star, LayoutDashboard, Workflow, Settings, Wand2,
   Gauge, Boxes, MessageSquare, CheckSquare, ClipboardList, Briefcase, Bot,
-  TrendingUp,
+  TrendingUp, FileText, BarChart3,
   type LucideIcon,
 } from "lucide-react";
 import type { Sector } from "./sector";
@@ -20,6 +20,9 @@ export const NAV: NavItem[] = [
   { href: "/app/home", label: "Home", icon: Home, group: "Run the day" },
   { href: "/app/story", label: "Growth Story", icon: TrendingUp, group: "Run the day", workspace: "psg-gold" },
   { href: "/app/diyam", label: "Growth Blueprint", icon: TrendingUp, group: "Run the day", workspace: "diyam" },
+  { href: "/app/diyam/content", label: "Content Library", icon: FileText, group: "Diyam Playbook", workspace: "diyam" },
+  { href: "/app/diyam/calendar", label: "Content Calendar", icon: CalendarDays, group: "Diyam Playbook", workspace: "diyam" },
+  { href: "/app/diyam/reports", label: "Reports & Decks", icon: BarChart3, group: "Diyam Playbook", workspace: "diyam" },
   { href: "/app/padmavathi", label: "Growth Story", icon: TrendingUp, group: "Run the day", workspace: "padmav" },
   { href: "/app/vardhman", label: "Growth Blueprint", icon: TrendingUp, group: "Run the day", workspace: "vardh" },
   { href: "/app/crm", label: "Enquiry CRM", icon: Users, group: "Run the day" },
@@ -44,7 +47,7 @@ export const NAV: NavItem[] = [
   { href: "/app/settings", label: "Settings", icon: Settings, group: "System" },
 ];
 
-export const NAV_GROUPS = ["Run the day", "Create", "Sell", "Grow", "System"];
+export const NAV_GROUPS = ["Run the day", "Diyam Playbook", "Create", "Sell", "Grow", "System"];
 
 /** Harshdeep Founder OS navigation. */
 export const FOUNDER_NAV: NavItem[] = [

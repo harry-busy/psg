@@ -360,6 +360,9 @@ export default function DiyamBlueprint() {
             Pulled straight from your Instagram Insights for <b>18 June to 17 July 2026</b>, compared to the previous
             month, plus a head-to-head against OnnMe and PSG Gold.
           </p>
+          <Link href="/app/diyam/reports" className="mt-4 inline-flex items-center gap-1.5 text-[14px] font-semibold" style={{ color: RED }}>
+            Open the full reports and comparison decks <ArrowRight size={15} />
+          </Link>
         </Reveal>
 
         {/* headline metrics */}
@@ -730,6 +733,39 @@ export default function DiyamBlueprint() {
             real; we are organising it into a system.
           </p>
         </Reveal>
+      </Section>
+
+      {/* ── THE PLAYBOOK / CONTENT + REPORTS ─────────────────────────────── */}
+      <Section>
+        <Reveal>
+          <Eyebrow>Everything, written down</Eyebrow>
+          <h2 className="font-display text-[clamp(1.5rem,4.6vw,2.9rem)] font-semibold leading-[1.14] tracking-tight" style={{ color: RED }}>
+            The full playbook and every report.
+          </h2>
+          <GoldLine />
+          <p className="max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#4a3b33" }}>
+            The complete 30-day content machine, the day-by-day calendar, and every Instagram report and competitor
+            comparison deck, reproduced in full, exactly as prepared, down to the last graph.
+          </p>
+        </Reveal>
+        <div className="mt-9 grid gap-5 sm:grid-cols-3">
+          {[
+            { icon: BarChart3, name: "Content Library", desc: "Positioning, Instagram features, PR plan and the caption, hook and hashtag bank, in full.", href: "/app/diyam/content" },
+            { icon: CalendarDays, name: "30-Day Content Calendar", desc: "Every day mapped, hook to CTA, building to Raksha Bandhan on 28 August.", href: "/app/diyam/calendar" },
+            { icon: TrendingUp, name: "Reports & Decks", desc: "Diyam's own analytics plus head-to-heads vs OnnMe, PSG Gold, Tiffany, SILVANA and more.", href: "/app/diyam/reports" },
+          ].map((t, i) => (
+            <Reveal key={t.name} delay={i * 60} className="h-full">
+              <Link href={t.href} className="group flex h-full flex-col rounded-2xl bg-white p-7 shadow-[0_12px_34px_-20px_rgba(60,10,25,0.32)] transition-transform duration-200 hover:-translate-y-1" style={{ borderTop: `4px solid ${GOLD}` }}>
+                <t.icon size={24} style={{ color: RED }} />
+                <h3 className="mt-3 font-display text-[19px] font-semibold" style={{ color: INK }}>{t.name}</h3>
+                <p className="mt-1.5 flex-1 text-[14.5px]" style={{ color: MUTED }}>{t.desc}</p>
+                <span className="mt-4 inline-flex items-center gap-1 text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: GOLD }}>
+                  Open <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
       </Section>
 
       <StudioReferences />
