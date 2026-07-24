@@ -23,6 +23,7 @@ export const NAV: NavItem[] = [
   { href: "/app/diyam/content", label: "Content Library", icon: FileText, group: "Diyam Playbook", workspace: "diyam" },
   { href: "/app/diyam/calendar", label: "Content Calendar", icon: CalendarDays, group: "Diyam Playbook", workspace: "diyam" },
   { href: "/app/diyam/reports", label: "Reports & Decks", icon: BarChart3, group: "Diyam Playbook", workspace: "diyam" },
+  { href: "/app/diyam/circle", label: "The Circle · Admin", icon: Users, group: "Diyam Playbook", workspace: "diyam" },
   { href: "/app/padmavathi", label: "Growth Story", icon: TrendingUp, group: "Run the day", workspace: "padmav" },
   { href: "/app/vardhman", label: "Growth Blueprint", icon: TrendingUp, group: "Run the day", workspace: "vardh" },
   { href: "/app/crm", label: "Enquiry CRM", icon: Users, group: "Run the day" },
