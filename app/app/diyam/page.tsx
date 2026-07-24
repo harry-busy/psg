@@ -173,6 +173,7 @@ const TOOLS = [
   { icon: Star, name: "Review QR Kit", desc: "Turn happy buyers into 5-stars.", href: "/app/reviews" },
   { icon: Wallet, name: "Savings Scheme", desc: "A customer-facing scheme calculator.", href: "/app/scheme" },
   { icon: LayoutDashboard, name: "Owner Dashboard", desc: "Your whole shop on one screen.", href: "/app/dashboard" },
+  { icon: Users, name: "The Circle · Admin", desc: "Live loyalty dashboard — member console, tier controls, reward redemption.", href: "/app/diyam/circle" },
 ];
 
 /* ── social analytics (scraped from the uploaded Instagram report + comparison decks,
