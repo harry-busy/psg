@@ -4,22 +4,22 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Product Card Maker — Jewellery Catalog Cards</title>
 <style>
-:root{--red:#D2042D;--cream:#EAE5D4;--ink:#2A1A1D}
+:root{--emerald:#1B4D3E;--seaglass:#7EBFA3;--seaglass-l:#A8D4C2;--cream:#EAF2EE;--ink:#0A1F17}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',Calibri,sans-serif;background:var(--cream);color:var(--ink)}
-header{background:var(--red);color:#fff;padding:14px 22px}h1{font-size:20px}
+header{background:linear-gradient(135deg,var(--emerald),#0D3326);color:#fff;padding:14px 22px}h1{font-size:20px}
 main{max-width:1150px;margin:0 auto;padding:18px;display:grid;grid-template-columns:340px 1fr;gap:18px}
 @media(max-width:900px){main{grid-template-columns:1fr}}
-.panel{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
-.panel h2{font-size:13px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;border-bottom:2px solid var(--cream);padding-bottom:6px}
+.panel{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 10px rgba(8,26,16,.08)}
+.panel h2{font-size:13px;color:var(--emerald);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;border-bottom:2px solid var(--cream);padding-bottom:6px}
 label{font-size:12px;font-weight:600;display:block;margin:8px 0 3px}
-input,select{width:100%;padding:8px;border:1px solid #d8cfc0;border-radius:8px;font-size:13px;background:#fffdf7}
-.btn{background:var(--red);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:600;cursor:pointer;width:100%;margin-top:10px;font-size:14px}
-.btn.sec{background:var(--ink)}
+input,select{width:100%;padding:8px;border:1px solid #b8d4c8;border-radius:8px;font-size:13px;background:#f8fdfa}
+.btn{background:var(--emerald);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-weight:600;cursor:pointer;width:100%;margin-top:10px;font-size:14px}
+.btn.sec{background:#2D6B56}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 #cv{max-width:100%;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.18)}
 #stage{display:flex;flex-direction:column;align-items:center;gap:10px}
-.drop{border:2px dashed var(--red);border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:#fff8f4;font-size:13px}
+.drop{border:2px dashed var(--seaglass);border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:#f0f9f4;font-size:13px}
 </style>
 </head>
 <body>
@@ -39,7 +39,7 @@ input,select{width:100%;padding:8px;border:1px solid #d8cfc0;border-radius:8px;f
     <div><label>WhatsApp number</label><input id="wa" placeholder="919876543210"></div>
   </div>
   <label>Theme</label>
-  <select id="theme"><option value="light">Cream · classic</option><option value="dark">Black velvet · premium</option><option value="red">Crimson · festive</option></select>
+  <select id="theme"><option value="light">Sea glass · clean</option><option value="dark">Deep emerald · premium</option><option value="red">Forest night · festive</option></select>
   <button class="btn" id="dl">⬇ Download card (1080×1350)</button>
   <button class="btn sec" id="dlsq">⬇ Download square (1080×1080)</button>
 </div>
@@ -50,7 +50,7 @@ const $=id=>document.getElementById(id);const cv=$("cv"),ctx=cv.getContext("2d")
 $("drop").onclick=()=>$("file").click();
 $("file").onchange=async e=>{img=await createImageBitmap(e.target.files[0]);draw()};
 ["brand","pname","purity","weight","price","wa","theme"].forEach(id=>$(id).oninput=$(id).onchange=draw);
-const THEMES={light:{bg1:"#EAE5D4",bg2:"#dcd4bd",ink:"#2A1A1D",acc:"#D2042D",sub:"#6d6250"},dark:{bg1:"#1b1b1e",bg2:"#000",ink:"#f2ead8",acc:"#e8c96a",sub:"#b8ab90"},red:{bg1:"#9E0322",bg2:"#5a0113",ink:"#fdf6e3",acc:"#f4d47c",sub:"#e8c2b8"}};
+const THEMES={light:{bg1:"#EAF2EE",bg2:"#c8e4d8",ink:"#0A1F17",acc:"#7EBFA3",sub:"#4D7264"},dark:{bg1:"#1B4D3E",bg2:"#071410",ink:"#EAEEF3",acc:"#A8D4C2",sub:"#7EBFA3"},red:{bg1:"#0F2B1E",bg2:"#051009",ink:"#EAEEF3",acc:"#7EBFA3",sub:"#A8D4C2"}};
 function draw(){const W=cv.width,H=cv.height,t=THEMES[$("theme").value];
 const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,t.bg1);g.addColorStop(1,t.bg2);ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
 // header band

@@ -10,15 +10,15 @@ import {
   ChevronDown, ChevronUp, Calendar, Phone, Mail,
 } from "lucide-react";
 
-/* ── theme ──────────────────────────────────────────────────────────────── */
-const RED = "#D2042D";
-const RED_DEEP = "#9e0426";
-const CREAM = "#EBE5D5";
-const CREAM_2 = "#e0d9c6";
-const GOLD = "#b8860b";
-const GOLD_SOFT = "#c9a227";
-const INK = "#1d1d1f";
-const MUTED = "#6d5f52";
+/* ── theme (two-colour: deep emerald + sea glass only) ─────────────────────── */
+const RED = "#1B4D3E";                 // deep emerald (primary)
+const RED_DEEP = "#0D3326";            // darker emerald
+const CREAM = "#C6E6DB";               // light sea glass
+const CREAM_2 = "#A8D4C2";             // light sea glass, deeper
+const GOLD = "#6BB091";                // deep sea glass (accent)
+const GOLD_SOFT = "#7EBFA3";           // sea glass
+const INK = "var(--color-ink)";        // dark emerald text
+const MUTED = "#3F6E5C";               // secondary text on sea-glass surfaces (dark, matches globals card-muted)
 const redWash = `linear-gradient(135deg, ${RED} 0%, ${RED_DEEP} 100%)`;
 
 /* ── types ──────────────────────────────────────────────────────────────── */
@@ -74,16 +74,18 @@ function TierBadge({ tier }: { tier: Tier }) {
 
 function RewardBadge({ status }: { status: RewardStatus | null }) {
   if (!status) return <span className="text-[12px]" style={{ color: MUTED }}>—</span>;
-  const map: Record<RewardStatus, { label: string; bg: string; color: string }> = {
-    active:   { label: "Active",   bg: "#dcfce7", color: "#15803d" },
-    redeemed: { label: "Redeemed", bg: "#f3f4f6", color: "#4b5563" },
-    expired:  { label: "Expired",  bg: "#fff7ed", color: "#c2410c" },
+  /* three states expressed in emerald + sea glass only, kept distinct via
+     fill / faint-tint / outline (no other hues). */
+  const map: Record<RewardStatus, { label: string; bg: string; color: string; border: string }> = {
+    active:   { label: "Active",   bg: "#7EBFA3",     color: "#0E3327", border: "transparent" }, // sea-glass fill
+    redeemed: { label: "Redeemed", bg: "#C6E6DB",     color: MUTED,     border: "transparent" }, // faint emerald tint
+    expired:  { label: "Expired",  bg: "transparent", color: MUTED,     border: "#6BB091" },      // outlined emerald
   };
   const s = map[status];
   return (
     <span
       className="inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold"
-      style={{ background: s.bg, color: s.color }}
+      style={{ background: s.bg, color: s.color, border: `1px solid ${s.border}` }}
     >
       {s.label}
     </span>
@@ -96,7 +98,7 @@ function StatCard({
   icon: React.ElementType; label: string; value: string | number; sub?: string; color?: string;
 }) {
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-[0_8px_24px_-12px_rgba(60,10,25,0.22)]">
+    <div className="rounded-2xl bg-[var(--color-surface)] p-5 shadow-[0_8px_24px_-12px_rgba(8,26,16,0.22)]">
       <div className="flex items-start justify-between">
         <div>
           <p
@@ -161,13 +163,13 @@ function MemberModal({
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-white shadow-2xl"
+        className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[var(--color-surface)] shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         {/* modal header */}
         <div
           className="flex items-center justify-between px-6 py-5"
-          style={{ background: redWash, color: "#fbf5ec", borderRadius: "16px 16px 0 0" }}
+          style={{ background: redWash, color: "#EFF8F4", borderRadius: "16px 16px 0 0" }}
         >
           <div>
             <div className="flex items-center gap-3">
@@ -356,7 +358,7 @@ function MemberModal({
                 disabled={busy}
                 onClick={doRedeem}
                 className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-[13px] font-semibold text-white transition-opacity disabled:opacity-50"
-                style={{ background: "#15803d" }}
+                style={{ background: RED }}
               >
                 <Check size={14} /> Mark Reward Redeemed
               </button>
@@ -374,7 +376,7 @@ function MemberModal({
               ) : (
                 <div
                   className="flex items-center gap-2 rounded-xl px-3 py-2"
-                  style={{ background: "#fff0f0" }}
+                  style={{ background: CREAM_2 }}
                 >
                   <AlertTriangle size={14} style={{ color: RED }} />
                   <span className="text-[12px]" style={{ color: RED }}>
@@ -463,11 +465,11 @@ export default function CircleAdmin() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ background: CREAM }}>
+    <div className="min-h-screen" style={{ background: "var(--color-canvas)" }}>
       {/* ── page header ─────────────────────────────────────────────────── */}
       <div
-        className="px-5 py-8 sm:px-8"
-        style={{ background: redWash, color: "#fbf5ec" }}
+        className="px-5 py-10 sm:px-8"
+        style={{ background: `linear-gradient(160deg, ${RED} 0%, ${RED_DEEP} 100%)`, color: "#ffffff" }}
       >
         <Link
           href="/app/diyam"
@@ -507,7 +509,7 @@ export default function CircleAdmin() {
               icon={Crown}   label="VIP Members"
               value={stats.vipCount}
               sub={`${stats.memberCount} regular members`}
-              color={GOLD}
+              color={RED}
             />
             <StatCard
               icon={Gift}    label="Active Rewards"
@@ -518,7 +520,7 @@ export default function CircleAdmin() {
               icon={Activity} label="Visits Today"
               value={stats.visitsToday}
               sub={`${stats.totalVisits} all-time`}
-              color="#15803d"
+              color={RED}
             />
           </div>
         ) : (
@@ -526,7 +528,7 @@ export default function CircleAdmin() {
             {[0, 1, 2, 3].map((i) => (
               <div
                 key={i}
-                className="h-24 animate-pulse rounded-2xl bg-white"
+                className="h-24 animate-pulse rounded-2xl bg-[var(--color-surface)]"
                 style={{ opacity: 0.6 }}
               />
             ))}
@@ -534,7 +536,7 @@ export default function CircleAdmin() {
         )}
 
         {/* ── member table ─────────────────────────────────────────────── */}
-        <div className="overflow-hidden rounded-2xl bg-white shadow-[0_8px_32px_-16px_rgba(60,10,25,0.2)]">
+        <div className="overflow-hidden rounded-2xl bg-[var(--color-surface)] shadow-[0_8px_32px_-16px_rgba(8,26,16,0.2)]">
           {/* filters bar */}
           <div
             className="flex flex-wrap items-center gap-3 border-b px-5 py-4"
@@ -550,7 +552,7 @@ export default function CircleAdmin() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search name or phone…"
-                className="w-full rounded-full border bg-gray-50 py-2 pl-9 pr-4 text-[13px] outline-none focus:ring-2 focus:ring-red-600/30"
+                className="w-full rounded-full border bg-[var(--color-surface-2)] py-2 pl-9 pr-4 text-[13px] outline-none focus:ring-2 focus:ring-[#1B4D3E]/30"
                 style={{ borderColor: CREAM_2 }}
               />
             </div>
@@ -622,7 +624,7 @@ export default function CircleAdmin() {
                           style={{ borderColor: CREAM_2 }}
                           onClick={() => setSelected(m)}
                           onMouseEnter={(e) => {
-                            (e.currentTarget as HTMLTableRowElement).style.background = "#faf7f1";
+                            (e.currentTarget as HTMLTableRowElement).style.background = "#C6E6DB";
                           }}
                           onMouseLeave={(e) => {
                             (e.currentTarget as HTMLTableRowElement).style.background = "";
@@ -656,7 +658,7 @@ export default function CircleAdmin() {
                           </td>
                           <td className="px-4 py-3">
                             <button
-                              className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors hover:bg-red-50"
+                              className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-colors hover:bg-[var(--color-surface-2)]"
                               style={{ borderColor: RED, color: RED }}
                               onClick={(e) => {
                                 e.stopPropagation();

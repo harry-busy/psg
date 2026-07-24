@@ -7,7 +7,7 @@ import { Markdown } from "@/components/diyam/Markdown";
 import { SubHead } from "@/components/diyam/SubHead";
 import { ArrowRight } from "lucide-react";
 
-const GOLD = "#b8860b";
+const GOLD = "#4E8A72";   // sea glass dark
 
 /* Renders one Diyam content document (verbatim markdown) with prev/next nav. */
 export default function DiyamDocPage() {
@@ -30,7 +30,7 @@ export default function DiyamDocPage() {
         backHref="/app/diyam/content"
         backLabel="Content Library"
         meta={
-          <span className="rounded-full px-3 py-1 font-mono text-[11px]" style={{ background: "var(--color-surface-2)", color: "var(--color-muted)" }}>
+          <span className="rounded-full px-3 py-1 font-mono text-[11px]" style={{ background: "var(--color-surface-2)", color: "#3F6E5C" }}>
             {doc.filename}
           </span>
         }

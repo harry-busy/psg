@@ -11,7 +11,7 @@ import type { LoyaltyMember } from "@/lib/data/types";
 import { Trash2, Star, MessageCircle } from "lucide-react";
 
 const tierFor = (pts: number): LoyaltyMember["tier"] => (pts >= 5000 ? "Platinum" : pts >= 1500 ? "Gold" : "Silver");
-const TIER_COLOR = { Silver: "#8a8a8a", Gold: "#c9a227", Platinum: "#5B3A8C" };
+const TIER_COLOR = { Silver: "#7EBFA3", Gold: "#4E8A72", Platinum: "#1B4D3E" };
 const POINTS_PER_100 = 1; // 1 point per ₹100 spent
 
 export default function LoyaltyPage() {
@@ -73,7 +73,7 @@ export default function LoyaltyPage() {
                     </div>
                   </td>
                   <td className="text-right">
-                    {m.phone && <a target="_blank" title="Thank" href={waLink(m.phone, `Namaste ${m.name} ji! Thank you for being a valued ${m.tier} member at ${s.name}. You have ${m.points} reward points.`)}><MessageCircle size={14} className="inline text-[#25D366]" /></a>}
+                    {m.phone && <a target="_blank" title="Thank" href={waLink(m.phone, `Namaste ${m.name} ji! Thank you for being a valued ${m.tier} member at ${s.name}. You have ${m.points} reward points.`)}><MessageCircle size={14} className="inline text-[var(--color-crimson)]" /></a>}
                     <button className="ml-2" onClick={() => store.remove("loyalty", m.id)}><Trash2 size={14} className="inline text-[var(--color-muted)]" /></button>
                   </td>
                 </tr>

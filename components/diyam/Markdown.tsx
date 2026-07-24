@@ -10,7 +10,8 @@ import * as React from "react";
  * nothing from the source docs is dropped.
  */
 
-const GOLD = "#b8860b";
+// Brand accent — mid emerald (two-colour constitution: emerald + sea glass only)
+const GOLD = "#2D6B56";
 
 /* ── inline ─────────────────────────────────────────────────────────────── */
 function inline(text: string, keyBase: string): React.ReactNode[] {

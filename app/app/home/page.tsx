@@ -82,7 +82,7 @@ export default function HomePage() {
                   </div>
                   {d.phone && (
                     <a
-                      className="rounded-lg bg-[#25D366] px-3 py-1.5 text-xs font-semibold text-white"
+                      className="rounded-lg bg-[var(--color-crimson)] px-3 py-1.5 text-xs font-semibold text-white"
                       target="_blank"
                       href={waLink(d.phone, `Namaste ${d.name} ji! Just following up on your interest in ${d.item || "our jewellery"} at ${s.name}. When may we welcome you?`)}
                     >

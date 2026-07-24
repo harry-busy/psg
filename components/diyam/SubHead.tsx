@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-const GOLD = "#b8860b";
+// Eyebrow accent sits on the deep-emerald canvas — light sea glass so it reads (two-colour: emerald + sea glass only)
+const GOLD = "#7EBFA3";
 
 /** Shared header for Diyam content / report sub-pages. */
 export function SubHead({
@@ -32,7 +33,7 @@ export function SubHead({
       <div className="mt-4 text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: GOLD }}>
         {eyebrow}
       </div>
-      <h1 className="mt-2 font-display text-[clamp(1.6rem,4vw,2.4rem)] font-semibold leading-tight tracking-tight text-[var(--color-ink)]">
+      <h1 className="mt-2 font-display text-[clamp(1.6rem,4vw,2.4rem)] font-semibold leading-tight tracking-tight">
         {title}
       </h1>
       {sub && <p className="mt-2 max-w-3xl text-[15px] leading-relaxed text-[var(--color-muted)]">{sub}</p>}

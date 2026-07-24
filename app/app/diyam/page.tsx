@@ -15,20 +15,30 @@ import {
 /*
  * The Growth Blueprint - Diyam House of Silver x Ospyr.
  * Native, Apple-styled rebuild of Diyam/Diyam_Experience.html. Uses the Ospyr
- * theme: red backgrounds #D2042D, cream background #EBE5D5. Real Instagram
+ * theme: deep emerald #1B4D3E + sea glass #7EBFA3, sea-glass canvas #EAF5F0. Real Instagram
  * analytics (18 Jun to 17 Jul). Every tool wired to the live module.
  * Diyam sells both 925 silver and hallmarked gold.
  */
 
-const RED = "#D2042D";
-const RED_DEEP = "#9e0426";
-const CREAM = "#EBE5D5";
-const CREAM_2 = "#e0d9c6";
-const GOLD = "#b8860b";
-const GOLD_SOFT = "#c9a227";
-const INK = "#1d1d1f";
-const MUTED = "#6d5f52";
-const redWash = `linear-gradient(135deg, ${RED} 0%, ${RED_DEEP} 100%)`;
+/* ── Brand palette ─────────────────────────────────────────────────────────── */
+const EMERALD   = "#1B4D3E";   // primary brand dark
+const EMERALD_D = "#0D3326";   // deepest emerald (footer, hero depth)
+const EMERALD_M = "#2D6B56";   // mid emerald (hover states)
+const SEAGLASS  = "#7EBFA3";   // primary brand accent
+const SEAGLASS_L = "#A8D4C2";  // light sea glass (on-dark secondary text)
+const CANVAS_L  = "#EAF5F0";   // ultra-light sea glass (light section bg)
+const CANVAS_M  = "#C8E8DC";   // mid sea glass (zebra, dividers)
+
+/* legacy aliases used throughout JSX — keep these so nothing breaks */
+const RED       = EMERALD;
+const RED_DEEP  = EMERALD_D;
+const CREAM     = CANVAS_L;
+const CREAM_2   = CANVAS_M;
+const GOLD      = EMERALD_M;
+const GOLD_SOFT = SEAGLASS;
+const INK       = EMERALD;     // body text = brand emerald (Cartier uses near-black; we use brand)
+const MUTED     = "#4D7264";   // muted green
+const redWash   = `linear-gradient(160deg, ${EMERALD} 0%, ${EMERALD_D} 100%)`;
 
 /* ── scroll reveal ─────────────────────────────────────────────────────────── */
 function Reveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
@@ -75,29 +85,62 @@ function CountUp({ value, suffix = "" }: { value: number; suffix?: string }) {
   return <span ref={ref}>{Math.round(n).toLocaleString("en-IN")}{suffix}</span>;
 }
 
-/* ── building blocks ───────────────────────────────────────────────────────── */
+/* ── building blocks ─────────────────────────────────────────────── Cartier ── */
+
+/* Thin uppercase label — Cartier uses very spaced small caps above headings */
 function Eyebrow({ children, onDark = false }: { children: React.ReactNode; onDark?: boolean }) {
-  return <div className="mb-4 text-[11px] font-bold uppercase tracking-[0.22em]" style={{ color: onDark ? GOLD_SOFT : GOLD }}>{children}</div>;
+  return (
+    <div
+      className="mb-5 text-[10px] font-semibold uppercase tracking-[0.38em]"
+      style={{ color: onDark ? SEAGLASS_L : SEAGLASS, letterSpacing: "0.38em" }}
+    >
+      {children}
+    </div>
+  );
 }
+
+/* Cartier uses a thin 1px rule, not a fat bar */
 function GoldLine() {
-  return <div className="my-6 h-[3px] w-16 rounded-full" style={{ background: `linear-gradient(90deg, ${GOLD_SOFT}, transparent)` }} />;
+  return (
+    <div
+      className="my-7 w-12 border-t"
+      style={{ borderColor: SEAGLASS, opacity: 0.6 }}
+    />
+  );
 }
-function Section({ children }: { children: React.ReactNode }) {
-  return <section className="px-5 py-16 sm:px-6 sm:py-24"><div className="mx-auto max-w-6xl">{children}</div></section>;
+
+/* Light section — sea glass canvas background */
+function Section({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return (
+    <section className={`px-5 py-20 sm:px-8 sm:py-28 ${className}`} style={{ background: CANVAS_L }}>
+      <div className="mx-auto max-w-6xl">{children}</div>
+    </section>
+  );
 }
+
+/* Sea-glass section — the brighter of the two light tones (Cartier alternates tones) */
+function WhiteSection({ children }: { children: React.ReactNode }) {
+  return (
+    <section className="px-5 py-20 sm:px-8 sm:py-28" style={{ background: SEAGLASS }}>
+      <div className="mx-auto max-w-6xl">{children}</div>
+    </section>
+  );
+}
+
+/* Dark emerald full-bleed section — the signature Diyam brand band */
 function BandSection({ children }: { children: React.ReactNode }) {
   return (
-    <section className="px-5 py-16 sm:px-6 sm:py-24" style={{ background: redWash, color: "#fbf5ec" }}>
+    <section className="px-5 py-20 sm:px-8 sm:py-28" style={{ background: redWash, color: "#ffffff" }}>
       <div className="mx-auto max-w-6xl"><Reveal>{children}</Reveal></div>
     </section>
   );
 }
 function StatBlock({ value, label, sub }: { value: React.ReactNode; label: string; sub?: string }) {
   return (
-    <div className="min-w-0">
-      <div className="font-display text-[clamp(1.85rem,7vw,3.2rem)] font-semibold leading-none tabular-nums" style={{ color: GOLD_SOFT }}>{value}</div>
-      <div className="mt-2.5 text-[13px] font-medium leading-snug sm:text-sm" style={{ color: "#f4e4d6" }}>{label}</div>
-      {sub && <div className="mt-1 text-[12px]" style={{ color: "#e2c7ad" }}>{sub}</div>}
+    <div className="min-w-0 border-l-[1.5px] pl-5" style={{ borderColor: "rgba(168,212,194,0.4)" }}>
+      <div className="font-display text-[clamp(2rem,7vw,3.4rem)] font-light leading-none tabular-nums tracking-tight" style={{ color: "#ffffff" }}>{value}</div>
+      <div className="mt-3 text-[12px] font-medium uppercase tracking-[0.14em]" style={{ color: SEAGLASS_L }}>{label}</div>
+      {sub && <div className="mt-1 text-[11px]" style={{ color: "rgba(168,212,194,0.65)" }}>{sub}</div>}
     </div>
   );
 }
@@ -116,13 +159,13 @@ function CompareBar({ name, meta, value, pct, note, you = false }: { name: strin
   return (
     <div ref={ref}>
       <div className="mb-2 flex flex-wrap items-baseline justify-between gap-x-2">
-        <span className="text-sm font-semibold" style={{ color: "#fbf5ec" }}>{name} <span className="font-normal" style={{ color: "#e7cdb4" }}>{meta}</span></span>
+        <span className="text-sm font-semibold" style={{ color: "#EFF8F4" }}>{name} <span className="font-normal" style={{ color: SEAGLASS_L }}>{meta}</span></span>
         <span className="font-display text-lg font-semibold tabular-nums" style={{ color: GOLD_SOFT }}>{value}</span>
       </div>
       <div className="h-4 w-full overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.14)" }}>
-        <div className="h-full rounded-full transition-[width] duration-[1400ms] ease-out" style={{ width: `${Math.max(w, 1.5)}%`, background: you ? "linear-gradient(90deg, #f6ead9, #ffffff)" : `linear-gradient(90deg, ${GOLD}, ${GOLD_SOFT})` }} />
+        <div className="h-full rounded-full transition-[width] duration-[1400ms] ease-out" style={{ width: `${Math.max(w, 1.5)}%`, background: you ? "linear-gradient(90deg, #A8D4C2, #EFF8F4)" : `linear-gradient(90deg, ${GOLD}, ${GOLD_SOFT})` }} />
       </div>
-      <div className="mt-1.5 text-[13px]" style={{ color: "#e7cdb4" }}>{note}</div>
+      <div className="mt-1.5 text-[13px]" style={{ color: SEAGLASS_L }}>{note}</div>
     </div>
   );
 }
@@ -217,10 +260,10 @@ const COMPARE = [
 
 function Metric({ v, l, d, up }: { v: string; l: string; d: string; up: boolean }) {
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-[0_12px_34px_-22px_rgba(60,10,25,0.35)]">
+    <div className="rounded-2xl bg-white p-5 shadow-[0_12px_34px_-22px_rgba(8,26,16,0.35)]">
       <div className="font-display text-[2rem] font-semibold leading-none tabular-nums" style={{ color: RED }}>{v}</div>
       <div className="mt-1.5 text-[13px] font-medium" style={{ color: INK }}>{l}</div>
-      <div className="mt-2 inline-flex items-center gap-1 text-[12px] font-semibold" style={{ color: up ? "#1d8a3f" : "#b25000" }}>
+      <div className="mt-2 inline-flex items-center gap-1 text-[12px] font-semibold" style={{ color: up ? "#2D6B56" : MUTED }}>
         {up ? <ArrowUpRight size={13} /> : <ArrowDownRight size={13} />} {d}
       </div>
     </div>
@@ -242,14 +285,14 @@ function PerfBar({ label, count, avg, pct }: { label: string; count: string; avg
 function TimeBox({ k, l }: { k: string; l: string }) {
   return (
     <div className="rounded-xl p-3" style={{ background: CREAM_2 }}>
-      <div className="font-display text-lg font-semibold" style={{ color: "#7a0b25" }}>{k}</div>
+      <div className="font-display text-lg font-semibold" style={{ color: "#1B4D3E" }}>{k}</div>
       <div className="mt-0.5 text-[12px]" style={{ color: MUTED }}>{l}</div>
     </div>
   );
 }
 function PostStat({ icon, v, l }: { icon: React.ReactNode; v: string; l: string }) {
   return (
-    <div className="rounded-lg py-2" style={{ background: "#faf7f1" }}>
+    <div className="rounded-lg py-2" style={{ background: CANVAS_L }}>
       <div className="flex items-center justify-center gap-1 font-display text-[15px] font-semibold tabular-nums" style={{ color: RED }}>
         <span style={{ color: GOLD }}>{icon}</span>{v}
       </div>
@@ -262,29 +305,67 @@ export default function DiyamBlueprint() {
   return (
     <div className="-mx-4 -my-6 sm:-mx-8 lg:-ml-10 lg:-mr-8" style={{ background: CREAM, color: INK }}>
 
-      {/* ── HERO ─────────────────────────────────────────────────────────── */}
-      <header className="relative overflow-hidden px-5 py-20 sm:px-6 sm:py-32" style={{ background: `radial-gradient(120% 90% at 82% 8%, #e6203f 0%, ${RED} 44%, ${RED_DEEP} 100%)`, color: "#fbf5ec" }}>
-        <div className="pointer-events-none absolute -right-32 -top-28 h-72 w-72 rounded-full opacity-40 sm:h-[420px] sm:w-[420px]" style={{ background: `radial-gradient(circle, ${GOLD_SOFT}55, transparent 65%)` }} />
-        <div className="pointer-events-none absolute -bottom-28 -left-28 h-64 w-64 rounded-full opacity-30 sm:h-80 sm:w-80" style={{ background: `radial-gradient(circle, ${GOLD_SOFT}44, transparent 65%)` }} />
-        <div className="relative mx-auto max-w-5xl">
+      {/* ── HERO — Cartier-style: full-bleed emerald, centered serif, minimal ── */}
+      <header
+        className="relative flex min-h-[92vh] flex-col items-center justify-center overflow-hidden px-6 py-24 text-center"
+        style={{ background: `linear-gradient(170deg, ${EMERALD_D} 0%, ${EMERALD} 55%, ${EMERALD_M} 100%)` }}
+      >
+        {/* Subtle radial glow in sea glass — Cartier's rare accent glow */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ background: `radial-gradient(ellipse 80% 60% at 50% 0%, rgba(126,191,163,0.18) 0%, transparent 65%)` }}
+        />
+
+        <div className="relative z-10 mx-auto max-w-4xl">
+          {/* Logo */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/diyam-logo.png" alt="Diyam House of Silver logo" className="mb-6 h-20 w-auto rounded-2xl shadow-[0_16px_44px_-18px_rgba(0,0,0,0.55)] ring-1 ring-white/15 sm:h-24" />
-          <div className="mb-6 text-[10px] font-semibold uppercase tracking-[0.22em] sm:mb-7 sm:text-[12px] sm:tracking-[0.38em]" style={{ color: GOLD_SOFT }}>
-            Diyam House of Silver &middot; 925 Silver &amp; Hallmark Gold &middot; Jayanagar, Bengaluru
+          <img
+            src="/diyam-logo.png"
+            alt="Diyam House of Silver"
+            className="mx-auto mb-10 h-20 w-auto rounded-2xl opacity-95 shadow-[0_20px_60px_-24px_rgba(0,0,0,0.7)] sm:h-24"
+          />
+
+          {/* Thin eyebrow — Cartier's ultra-spaced label */}
+          <div
+            className="mb-8 text-[10px] uppercase"
+            style={{ color: SEAGLASS, letterSpacing: "0.5em" }}
+          >
+            Diyam House of Silver &nbsp;&middot;&nbsp; 925 Sterling &nbsp;&middot;&nbsp; Jayanagar, Bengaluru
           </div>
-          <h1 className="font-display text-[clamp(2rem,7.4vw,4.75rem)] font-semibold leading-[1.05] tracking-tight">
-            You have done the work.<br />Now let&apos;s make the world <span className="italic" style={{ color: GOLD_SOFT }}>see it.</span>
+
+          {/* Thin rule */}
+          <div className="mx-auto mb-10 w-8 border-t" style={{ borderColor: "rgba(126,191,163,0.5)" }} />
+
+          {/* Headline — Cartier uses large, light-weight, serif display type */}
+          <h1
+            className="font-display text-[clamp(2.2rem,6.5vw,5rem)] font-light leading-[1.08] tracking-[-0.02em]"
+            style={{ color: "#ffffff" }}
+          >
+            You have done the work.<br />
+            <span className="italic" style={{ color: SEAGLASS_L }}>Now let the world see it.</span>
           </h1>
-          <p className="mt-6 max-w-2xl text-[clamp(1rem,2.4vw,1.45rem)] leading-relaxed sm:mt-7" style={{ color: "#f4e4d6" }}>
-            39 posts a month. 31 reels. Real craft in 925 silver and hallmarked gold, a 4.6 star name. Everything is in
-            place except the engine that turns all that effort into followers, enquiries and sales. This is that engine.
+
+          {/* Subtext */}
+          <p
+            className="mx-auto mt-8 max-w-2xl text-[clamp(0.95rem,2vw,1.2rem)] font-light leading-[1.8]"
+            style={{ color: "rgba(200,232,220,0.75)" }}
+          >
+            39 posts. 31 reels. Real craft, honest silver, a 4.6&thinsp;★ name. Everything is in place
+            except the engine that turns the effort into reach, enquiries and sales.
           </p>
-          <div className="mt-9 inline-block border-t pt-4 text-[13px] tracking-wide sm:mt-11 sm:text-sm" style={{ borderColor: `${GOLD_SOFT}55`, color: "#e6d3bb" }}>
-            A complete growth and sales blueprint prepared for Diyam House of Silver &middot; by Ospyr
+
+          {/* Attribution */}
+          <div
+            className="mx-auto mt-12 max-w-sm border-t pt-6 text-[11px] uppercase tracking-[0.28em]"
+            style={{ borderColor: "rgba(126,191,163,0.25)", color: "rgba(168,212,194,0.55)" }}
+          >
+            A growth blueprint prepared by Ospyr
           </div>
         </div>
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2" style={{ color: GOLD_SOFT }}>
-          <span className="block animate-bounce"><ChevronDown size={20} /></span>
+
+        {/* Scroll cue */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2" style={{ color: "rgba(126,191,163,0.5)" }}>
+          <span className="block animate-bounce"><ChevronDown size={18} /></span>
         </div>
       </header>
 
@@ -298,13 +379,13 @@ export default function DiyamBlueprint() {
           <GoldLine />
           <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12">
             <div>
-              <p className="max-w-2xl text-base leading-relaxed sm:text-lg" style={{ color: "#4a3b33" }}>
+              <p className="max-w-2xl text-base leading-relaxed sm:text-lg" style={{ color: "#1A3428" }}>
                 Diyam House of Silver was born from a simple belief: that sterling silver deserves the same reverence as
                 gold, the same craft, the same trust, the same soul. From a workbench in Jayanagar to a name that serves
                 both wholesale partners and walk-in families, Diyam has quietly built a reputation on one promise: real
                 925 silver and honest, hallmarked gold.
               </p>
-              <p className="mt-4 max-w-2xl text-base leading-relaxed sm:text-lg" style={{ color: "#4a3b33" }}>
+              <p className="mt-4 max-w-2xl text-base leading-relaxed sm:text-lg" style={{ color: "#1A3428" }}>
                 That story, the founder&apos;s hands, the first design, the families who return generation after
                 generation, is the most powerful marketing you own. Most people who would love Diyam have simply never
                 heard it. We put the legacy at the centre of the brand: a founder&apos;s film, the craft in motion, the
@@ -315,10 +396,10 @@ export default function DiyamBlueprint() {
                 story before this goes live. Give us the true details and we write the film script around them.
               </div>
             </div>
-            <div className="flex flex-col items-center justify-center gap-5 rounded-[22px] p-8 text-center shadow-[0_24px_70px_-30px_rgba(60,10,25,0.5)]" style={{ background: redWash, border: `1px solid ${GOLD_SOFT}44` }}>
+            <div className="flex flex-col items-center justify-center gap-5 rounded-[22px] p-8 text-center shadow-[0_24px_70px_-30px_rgba(8,26,16,0.5)]" style={{ background: redWash, border: `1px solid ${GOLD_SOFT}44` }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/diyam-logo.png" alt="Diyam House of Silver logo" className="w-full max-w-[300px] rounded-2xl shadow-[0_18px_50px_-22px_rgba(0,0,0,0.6)] ring-1 ring-white/10" />
-              <div className="text-[12px] uppercase tracking-[0.2em]" style={{ color: "#e2c7ad" }}>Exclusive silver jewellery &amp; artecrafts</div>
+              <div className="text-[12px] uppercase tracking-[0.2em]" style={{ color: "#A8D4C2" }}>Exclusive silver jewellery &amp; artecrafts</div>
             </div>
           </div>
         </Reveal>
@@ -330,7 +411,7 @@ export default function DiyamBlueprint() {
         <h2 className="font-display text-[clamp(1.5rem,4.6vw,2.9rem)] font-semibold leading-[1.14] tracking-tight">
           Huge effort. Almost no reward, yet.
         </h2>
-        <p className="mt-5 max-w-2xl text-base sm:text-lg" style={{ color: "#f4e4d6" }}>
+        <p className="mt-5 max-w-2xl text-base sm:text-lg" style={{ color: "#A8D4C2" }}>
           Straight from your Instagram analytics, 18 June to 17 July. Read them without flinching, because every one of
           these is about to change.
         </p>
@@ -342,7 +423,7 @@ export default function DiyamBlueprint() {
           <StatBlock value={<CountUp value={3383} />} label="Reach" sub="up 40 percent" />
           <StatBlock value={<CountUp value={5383} />} label="Impressions" sub="up 57 percent" />
         </div>
-        <p className="mt-10 max-w-3xl text-base sm:text-lg" style={{ color: "#f4e4d6" }}>
+        <p className="mt-10 max-w-3xl text-base sm:text-lg" style={{ color: "#A8D4C2" }}>
           The good news is buried in here: reach is up 40 percent, impressions up 57 percent, and your reels already
           outperform images 4-to-1. The raw material is working. It has never been organised into a system. That is all
           this is.
@@ -357,7 +438,7 @@ export default function DiyamBlueprint() {
             Every number from your report, in one place.
           </h2>
           <GoldLine />
-          <p className="max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#4a3b33" }}>
+          <p className="max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#1A3428" }}>
             Pulled straight from your Instagram Insights for <b>18 June to 17 July 2026</b>, compared to the previous
             month, plus a head-to-head against OnnMe and PSG Gold.
           </p>
@@ -376,7 +457,7 @@ export default function DiyamBlueprint() {
         {/* post mix + best time */}
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           <Reveal className="h-full">
-            <div className="flex h-full flex-col rounded-2xl bg-white p-6 shadow-[0_12px_34px_-22px_rgba(60,10,25,0.35)]">
+            <div className="flex h-full flex-col rounded-2xl bg-white p-6 shadow-[0_12px_34px_-22px_rgba(8,26,16,0.35)]">
               <div className="flex items-center gap-2"><BarChart3 size={18} style={{ color: RED }} /><b className="font-display text-[17px]" style={{ color: INK }}>Post mix and what performs</b></div>
               <p className="mt-1 text-[13.5px]" style={{ color: MUTED }}>31 reels vs 8 images. Reels earn 3.3x the engagement, this is your growth lever.</p>
               <div className="mt-4 space-y-4">
@@ -386,7 +467,7 @@ export default function DiyamBlueprint() {
             </div>
           </Reveal>
           <Reveal className="h-full">
-            <div className="flex h-full flex-col rounded-2xl bg-white p-6 shadow-[0_12px_34px_-22px_rgba(60,10,25,0.35)]">
+            <div className="flex h-full flex-col rounded-2xl bg-white p-6 shadow-[0_12px_34px_-22px_rgba(8,26,16,0.35)]">
               <div className="flex items-center gap-2"><Clock size={18} style={{ color: RED }} /><b className="font-display text-[17px]" style={{ color: INK }}>When your audience shows up</b></div>
               <div className="mt-4 grid grid-cols-2 gap-4">
                 <TimeBox k="Sunday" l="Highest-engagement day" />
@@ -394,7 +475,7 @@ export default function DiyamBlueprint() {
                 <TimeBox k="Wednesday" l="Where you post most" />
                 <TimeBox k="11 AM" l="Where you post most" />
               </div>
-              <p className="mt-4 text-[13px]" style={{ color: "#b25000" }}>
+              <p className="mt-4 text-[13px]" style={{ color: "#2D6B56" }}>
                 The leaders post at 6 PM. Shifting your slot alone leaves easy engagement on the table.
               </p>
             </div>
@@ -403,15 +484,15 @@ export default function DiyamBlueprint() {
 
         {/* top posts */}
         <Reveal>
-          <h3 className="mt-10 font-display text-xl font-semibold" style={{ color: "#7a0b25" }}>Your top 3 posts this month</h3>
+          <h3 className="mt-10 font-display text-xl font-semibold" style={{ color: "#1B4D3E" }}>Your top 3 posts this month</h3>
         </Reveal>
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
           {TOP_POSTS.map((p, i) => (
             <Reveal key={p.date} delay={i * 60} className="h-full">
-              <div className="flex h-full flex-col rounded-2xl bg-white p-5 shadow-[0_12px_34px_-22px_rgba(60,10,25,0.35)]" style={{ borderTop: `4px solid ${GOLD}` }}>
+              <div className="flex h-full flex-col rounded-2xl bg-white p-5 shadow-[0_12px_34px_-22px_rgba(8,26,16,0.35)]" style={{ borderTop: `4px solid ${GOLD}` }}>
                 <div className="flex items-center justify-between">
                   <span className="text-[12px] font-bold uppercase tracking-[0.12em]" style={{ color: GOLD }}>{p.date}</span>
-                  <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase" style={{ background: CREAM_2, color: "#7a0b25" }}>Reel</span>
+                  <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase" style={{ background: CREAM_2, color: "#1B4D3E" }}>Reel</span>
                 </div>
                 <b className="mt-2 block text-[15px]" style={{ color: INK }}>{p.title}</b>
                 <div className="mt-3 grid grid-cols-3 gap-2 text-center">
@@ -419,7 +500,7 @@ export default function DiyamBlueprint() {
                   <PostStat icon={<Heart size={13} />} v={p.eng} l="Eng." />
                   <PostStat icon={<BarChart3 size={13} />} v={p.imp} l="Impr." />
                 </div>
-                <div className="mt-3 border-t pt-3 text-[12px]" style={{ borderColor: "#efe7d6", color: MUTED }}>
+                <div className="mt-3 border-t pt-3 text-[12px]" style={{ borderColor: CANVAS_M, color: MUTED }}>
                   {p.likes} likes &middot; {p.comments} comments &middot; {p.er} eng. by impressions
                 </div>
               </div>
@@ -448,17 +529,17 @@ export default function DiyamBlueprint() {
             Diyam vs OnnMe vs PSG Gold.
           </h2>
           <GoldLine />
-          <p className="max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#4a3b33" }}>
+          <p className="max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#1A3428" }}>
             Same 30 days, side by side. OnnMe is a close peer already winning; PSG Gold is the mountain-top. This is
             exactly the ground the engine closes.
           </p>
         </Reveal>
         <Reveal>
-          <div className="mt-8 overflow-hidden rounded-[18px] bg-white shadow-[0_20px_60px_-28px_rgba(60,10,25,0.4)]">
+          <div className="mt-8 overflow-hidden rounded-[18px] bg-white shadow-[0_20px_60px_-28px_rgba(8,26,16,0.4)]">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[560px] border-collapse text-left">
                 <thead>
-                  <tr style={{ background: redWash, color: "#fbf5ec" }}>
+                  <tr style={{ background: redWash, color: "#EFF8F4" }}>
                     <th className="px-4 py-3 text-[12px] font-bold uppercase tracking-[0.1em] sm:px-6">Metric</th>
                     <th className="px-4 py-3 text-[13px] font-bold sm:px-6" style={{ color: GOLD_SOFT }}>Diyam</th>
                     <th className="px-4 py-3 text-[13px] font-semibold sm:px-6">OnnMe</th>
@@ -467,9 +548,9 @@ export default function DiyamBlueprint() {
                 </thead>
                 <tbody>
                   {COMPARE.map((r, i) => (
-                    <tr key={r.m} style={{ background: i % 2 ? "#faf7f1" : "#fff" }}>
+                    <tr key={r.m} style={{ background: i % 2 ? CANVAS_L : "#fff" }}>
                       <td className="px-4 py-3 text-[13.5px] font-medium sm:px-6" style={{ color: INK }}>{r.m}</td>
-                      <td className="px-4 py-3 text-[14px] font-bold tabular-nums sm:px-6" style={{ color: RED, background: "rgba(210,4,45,0.06)" }}>{r.d}</td>
+                      <td className="px-4 py-3 text-[14px] font-bold tabular-nums sm:px-6" style={{ color: RED, background: "rgba(27,77,62,0.06)" }}>{r.d}</td>
                       <td className="px-4 py-3 text-[13.5px] tabular-nums sm:px-6" style={{ color: MUTED }}>{r.o}</td>
                       <td className="px-4 py-3 text-[13.5px] tabular-nums sm:px-6" style={{ color: MUTED }}>{r.p}</td>
                     </tr>
@@ -486,10 +567,10 @@ export default function DiyamBlueprint() {
             { big: "6 PM", t: "when the leaders post", p: "OnnMe peaks Saturday 6 PM, PSG Gold Thursday 6 PM. You post at 11 AM on Wednesday." },
           ].map((k) => (
             <Reveal key={k.t} className="h-full">
-              <div className="flex h-full flex-col rounded-2xl p-6" style={{ background: redWash, color: "#fbf5ec" }}>
+              <div className="flex h-full flex-col rounded-2xl p-6" style={{ background: redWash, color: "#EFF8F4" }}>
                 <div className="font-display text-4xl font-semibold" style={{ color: GOLD_SOFT }}>{k.big}</div>
                 <b className="mt-2 block text-[15px]">{k.t}</b>
-                <p className="mt-1.5 text-[13.5px]" style={{ color: "#f4e4d6" }}>{k.p}</p>
+                <p className="mt-1.5 text-[13.5px]" style={{ color: "#A8D4C2" }}>{k.p}</p>
               </div>
             </Reveal>
           ))}
@@ -500,14 +581,14 @@ export default function DiyamBlueprint() {
       </Section>
 
       {/* ── THE GAP / COMPARISON ─────────────────────────────────────────── */}
-      <div className="px-5 py-16 sm:px-6 sm:py-24" style={{ background: redWash, color: "#fbf5ec" }}>
+      <div className="px-5 py-16 sm:px-6 sm:py-24" style={{ background: redWash, color: "#EFF8F4" }}>
         <div className="mx-auto max-w-6xl">
           <Reveal>
             <Eyebrow onDark>The gap, you vs the field</Eyebrow>
             <h2 className="max-w-4xl font-display text-[clamp(1.5rem,4.6vw,2.9rem)] font-semibold leading-[1.14] tracking-tight">
               You are outworking brands many times your size, for a fraction of the return.
             </h2>
-            <p className="mt-5 max-w-3xl text-base sm:text-lg" style={{ color: "#f4e4d6" }}>
+            <p className="mt-5 max-w-3xl text-base sm:text-lg" style={{ color: "#A8D4C2" }}>
               Same month, same effort level. This is not to discourage you, it is proof that the ceiling is enormous and
               the fix is a system, not more hours.
             </p>
@@ -534,7 +615,7 @@ export default function DiyamBlueprint() {
             Six fixable reasons, every one is in your data.
           </h2>
           <GoldLine />
-          <p className="max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#4a3b33" }}>
+          <p className="max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#1A3428" }}>
             None of these are about how good your jewellery is. They are about the machine around it.
           </p>
           <div className="mt-11 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -546,11 +627,11 @@ export default function DiyamBlueprint() {
               { x: "No reach engine", h: "Reels are not built to travel", p: "No hooks, trending audio, creators or shareable formats, so reels reach about 120 people, not 12,000.", fix: "Reel growth engine plus UGC" },
               { x: "No system", h: "Effort without a machine", p: "Posting by hand, no automations, no funnel, no follow-up, no data loop. Hard work leaks out everywhere.", fix: "The full growth engine below" },
             ].map((d) => (
-              <div key={d.x} className="rounded-2xl bg-white p-6 shadow-[0_10px_30px_-18px_rgba(60,10,25,0.3)]" style={{ borderLeft: `4px solid ${RED}` }}>
+              <div key={d.x} className="rounded-2xl bg-white p-6 shadow-[0_10px_30px_-18px_rgba(8,26,16,0.3)]" style={{ borderLeft: `4px solid ${RED}` }}>
                 <div className="text-[13px] font-bold uppercase tracking-[0.08em]" style={{ color: RED }}>{d.x}</div>
                 <h4 className="mt-1.5 font-display text-[17px] font-semibold" style={{ color: INK }}>{d.h}</h4>
                 <p className="mt-2 text-[14.5px] leading-relaxed" style={{ color: MUTED }}>{d.p}</p>
-                <div className="mt-3 inline-flex items-center gap-1.5 text-[13.5px] font-semibold" style={{ color: "#0E7C57" }}>
+                <div className="mt-3 inline-flex items-center gap-1.5 text-[13.5px] font-semibold" style={{ color: "#2D6B56" }}>
                   <ArrowRight size={14} /> {d.fix}
                 </div>
               </div>
@@ -562,7 +643,7 @@ export default function DiyamBlueprint() {
       {/* ── PULL QUOTE ───────────────────────────────────────────────────── */}
       <Section>
         <Reveal>
-          <div className="relative overflow-hidden rounded-[22px] px-6 py-12 text-center shadow-[0_20px_60px_-20px_rgba(60,10,25,0.5)] sm:rounded-[28px] sm:px-12 sm:py-16" style={{ background: redWash, color: "#fbf5ec" }}>
+          <div className="relative overflow-hidden rounded-[22px] px-6 py-12 text-center shadow-[0_20px_60px_-20px_rgba(8,26,16,0.5)] sm:rounded-[28px] sm:px-12 sm:py-16" style={{ background: redWash, color: "#EFF8F4" }}>
             <span className="pointer-events-none absolute left-4 top-1 font-display text-[100px] leading-none sm:left-6 sm:top-2 sm:text-[160px]" style={{ color: `${GOLD_SOFT}22` }}>&ldquo;</span>
             <q className="relative block font-display text-[clamp(1.3rem,3.8vw,2.35rem)] font-medium italic leading-snug">
               Diyam does not need to work harder. It needs the machine that finally pays back the work you are already doing.
@@ -580,22 +661,23 @@ export default function DiyamBlueprint() {
             The complete growth engine.
           </h2>
           <GoldLine />
-          <p className="max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#4a3b33" }}>
+          <p className="max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#1A3428" }}>
             A full high-end marketing department for Diyam, built once, run every day. Wholesale and retail, online and
             in-store, content and commerce, silver and gold.
           </p>
         </Reveal>
-        <div className="mt-11 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-12 grid gap-px sm:grid-cols-2 lg:grid-cols-3" style={{ background: CANVAS_M }}>
           {ENGINE.map((e, i) => (
             <Reveal key={e.h} delay={(i % 3) * 60} className="h-full">
-              <div className="flex h-full flex-col rounded-2xl bg-white p-7 shadow-[0_12px_34px_-20px_rgba(60,10,25,0.32)] transition-transform duration-200 hover:-translate-y-1" style={{ borderTop: `4px solid ${RED}` }}>
-                <e.icon size={24} style={{ color: RED }} />
-                <h3 className="mt-3 font-display text-[19px] font-semibold" style={{ color: INK }}>{e.h}</h3>
-                <p className="mt-1.5 text-[14.5px]" style={{ color: MUTED }}>{e.p}</p>
-                <ul className="mt-3 space-y-1.5">
+              <div className="flex h-full flex-col bg-white p-8 transition-colors duration-200 hover:bg-[#EAF5F0]">
+                <e.icon size={20} style={{ color: SEAGLASS }} />
+                <h3 className="mt-4 font-display text-[17px] font-semibold tracking-tight" style={{ color: EMERALD }}>{e.h}</h3>
+                <p className="mt-1.5 text-[13px] leading-relaxed" style={{ color: MUTED }}>{e.p}</p>
+                <ul className="mt-4 space-y-2 border-t pt-4" style={{ borderColor: CANVAS_M }}>
                   {e.li.map((x) => (
-                    <li key={x} className="flex items-start gap-2 text-[14px]" style={{ color: "#4a3b33" }}>
-                      <Check size={15} className="mt-1 flex-none" style={{ color: GOLD }} /> {x}
+                    <li key={x} className="flex items-start gap-2.5 text-[13px]" style={{ color: "#1A3428" }}>
+                      <span className="mt-1.5 h-1 w-1 flex-none rounded-full" style={{ background: SEAGLASS }} />
+                      {x}
                     </li>
                   ))}
                 </ul>
@@ -606,31 +688,31 @@ export default function DiyamBlueprint() {
       </Section>
 
       {/* ── AUTOMATION SUITE (red band) ──────────────────────────────────── */}
-      <div className="px-5 py-16 sm:px-6 sm:py-24" style={{ background: redWash, color: "#fbf5ec" }}>
+      <div className="px-5 py-16 sm:px-6 sm:py-24" style={{ background: redWash, color: "#EFF8F4" }}>
         <div className="mx-auto max-w-6xl">
           <Reveal>
             <Eyebrow onDark>The automation suite, you click, it happens</Eyebrow>
             <h2 className="font-display text-[clamp(1.5rem,4.6vw,2.9rem)] font-semibold leading-[1.14] tracking-tight">
               Every routine job, on autopilot.
             </h2>
-            <p className="mt-5 max-w-3xl text-base sm:text-lg" style={{ color: "#f4e4d6" }}>
+            <p className="mt-5 max-w-3xl text-base sm:text-lg" style={{ color: "#A8D4C2" }}>
               The work that is impossible to do by hand, answered instantly, 24/7, in Kannada and English.
             </p>
           </Reveal>
-          <div className="mt-11 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-12 grid gap-px sm:grid-cols-2 lg:grid-cols-4" style={{ background: "rgba(168,212,194,0.12)" }}>
             {AUTO.map((a, i) => (
               <Reveal key={a.b} delay={(i % 4) * 50} className="h-full">
-                <div className="flex h-full flex-col rounded-2xl border p-6 transition-transform duration-200 hover:-translate-y-1" style={{ background: "#2b0512", borderColor: `${GOLD_SOFT}30` }}>
-                  <a.icon size={22} style={{ color: GOLD_SOFT }} />
-                  <b className="mt-3 block text-[16px]" style={{ color: GOLD_SOFT }}>{a.b}</b>
-                  <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: "#e6d0c2" }}>{a.p}</p>
+                <div className="flex h-full flex-col p-6 transition-colors" style={{ background: "rgba(13,51,38,0.6)" }}>
+                  <a.icon size={18} style={{ color: SEAGLASS_L, opacity: 0.8 }} />
+                  <b className="mt-3 block text-[14px] font-semibold" style={{ color: "#ffffff" }}>{a.b}</b>
+                  <p className="mt-1.5 text-[12.5px] leading-relaxed" style={{ color: SEAGLASS_L, opacity: 0.7 }}>{a.p}</p>
                 </div>
               </Reveal>
             ))}
           </div>
           <Reveal>
-            <div className="mt-8 rounded-2xl p-6 sm:mt-9 sm:p-7" style={{ background: "#2b0512", borderLeft: `4px solid ${GOLD_SOFT}` }}>
-              <p className="text-[14px] leading-relaxed sm:text-[15px]" style={{ color: "#f0ddc7" }}>
+            <div className="mt-8 rounded-2xl p-6 sm:mt-9 sm:p-7" style={{ background: "#0D3326", borderLeft: `4px solid ${GOLD_SOFT}` }}>
+              <p className="text-[14px] leading-relaxed sm:text-[15px]" style={{ color: "#EFF8F4" }}>
                 <b style={{ color: GOLD_SOFT }}>52 automations across 21 groups are already built and import-ready</b>, lead
                 capture, WhatsApp selling, AI content, festive engines, bridal drip, reviews, inventory, money, loyalty,
                 AI sales intelligence, Kannada voice, Instagram-at-scale and the owner-intelligence layer. Diyam gets the
@@ -652,18 +734,19 @@ export default function DiyamBlueprint() {
             One month to flip the machine on.
           </h2>
           <GoldLine />
-          <p className="max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#4a3b33" }}>
+          <p className="max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#1A3428" }}>
             You asked for growth in the next month. Here is exactly how we spend it, foundation to first results in four weeks.
           </p>
-          <div className="mt-11 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {SPRINT.map((w) => (
-              <div key={w.n} className="rounded-2xl bg-white p-6 shadow-[0_18px_50px_-26px_rgba(60,10,25,0.4)]" style={{ borderTop: `5px solid ${RED}` }}>
-                <div className="text-[12px] font-bold uppercase tracking-[0.16em]" style={{ color: GOLD }}>{w.n}</div>
-                <h4 className="mt-2 mb-3 font-display text-lg font-semibold" style={{ color: "#7a0b25" }}>{w.h}</h4>
-                <ul className="space-y-1.5">
+          <div className="mt-12 grid gap-px sm:grid-cols-2 lg:grid-cols-4" style={{ background: CANVAS_M }}>
+            {SPRINT.map((w, i) => (
+              <div key={w.n} className="bg-white p-7 hover:bg-[#EAF5F0] transition-colors">
+                <div className="text-[10px] font-bold uppercase tracking-[0.32em]" style={{ color: SEAGLASS }}>{w.n}</div>
+                <h4 className="mt-2 mb-4 font-display text-[18px] font-semibold" style={{ color: EMERALD }}>{w.h}</h4>
+                <div className="w-6 border-t mb-4" style={{ borderColor: SEAGLASS, opacity: 0.5 }} />
+                <ul className="space-y-2">
                   {w.li.map((x) => (
-                    <li key={x} className="flex items-start gap-2 text-[13.5px]" style={{ color: MUTED }}>
-                      <ArrowRight size={13} className="mt-1 flex-none" style={{ color: GOLD }} /> {x}
+                    <li key={x} className="flex items-start gap-2.5 text-[13px]" style={{ color: MUTED }}>
+                      <span className="mt-1.5 h-1 w-1 flex-none rounded-full" style={{ background: SEAGLASS }} />{x}
                     </li>
                   ))}
                 </ul>
@@ -679,7 +762,7 @@ export default function DiyamBlueprint() {
         <h2 className="font-display text-[clamp(1.5rem,4.6vw,2.9rem)] font-semibold leading-[1.14] tracking-tight">
           Reach is nice. We are here for revenue.
         </h2>
-        <p className="mt-5 max-w-3xl text-base sm:text-lg" style={{ color: "#f4e4d6" }}>
+        <p className="mt-5 max-w-3xl text-base sm:text-lg" style={{ color: "#A8D4C2" }}>
           Every part of the engine points at one thing, money in the till, retail and wholesale. Here is the path a
           single reel now takes:
         </p>
@@ -691,14 +774,14 @@ export default function DiyamBlueprint() {
             { n: "04", b: "Order or store visit", s: "retail sale, wholesale enquiry" },
             { n: "05", b: "Review plus repeat", s: "referral and occasion nurture" },
           ].map((node) => (
-            <div key={node.n} className="rounded-2xl border p-5 text-center" style={{ background: "#2b0512", borderColor: `${GOLD_SOFT}2e` }}>
+            <div key={node.n} className="rounded-2xl border p-5 text-center" style={{ background: "#0D3326", borderColor: `${GOLD_SOFT}2e` }}>
               <div className="font-display text-[15px] font-bold" style={{ color: GOLD_SOFT }}>{node.n}</div>
-              <b className="mt-2 block text-[15px]" style={{ color: "#fbf5ec" }}>{node.b}</b>
-              <span className="mt-1 block text-[12.5px]" style={{ color: "#e6d0c2" }}>{node.s}</span>
+              <b className="mt-2 block text-[15px]" style={{ color: "#EFF8F4" }}>{node.b}</b>
+              <span className="mt-1 block text-[12.5px]" style={{ color: SEAGLASS_L }}>{node.s}</span>
             </div>
           ))}
         </div>
-        <p className="mt-10 max-w-3xl text-base sm:text-lg" style={{ color: "#f4e4d6" }}>
+        <p className="mt-10 max-w-3xl text-base sm:text-lg" style={{ color: "#A8D4C2" }}>
           Silver&apos;s advantage: lower ticket, high gifting and impulse, festive-driven for Rakhi, Diwali and weddings,
           and endlessly repeatable, while gold anchors the high-value sales. That means <b style={{ color: GOLD_SOFT }}>volume
           and value together</b>, the perfect pairing for a content-and-WhatsApp engine to compound quickly.
@@ -713,19 +796,23 @@ export default function DiyamBlueprint() {
             From 281 followers to a real audience.
           </h2>
           <GoldLine />
-          <p className="max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#4a3b33" }}>
+          <p className="max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#1A3428" }}>
             Honest, directional targets, the same craft, finally seen. We report the real curve every week.
           </p>
-          <div className="mt-11 grid gap-6 sm:grid-cols-3">
+          <div className="mt-12 grid gap-px sm:grid-cols-3" style={{ background: CANVAS_M }}>
             {[
               { h: "30 days", n: "1,500+", c: "followers, reels crossing thousands, live WhatsApp enquiries", mid: false },
-              { h: "90 days", n: "8,000+", c: "a real content brand, steady sales from Instagram plus WhatsApp", mid: true },
-              { h: "12 months", n: "50K+", c: "a recognised Bangalore silver and gold name, retail and wholesale", mid: false },
+              { h: "90 days", n: "8,000+", c: "a real content brand, steady sales from Instagram and WhatsApp", mid: true },
+              { h: "12 months", n: "50 K+", c: "a recognised Bangalore silver and gold name, retail and wholesale", mid: false },
             ].map((g) => (
-              <div key={g.h} className={cn("rounded-3xl bg-white p-7 text-center shadow-[0_18px_50px_-24px_rgba(0,0,0,0.4)] sm:p-8", g.mid && "sm:scale-[1.05]")} style={{ borderTop: `5px solid ${g.mid ? RED : GOLD}` }}>
-                <h4 className="text-[13px] font-bold uppercase tracking-[0.14em]" style={{ color: MUTED }}>{g.h}</h4>
-                <div className="my-3 font-display text-[2.75rem] font-semibold leading-none sm:text-5xl" style={{ color: g.mid ? RED : "#7a0b25" }}>{g.n}</div>
-                <div className="text-[15px]" style={{ color: MUTED }}>{g.c}</div>
+              <div
+                key={g.h}
+                className="p-10 text-center"
+                style={{ background: g.mid ? EMERALD : "#ffffff", color: g.mid ? "#ffffff" : EMERALD }}
+              >
+                <div className="text-[10px] font-semibold uppercase tracking-[0.32em]" style={{ color: g.mid ? SEAGLASS_L : SEAGLASS }}>{g.h}</div>
+                <div className="my-4 font-display text-[3rem] font-light leading-none tracking-tight sm:text-[3.5rem]">{g.n}</div>
+                <div className="mx-auto max-w-[220px] text-[13px] leading-relaxed" style={{ color: g.mid ? "rgba(168,212,194,0.8)" : MUTED }}>{g.c}</div>
               </div>
             ))}
           </div>
@@ -744,7 +831,7 @@ export default function DiyamBlueprint() {
             The full playbook and every report.
           </h2>
           <GoldLine />
-          <p className="max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#4a3b33" }}>
+          <p className="max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#1A3428" }}>
             The complete 30-day content machine, the day-by-day calendar, and every Instagram report and competitor
             comparison deck, reproduced in full, exactly as prepared, down to the last graph.
           </p>
@@ -756,7 +843,7 @@ export default function DiyamBlueprint() {
             { icon: TrendingUp, name: "Reports & Decks", desc: "Diyam's own analytics plus head-to-heads vs OnnMe, PSG Gold, Tiffany, SILVANA and more.", href: "/app/diyam/reports" },
           ].map((t, i) => (
             <Reveal key={t.name} delay={i * 60} className="h-full">
-              <Link href={t.href} className="group flex h-full flex-col rounded-2xl bg-white p-7 shadow-[0_12px_34px_-20px_rgba(60,10,25,0.32)] transition-transform duration-200 hover:-translate-y-1" style={{ borderTop: `4px solid ${GOLD}` }}>
+              <Link href={t.href} className="group flex h-full flex-col rounded-2xl bg-white p-7 shadow-[0_12px_34px_-20px_rgba(8,26,16,0.32)] transition-transform duration-200 hover:-translate-y-1" style={{ borderTop: `4px solid ${GOLD}` }}>
                 <t.icon size={24} style={{ color: RED }} />
                 <h3 className="mt-3 font-display text-[19px] font-semibold" style={{ color: INK }}>{t.name}</h3>
                 <p className="mt-1.5 flex-1 text-[14.5px]" style={{ color: MUTED }}>{t.desc}</p>
@@ -772,35 +859,35 @@ export default function DiyamBlueprint() {
       <StudioReferences />
 
       {/* ── PROOF / TOOLS (red band) ─────────────────────────────────────── */}
-      <div className="px-5 py-16 sm:px-6 sm:py-24" style={{ background: redWash, color: "#fbf5ec" }}>
+      <div className="px-5 py-16 sm:px-6 sm:py-24" style={{ background: redWash, color: "#EFF8F4" }}>
         <div className="mx-auto max-w-6xl">
           <Reveal>
             <Eyebrow onDark>The unfair advantage</Eyebrow>
             <h2 className="max-w-4xl font-display text-[clamp(1.5rem,4.6vw,2.9rem)] font-semibold leading-[1.14] tracking-tight">
               Most agencies show slides. We hand you working software.
             </h2>
-            <p className="mt-5 max-w-3xl text-base sm:text-lg" style={{ color: "#f4e4d6" }}>
+            <p className="mt-5 max-w-3xl text-base sm:text-lg" style={{ color: "#A8D4C2" }}>
               Eight white-label tools and 52 automations are already built, configured for Diyam. Click any tool to open
               the real thing, running inside your OS.
             </p>
           </Reveal>
-          <div className="mt-11 grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-4">
+          <div className="mt-12 grid gap-px sm:grid-cols-2 sm:gap-px lg:grid-cols-4" style={{ background: "rgba(168,212,194,0.12)" }}>
             {TOOLS.map((t, i) => (
               <Reveal key={t.name} delay={(i % 4) * 60} className="h-full">
-                <Link href={t.href} className="group flex h-full flex-col rounded-2xl border p-6 transition-all duration-200 hover:-translate-y-1" style={{ background: "#2b0512", borderColor: `${GOLD_SOFT}30` }}>
-                  <t.icon size={24} style={{ color: GOLD_SOFT }} />
-                  <b className="mt-3 block text-[16px] sm:text-[17px]" style={{ color: GOLD_SOFT }}>{t.name}</b>
-                  <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: "#e6d0c2" }}>{t.desc}</p>
-                  <span className="mt-auto inline-flex items-center gap-1 pt-4 text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: GOLD }}>
-                    Open tool <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
+                <Link href={t.href} className="group flex h-full flex-col p-7 transition-colors hover:bg-[rgba(45,107,86,0.5)]" style={{ background: "rgba(13,51,38,0.55)" }}>
+                  <t.icon size={18} style={{ color: SEAGLASS_L, opacity: 0.75 }} />
+                  <b className="mt-4 block text-[15px] font-semibold" style={{ color: "#ffffff" }}>{t.name}</b>
+                  <p className="mt-1.5 flex-1 text-[12.5px] leading-relaxed" style={{ color: SEAGLASS_L, opacity: 0.65 }}>{t.desc}</p>
+                  <span className="mt-6 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.24em]" style={{ color: SEAGLASS_L, opacity: 0.6 }}>
+                    Discover <ArrowRight size={11} className="transition-transform group-hover:translate-x-0.5" />
                   </span>
                 </Link>
               </Reveal>
             ))}
           </div>
           <Reveal>
-            <div className="mt-8 rounded-2xl p-6 sm:mt-9 sm:p-7" style={{ background: "#2b0512", borderLeft: `4px solid ${GOLD_SOFT}` }}>
-              <p className="text-[14px] leading-relaxed sm:text-[15px]" style={{ color: "#f0ddc7" }}>
+            <div className="mt-8 rounded-2xl p-6 sm:mt-9 sm:p-7" style={{ background: "#0D3326", borderLeft: `4px solid ${GOLD_SOFT}` }}>
+              <p className="text-[14px] leading-relaxed sm:text-[15px]" style={{ color: "#EFF8F4" }}>
                 All eight tools are white-label, brand name, colours and WhatsApp number configure to Diyam in seconds.{" "}
                 <Link href="/app/home" className="inline-flex items-center gap-1 font-semibold underline underline-offset-2" style={{ color: GOLD_SOFT }}>
                   Open your command center <ArrowRight size={13} />
@@ -814,7 +901,7 @@ export default function DiyamBlueprint() {
       {/* ── ENGAGEMENT ───────────────────────────────────────────────────── */}
       <Section>
         <Reveal>
-          <div className="rounded-[22px] px-6 py-12 shadow-[0_20px_60px_-20px_rgba(60,10,25,0.5)] sm:rounded-[28px] sm:px-12 sm:py-14" style={{ background: redWash, color: "#fbf5ec" }}>
+          <div className="rounded-[22px] px-6 py-12 shadow-[0_20px_60px_-20px_rgba(8,26,16,0.5)] sm:rounded-[28px] sm:px-12 sm:py-14" style={{ background: redWash, color: "#EFF8F4" }}>
             <Eyebrow onDark>How we work together</Eyebrow>
             <h2 className="font-display text-[clamp(1.45rem,4vw,2.6rem)] font-semibold tracking-tight">Full build, then we run it with you.</h2>
             <div className="mt-9 grid gap-6 sm:grid-cols-2">
@@ -825,7 +912,7 @@ export default function DiyamBlueprint() {
                 <div key={ph.n} className="rounded-2xl p-6 sm:p-7" style={{ background: "rgba(255,255,255,0.07)", border: `1px solid ${GOLD_SOFT}40` }}>
                   <div className="text-[12px] font-bold uppercase tracking-[0.16em]" style={{ color: GOLD_SOFT }}>{ph.n}</div>
                   <h4 className="mt-2 mb-2 font-display text-xl font-semibold">{ph.h}</h4>
-                  <p className="text-[15px]" style={{ color: "#f0ddc7" }}>{ph.p}</p>
+                  <p className="text-[15px]" style={{ color: "#EFF8F4" }}>{ph.p}</p>
                 </div>
               ))}
             </div>
@@ -833,36 +920,40 @@ export default function DiyamBlueprint() {
         </Reveal>
       </Section>
 
-      {/* ── CTA ──────────────────────────────────────────────────────────── */}
-      <Section>
+      {/* ── CTA — Cartier: clean, centered, understated on brand emerald ─── */}
+      <section className="px-6 py-28 text-center sm:py-36" style={{ background: EMERALD }}>
         <Reveal>
-          <div className="text-center">
-            <Eyebrow>The invitation</Eyebrow>
-            <h2 className="mx-auto max-w-3xl font-display text-[clamp(1.65rem,5.4vw,3.2rem)] font-semibold leading-[1.12] tracking-tight" style={{ color: "#7a0b25" }}>
-              The silver is pure, the gold is true, the story is real. Let&apos;s make Bangalore see it.
+          <div className="mx-auto max-w-2xl">
+            <div className="mx-auto mb-8 w-8 border-t" style={{ borderColor: "rgba(126,191,163,0.4)" }} />
+            <div className="mb-6 text-[10px] uppercase tracking-[0.4em]" style={{ color: SEAGLASS_L, opacity: 0.7 }}>
+              The invitation
+            </div>
+            <h2 className="font-display text-[clamp(1.8rem,5vw,3.4rem)] font-light leading-[1.1] tracking-[-0.02em]" style={{ color: "#ffffff" }}>
+              The silver is pure.<br />The story is real.
             </h2>
-            <p className="mx-auto mt-6 max-w-2xl text-base sm:text-lg" style={{ color: "#4a3b33" }}>
-              You have already done the hard part for a year. Give us one month to show you what happens when the whole
-              engine turns on.
+            <p className="mx-auto mt-7 max-w-xl text-[15px] font-light leading-[1.9]" style={{ color: SEAGLASS_L, opacity: 0.75 }}>
+              You have already done the hard part for a year. Give us one month to show you what happens when the whole engine turns on.
             </p>
-            <div className="mt-9 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:gap-4">
-              <Link href="/app/home" className="inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-[15px] font-semibold shadow-[0_16px_40px_-12px_rgba(198,162,78,0.55)] transition-transform hover:-translate-y-0.5 sm:text-[16px]" style={{ background: `linear-gradient(90deg, #9a6212, ${GOLD_SOFT})`, color: INK }}>
-                Open your command center <ArrowRight size={17} />
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link href="/app/home" className="inline-flex items-center gap-2 border px-8 py-3.5 text-[12px] font-medium uppercase tracking-[0.2em] transition-colors hover:bg-white hover:text-[#1B4D3E]" style={{ borderColor: "rgba(126,191,163,0.5)", color: "#ffffff" }}>
+                Enter the workspace <ArrowRight size={14} />
               </Link>
-              <Link href="/app/automations" className="inline-flex items-center justify-center gap-2 rounded-full px-7 py-4 text-[15px] font-semibold transition-colors" style={{ border: `1.5px solid ${RED}`, color: RED }}>
-                <Workflow size={16} /> See the automations
+              <Link href="/app/automations" className="inline-flex items-center gap-2 text-[12px] font-medium uppercase tracking-[0.2em] transition-opacity hover:opacity-80" style={{ color: SEAGLASS_L }}>
+                <Workflow size={14} /> View automations
               </Link>
             </div>
           </div>
         </Reveal>
-      </Section>
+      </section>
 
-      {/* ── FOOTER ───────────────────────────────────────────────────────── */}
-      <footer className="px-6 py-12 text-center" style={{ background: INK, color: "#cbbcae" }}>
+      {/* ── FOOTER ─────────────────────────────────────────────────────── */}
+      <footer className="px-6 py-14 text-center" style={{ background: EMERALD_D }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/diyam-logo.png" alt="Diyam House of Silver logo" className="mx-auto mb-6 h-16 w-auto rounded-xl opacity-95 shadow-lg" />
-        <div className="font-display text-xl font-semibold tracking-[0.2em]" style={{ color: GOLD_SOFT }}>OSPYR</div>
-        <p className="mt-3 text-[13px]">The team behind the jeweller. &middot; Prepared for Diyam House of Silver, Jayanagar, Bengaluru.</p>
+        <img src="/diyam-logo.png" alt="Diyam House of Silver logo" className="mx-auto mb-7 h-14 w-auto rounded-xl opacity-80" />
+        <div className="text-[10px] font-semibold uppercase tracking-[0.36em]" style={{ color: SEAGLASS, opacity: 0.7 }}>OSPYR</div>
+        <p className="mt-3 text-[11px] uppercase tracking-[0.14em]" style={{ color: "rgba(168,212,194,0.35)" }}>
+          The team behind the jeweller &nbsp;&middot;&nbsp; Diyam House of Silver, Jayanagar, Bengaluru
+        </p>
       </footer>
     </div>
   );

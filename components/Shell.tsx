@@ -54,8 +54,10 @@ export function Shell({ children }: { children: React.ReactNode }) {
   const monthRev = kpis(metrics.filter((m) => m.date >= daysAgo(29))).revenue;
   const runwayMonths = f.monthlyBurn ? (f.cashBalance / f.monthlyBurn).toFixed(1) : "∞";
 
+  const isDiyam = ws.toLowerCase().includes("diyam");
+
   return (
-    <div className="min-h-screen">
+    <div className={cn("min-h-screen", isDiyam && "diyam-ws")}>
       {/* mobile top bar */}
       <div className="glass sticky top-0 z-30 flex items-center justify-between border-b border-[var(--color-line)] px-4 py-3 lg:hidden">
         <button onClick={() => setOpen(true)} aria-label="Menu"><Menu size={22} /></button>

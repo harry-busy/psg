@@ -14,9 +14,9 @@ import { captionPrompt, brandSystem } from "@/lib/ai/prompts";
 import { Sparkles, Download, Send, Upload } from "lucide-react";
 
 const THEMES = {
-  light: { bg1: "#EAE5D4", bg2: "#dcd4bd", ink: "#2A1A1D", acc: "#D2042D", sub: "#6d6250" },
-  dark: { bg1: "#1b1b1e", bg2: "#000000", ink: "#f2ead8", acc: "#e8c96a", sub: "#b8ab90" },
-  red: { bg1: "#9E0322", bg2: "#5a0113", ink: "#fdf6e3", acc: "#f4d47c", sub: "#e8c2b8" },
+  light: { bg1: "#A8D4C2", bg2: "#7EBFA3", ink: "#1B4D3E", acc: "#1B4D3E", sub: "#0E3327" },
+  dark: { bg1: "#1B4D3E", bg2: "#0D3326", ink: "#FFFFFF", acc: "#A8D4C2", sub: "#7EBFA3" },
+  red: { bg1: "#0E3327", bg2: "#0D3326", ink: "#FFFFFF", acc: "#7EBFA3", sub: "#A8D4C2" },
 } as const;
 type Theme = keyof typeof THEMES;
 
@@ -48,7 +48,7 @@ export default function CardsPage() {
     ctx.fillText([f.purity, f.weight && "Weight: " + f.weight].filter(Boolean).join("   ·   "), W / 2, y);
     if (f.price) { y += H * 0.055; ctx.fillStyle = t.acc; ctx.font = `700 ${W * 0.05}px sans-serif`; ctx.fillText((/^[0-9]/.test(f.price) ? "₹ " : "") + f.price, W / 2, y); }
     const fy = H - H * 0.06; ctx.fillStyle = t.acc; rr(W * 0.2, fy - H * 0.033, W * 0.6, H * 0.05, 26); ctx.fill();
-    ctx.fillStyle = f.theme === "light" ? "#fff" : "#1b1b1e"; ctx.font = `600 ${W * 0.026}px sans-serif`;
+    ctx.fillStyle = f.theme === "light" ? "#fff" : "#0E3327"; ctx.font = `600 ${W * 0.026}px sans-serif`;
     ctx.fillText(s.whatsapp ? "WhatsApp to order · +" + s.whatsapp : "Visit our showroom", W / 2, fy);
   }, [f, s.name, s.whatsapp]);
 
@@ -102,7 +102,7 @@ export default function CardsPage() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Price ₹"><Input value={f.price} onChange={(e) => setF({ ...f, price: e.target.value })} placeholder="94,500 / On request" /></Field>
-            <Field label="Theme"><Select value={f.theme} onChange={(e) => setF({ ...f, theme: e.target.value as Theme })}><option value="light">Cream classic</option><option value="dark">Black premium</option><option value="red">Crimson festive</option></Select></Field>
+            <Field label="Theme"><Select value={f.theme} onChange={(e) => setF({ ...f, theme: e.target.value as Theme })}><option value="light">Sea glass</option><option value="dark">Emerald</option><option value="red">Deep emerald</option></Select></Field>
           </div>
           <div className="mt-4 flex gap-2">
             <Button className="flex-1" onClick={() => dl(false)}><Download size={15} /> Portrait</Button>

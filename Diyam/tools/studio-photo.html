@@ -4,27 +4,27 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Studio Photo — Jewellery Image Studio</title>
 <style>
-:root{--red:#D2042D;--cream:#EAE5D4;--ink:#2A1A1D;--card:#fff}
+:root{--emerald:#1B4D3E;--seaglass:#7EBFA3;--seaglass-l:#A8D4C2;--cream:#EAF2EE;--ink:#0A1F17;--card:#fff}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',Calibri,sans-serif;background:var(--cream);color:var(--ink);min-height:100vh}
-header{background:var(--red);color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+header{background:linear-gradient(135deg,var(--emerald),#0D3326);color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
 header h1{font-size:20px;letter-spacing:.5px}
-header .brand{font-size:13px;opacity:.9}
+header .brand{font-size:13px;opacity:.85;color:var(--seaglass-l)}
 main{max-width:1200px;margin:0 auto;padding:18px;display:grid;grid-template-columns:320px 1fr;gap:18px}
 @media(max-width:900px){main{grid-template-columns:1fr}}
-.panel{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
-.panel h2{font-size:14px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;border-bottom:2px solid var(--cream);padding-bottom:6px}
+.panel{background:var(--card);border-radius:12px;padding:16px;box-shadow:0 2px 10px rgba(8,26,16,.08)}
+.panel h2{font-size:14px;color:var(--emerald);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;border-bottom:2px solid var(--cream);padding-bottom:6px}
 label{font-size:12px;font-weight:600;display:block;margin:10px 0 4px}
-input[type=text],input[type=number],select{width:100%;padding:8px;border:1px solid #d8cfc0;border-radius:8px;font-size:13px;background:#fffdf7}
-input[type=range]{width:100%}
-.drop{border:2px dashed var(--red);border-radius:12px;padding:26px 12px;text-align:center;cursor:pointer;background:#fff8f4;transition:.2s}
-.drop:hover{background:#ffefe9}
-.drop b{color:var(--red)}
+input[type=text],input[type=number],select{width:100%;padding:8px;border:1px solid #b8d4c8;border-radius:8px;font-size:13px;background:#f8fdfa}
+input[type=range]{width:100%;accent-color:var(--seaglass)}
+.drop{border:2px dashed var(--seaglass);border-radius:12px;padding:26px 12px;text-align:center;cursor:pointer;background:#f0f9f4;transition:.2s}
+.drop:hover{background:#e2f4ec}
+.drop b{color:var(--emerald)}
 .swatches{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
 .sw{width:44px;height:44px;border-radius:8px;cursor:pointer;border:3px solid transparent}
-.sw.active{border-color:var(--red)}
-.btn{background:var(--red);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;width:100%;margin-top:10px}
-.btn.sec{background:var(--ink)}
+.sw.active{border-color:var(--seaglass)}
+.btn{background:var(--emerald);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;width:100%;margin-top:10px}
+.btn.sec{background:#2D6B56}
 .btn:disabled{opacity:.5;cursor:wait}
 .row{display:flex;gap:8px}
 .row .btn{flex:1}
@@ -32,11 +32,11 @@ input[type=range]{width:100%}
 #cv{max-width:100%;max-height:66vh;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.18);background:#eee}
 #thumbs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
 #thumbs img{width:56px;height:56px;object-fit:cover;border-radius:8px;cursor:pointer;border:3px solid transparent}
-#thumbs img.active{border-color:var(--red)}
-#status{font-size:12px;color:#7a5c00;background:#fff3c4;border-radius:8px;padding:6px 10px;display:none}
+#thumbs img.active{border-color:var(--seaglass)}
+#status{font-size:12px;color:#1B4D3E;background:#D6F0E6;border-radius:8px;padding:6px 10px;display:none}
 .check{display:flex;align-items:center;gap:8px;font-size:13px;margin-top:8px}
-.check input{width:auto}
-footer{text-align:center;font-size:11px;color:#8a7f6d;padding:14px}
+.check input{width:auto;accent-color:var(--seaglass)}
+footer{text-align:center;font-size:11px;color:#4d7264;padding:14px}
 </style>
 </head>
 <body>
@@ -53,7 +53,7 @@ footer{text-align:center;font-size:11px;color:#8a7f6d;padding:14px}
     <h2>2 · Studio Look</h2>
     <label>Backdrop</label>
     <div class="swatches" id="swatches"></div>
-    <label>Custom backdrop colour</label><input type="color" id="customBg" value="#EAE5D4" style="width:100%;height:36px;border:none;border-radius:8px;cursor:pointer">
+    <label>Custom backdrop colour</label><input type="color" id="customBg" value="#EAF2EE" style="width:100%;height:36px;border:none;border-radius:8px;cursor:pointer">
     <label>Subject size <span id="zoV">78%</span></label><input type="range" id="zoom" min="40" max="100" value="78">
     <label>Ground shadow <span id="shV">60%</span></label><input type="range" id="shadow" min="0" max="100" value="60">
     <label>Brightness <span id="brV">100%</span></label><input type="range" id="bright" min="70" max="140" value="100">
@@ -83,7 +83,7 @@ footer{text-align:center;font-size:11px;color:#8a7f6d;padding:14px}
 <footer>White-label jewellery tool · works fully in your browser · no photos ever leave this device</footer>
 <script type="module">
 const $=id=>document.getElementById(id);
-const BG=[["Cream Studio","#EAE5D4","#d9d2bc"],["Pearl White","#f7f5f0","#e4e0d5"],["Charcoal","#3a3a3d","#1c1c1f"],["Black Velvet","#1b1b1e","#000"],["Maroon Velvet","#5a1020","#2e0810"],["Royal Blue","#1e2a5a","#0d1430"],["Gold Silk","#e8d9a0","#c9ab55"],["Rose","#e8c9c2","#d3a79d"]];
+const BG=[["Sea Glass","#EAF2EE","#c8e4d8"],["Pearl White","#f7f5f0","#e4e0d5"],["Charcoal","#3a3a3d","#1c1c1f"],["Black Velvet","#1b1b1e","#000"],["Maroon Velvet","#5a1020","#2e0810"],["Royal Blue","#1e2a5a","#0d1430"],["Gold Silk","#e8d9a0","#c9ab55"],["Rose","#e8c9c2","#d3a79d"]];
 let files=[],results=[],cur=0,removeBackground=null,aiLoading=false,bgSel=0,customOn=false;
 const cv=$("cv"),ctx=cv.getContext("2d");
 // swatches

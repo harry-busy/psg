@@ -7,8 +7,8 @@ import { Markdown } from "@/components/diyam/Markdown";
 import { SubHead } from "@/components/diyam/SubHead";
 import { CalendarDays } from "lucide-react";
 
-const GOLD = "#b8860b";
-const RED = "#D2042D";
+const GOLD = "#4E8A72";   // sea glass dark
+const RED = "#1B4D3E";    // deep emerald
 
 interface Section { title: string; short: string; body: string; days: number; }
 
@@ -37,13 +37,13 @@ export default function DiyamCalendarPage() {
         backLabel="Content Library"
         meta={
           <>
-            <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-semibold" style={{ background: `${RED}14`, color: RED }}>
+            <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-semibold" style={{ background: `${RED}14`, color: "#EFF8F4" }}>
               <CalendarDays size={13} /> {totalDays} days
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-semibold" style={{ background: `${GOLD}1e`, color: GOLD }}>
+            <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-semibold" style={{ background: `${GOLD}1e`, color: "#EFF8F4" }}>
               {sections.filter((s) => /week/i.test(s.title)).length} weeks
             </span>
-            <span className="rounded-full px-3 py-1 font-mono text-[11px]" style={{ background: "var(--color-surface-2)", color: "var(--color-muted)" }}>
+            <span className="rounded-full px-3 py-1 font-mono text-[11px]" style={{ background: "var(--color-surface-2)", color: "#3F6E5C" }}>
               {doc.filename}
             </span>
           </>
@@ -88,7 +88,7 @@ function Tab({ active, onClick, label, badge }: { active: boolean; onClick: () =
     <button
       onClick={onClick}
       className="flex flex-none items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-[13px] font-semibold transition"
-      style={active ? { background: RED, color: "#fff" } : { background: "var(--color-surface-2)", color: "var(--color-muted)" }}
+      style={active ? { background: RED, color: "#fff" } : { background: "var(--color-surface-2)", color: "var(--color-ink)" }}
     >
       {label}
       {badge != null && (

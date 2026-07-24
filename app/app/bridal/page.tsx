@@ -75,9 +75,9 @@ export default function BridalPage() {
               </div>
 
               {due && (
-                <div className="mb-3 flex items-center justify-between rounded-xl bg-[#fff3c4]/60 px-3 py-2 text-sm">
+                <div className="mb-3 flex items-center justify-between rounded-xl bg-[#A8D4C2]/60 px-3 py-2 text-sm">
                   <span><b>Now due:</b> {due.label}</span>
-                  {b.phone && <a target="_blank" className="rounded-lg bg-[#25D366] px-2.5 py-1 text-xs font-semibold text-white" href={waLink(b.phone, `Namaste ${b.bride} ji! From ${s.name} - we'd love to ${due.msg} for your big day.`)}>Message</a>}
+                  {b.phone && <a target="_blank" className="rounded-lg bg-[var(--color-crimson)] px-2.5 py-1 text-xs font-semibold text-white" href={waLink(b.phone, `Namaste ${b.bride} ji! From ${s.name} - we'd love to ${due.msg} for your big day.`)}>Message</a>}
                 </div>
               )}
 

@@ -4,8 +4,8 @@ import Link from "next/link";
 import { DIYAM_REPORTS, type DiyamReport } from "@/lib/diyam/reports.generated";
 import { ArrowRight, Instagram, BarChart3, Images } from "lucide-react";
 
-const GOLD = "#b8860b";
-const RED = "#D2042D";
+const GOLD = "#4E8A72";   // sea glass dark
+const RED = "#1B4D3E";    // deep emerald
 
 const GROUPS: { key: DiyamReport["group"]; title: string; blurb: string }[] = [
   { key: "own", title: "Diyam's own Instagram reports", blurb: "The raw analytics for @diyamhouseofsilver, 18 Jun – 17 Jul 2026." },
@@ -22,10 +22,10 @@ export default function DiyamReportsHub() {
         <Link href="/app/diyam" className="text-[13px] font-medium text-[var(--color-muted)] hover:text-[var(--color-ink)]">
           ← Growth Blueprint
         </Link>
-        <div className="mt-4 text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: GOLD }}>
+        <div className="mt-4 text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: "#7EBFA3" }}>
           The analytics
         </div>
-        <h1 className="mt-2 font-display text-[clamp(1.8rem,4.6vw,2.8rem)] font-semibold leading-tight tracking-tight text-[var(--color-ink)]">
+        <h1 className="mt-2 font-display text-[clamp(1.8rem,4.6vw,2.8rem)] font-semibold leading-tight tracking-tight">
           Reports &amp; Decks
         </h1>
         <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-[var(--color-muted)]">
@@ -40,7 +40,7 @@ export default function DiyamReportsHub() {
           if (!items.length) return null;
           return (
             <section key={g.key}>
-              <h2 className="font-display text-[18px] font-semibold text-[var(--color-ink)]">{g.title}</h2>
+              <h2 className="font-display text-[18px] font-semibold text-[#EFF8F4]">{g.title}</h2>
               <p className="mt-1 text-[13.5px] text-[var(--color-muted)]">{g.blurb}</p>
               <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {items.map((r) => {

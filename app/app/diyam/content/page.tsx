@@ -4,8 +4,8 @@ import Link from "next/link";
 import { DIYAM_DOCS } from "@/lib/diyam/content.generated";
 import { ArrowRight, FileText, CalendarDays } from "lucide-react";
 
-const GOLD = "#b8860b";
-const RED = "#D2042D";
+const GOLD = "#4E8A72";   // sea glass dark
+const RED = "#1B4D3E";    // deep emerald
 
 /*
  * Content hub for Diyam House of Silver. Lists every document in
@@ -19,10 +19,10 @@ export default function DiyamContentHub() {
         <Link href="/app/diyam" className="text-[13px] font-medium text-[var(--color-muted)] hover:text-[var(--color-ink)]">
           ← Growth Blueprint
         </Link>
-        <div className="mt-4 text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: GOLD }}>
+        <div className="mt-4 text-[11px] font-bold uppercase tracking-[0.2em]" style={{ color: "#7EBFA3" }}>
           The content machine
         </div>
-        <h1 className="mt-2 font-display text-[clamp(1.8rem,4.6vw,2.8rem)] font-semibold leading-tight tracking-tight text-[var(--color-ink)]">
+        <h1 className="mt-2 font-display text-[clamp(1.8rem,4.6vw,2.8rem)] font-semibold leading-tight tracking-tight">
           Diyam Content Library
         </h1>
         <p className="mt-3 max-w-3xl text-[15px] leading-relaxed text-[var(--color-muted)]">

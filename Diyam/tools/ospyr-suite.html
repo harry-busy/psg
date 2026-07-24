@@ -4,47 +4,47 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ospyr Jewellery Suite — All-in-One</title>
 <style>
-:root{--red:#D2042D;--cream:#EAE5D4;--ink:#2A1A1D;--green:#1E7D34;--gold:#c9a227}
+:root{--emerald:#1B4D3E;--seaglass:#7EBFA3;--seaglass-l:#A8D4C2;--cream:#EAF2EE;--ink:#0A1F17;--green:#1A7A4A}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',Calibri,sans-serif;background:var(--cream);color:var(--ink)}
-header{background:var(--red);color:#fff;padding:10px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:0;z-index:9}
+header{background:linear-gradient(135deg,var(--emerald),#0D3326);color:#fff;padding:10px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;position:sticky;top:0;z-index:9}
 header h1{font-size:17px;white-space:nowrap}
 nav{display:flex;gap:4px;flex-wrap:wrap}
-nav button{background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:12.5px;cursor:pointer;font-weight:600}
-nav button.on{background:#fff;color:var(--red)}
+nav button{background:rgba(126,191,163,.18);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-size:12.5px;cursor:pointer;font-weight:600}
+nav button.on{background:var(--seaglass);color:var(--ink)}
 main{max-width:1250px;margin:0 auto;padding:16px}
 .tab{display:none}.tab.on{display:block}
-.panel{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 10px rgba(0,0,0,.07);margin-bottom:14px}
-.panel h2{font-size:13px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;border-bottom:2px solid var(--cream);padding-bottom:6px}
+.panel{background:#fff;border-radius:12px;padding:16px;box-shadow:0 2px 10px rgba(8,26,16,.08);margin-bottom:14px}
+.panel h2{font-size:13px;color:var(--emerald);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;border-bottom:2px solid var(--cream);padding-bottom:6px}
 label{font-size:12px;font-weight:600;display:block;margin:8px 0 3px}
-input,select,textarea{width:100%;padding:8px;border:1px solid #d8cfc0;border-radius:8px;font-size:13px;background:#fffdf7}
-.btn{background:var(--red);color:#fff;border:none;border-radius:8px;padding:10px 14px;font-weight:600;cursor:pointer;font-size:13.5px;margin-top:8px}
-.btn.sec{background:var(--ink)}.btn.wa{background:#25D366}.btn.tg{background:#2AABEE}.btn.ai{background:#5B3A8C}
+input,select,textarea{width:100%;padding:8px;border:1px solid #b8d4c8;border-radius:8px;font-size:13px;background:#f8fdfa}
+.btn{background:var(--emerald);color:#fff;border:none;border-radius:8px;padding:10px 14px;font-weight:600;cursor:pointer;font-size:13.5px;margin-top:8px}
+.btn.sec{background:#2D6B56}.btn.wa{background:#25D366}.btn.tg{background:#2AABEE}.btn.ai{background:#5B3A8C}
 .btn:disabled{opacity:.5;cursor:wait}
 .grid{display:grid;gap:16px}.g2{grid-template-columns:340px 1fr}.g22{grid-template-columns:1fr 1fr}
 @media(max-width:900px){.g2,.g22{grid-template-columns:1fr}}
 canvas.prev{max-width:100%;max-height:60vh;border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,.18);background:#eee}
-.drop{border:2px dashed var(--red);border-radius:10px;padding:18px;text-align:center;cursor:pointer;background:#fff8f4;font-size:13px}
+.drop{border:2px dashed var(--seaglass);border-radius:10px;padding:18px;text-align:center;cursor:pointer;background:#f0f9f4;font-size:13px}
 .sw{width:38px;height:38px;border-radius:8px;cursor:pointer;border:3px solid transparent;display:inline-block;margin:2px}
-.sw.active{border-color:var(--red)}
+.sw.active{border-color:var(--seaglass)}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{background:var(--cream);text-align:left;padding:7px;font-size:11px;text-transform:uppercase}
-td{padding:7px;border-bottom:1px solid #f0ead9}
-tr.due{background:#fff3c4}
-tr.total td{border-top:3px double var(--red);font-size:17px;color:var(--red);font-weight:800}
+td{padding:7px;border-bottom:1px solid #d8eee6}
+tr.due{background:#E8F6EE}
+tr.total td{border-top:3px double var(--seaglass);font-size:17px;color:var(--emerald);font-weight:800}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px}
-.stat{background:#fff;border-radius:12px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.stat b{display:block;font-size:22px;color:var(--red)}
-.stat span{font-size:10px;text-transform:uppercase;color:#8a7f6d;letter-spacing:.5px}
-.chip{padding:4px 11px;border-radius:14px;background:#fff;border:1px solid #d8cfc0;font-size:12px;cursor:pointer;display:inline-block;margin:2px}
-.chip.on{background:var(--red);color:#fff;border-color:var(--red)}
-.note{font-size:11px;color:#8a7f6d;margin-top:6px;line-height:1.6}
-.fest{background:#fff;border-radius:10px;padding:12px;margin-bottom:8px;border-left:4px solid var(--red);font-size:13px}
-.fest.major{border-left-color:var(--gold);background:linear-gradient(90deg,#fffbe8,#fff)}
+.stat{background:#fff;border-radius:12px;padding:12px;text-align:center;box-shadow:0 2px 8px rgba(8,26,16,.07)}
+.stat b{display:block;font-size:22px;color:var(--emerald)}
+.stat span{font-size:10px;text-transform:uppercase;color:#4d7264;letter-spacing:.5px}
+.chip{padding:4px 11px;border-radius:14px;background:#fff;border:1px solid #b8d4c8;font-size:12px;cursor:pointer;display:inline-block;margin:2px}
+.chip.on{background:var(--emerald);color:#fff;border-color:var(--emerald)}
+.note{font-size:11px;color:#4d7264;margin-top:6px;line-height:1.6}
+.fest{background:#fff;border-radius:10px;padding:12px;margin-bottom:8px;border-left:4px solid var(--seaglass);font-size:13px}
+.fest.major{border-left-color:var(--emerald);background:linear-gradient(90deg,#E8F6EE,#fff)}
 #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 20px;border-radius:24px;font-size:13px;display:none;z-index:99;max-width:90%}
 .ok{color:var(--green);font-weight:700}.bad{color:#B02A37;font-weight:700}
 .row{display:flex;gap:6px;flex-wrap:wrap}
-.big{font-size:30px;font-weight:800;color:var(--red);text-align:center;margin:8px 0 2px}
+.big{font-size:30px;font-weight:800;color:var(--emerald);text-align:center;margin:8px 0 2px}
 </style>
 </head>
 <body>
@@ -120,7 +120,7 @@ $("tab-studio").innerHTML=`<div class="grid g2"><div>
 <textarea id="stCapOut" rows="4" placeholder="AI caption appears here…" style="margin-top:8px"></textarea>
 <button class="btn wa" id="stWa">💬 Share caption on WhatsApp</button></div>
 </div><div class="panel" style="text-align:center"><h2>Preview</h2><canvas id="stCv" class="prev" width="1080" height="1080"></canvas><div id="stThumbs" style="margin-top:8px"></div></div></div>`;
-const stBG=[["Cream","#EAE5D4","#d9d2bc"],["Pearl","#f7f5f0","#e4e0d5"],["Charcoal","#3a3a3d","#1c1c1f"],["Black","#1b1b1e","#000"],["Maroon","#5a1020","#2e0810"],["Blue","#1e2a5a","#0d1430"],["Gold","#e8d9a0","#c9ab55"],["Rose","#e8c9c2","#d3a79d"]];
+const stBG=[["Sea Glass","#EAF2EE","#c8e4d8"],["Pearl","#f7f5f0","#e4e0d5"],["Charcoal","#3a3a3d","#1c1c1f"],["Black","#1b1b1e","#000"],["Maroon","#5a1020","#2e0810"],["Blue","#1e2a5a","#0d1430"],["Gold","#e8d9a0","#c9ab55"],["Rose","#e8c9c2","#d3a79d"]];
 let stImgs=[],stCur=0,stBgSel=0,rmbg=null,rmbgL=false;
 const stCv=$("stCv"),stX=stCv.getContext("2d");
 $("stSw").innerHTML=stBG.map((b,i)=>`<span class="sw ${i?"":"active"}" style="background:linear-gradient(135deg,${b[1]},${b[2]})" data-i="${i}"></span>`).join("");
@@ -171,7 +171,7 @@ $("tab-cards").innerHTML=`<div class="grid g2"><div class="panel"><h2>Card</h2>
 <textarea id="cdCapOut" rows="3" placeholder="AI caption…" style="margin-top:6px"></textarea></div>
 <div class="panel" style="text-align:center"><h2>Preview</h2><canvas id="cdCv" class="prev" width="1080" height="1350"></canvas></div></div>`;
 const cdCv=$("cdCv"),cdX=cdCv.getContext("2d");let cdImg=null;
-const cdTH={light:{bg1:"#EAE5D4",bg2:"#dcd4bd",ink:"#2A1A1D",acc:"#D2042D",sub:"#6d6250"},dark:{bg1:"#1b1b1e",bg2:"#000",ink:"#f2ead8",acc:"#e8c96a",sub:"#b8ab90"},red:{bg1:"#9E0322",bg2:"#5a0113",ink:"#fdf6e3",acc:"#f4d47c",sub:"#e8c2b8"}};
+const cdTH={light:{bg1:"#EAF2EE",bg2:"#c8e4d8",ink:"#0A1F17",acc:"#7EBFA3",sub:"#4D7264"},dark:{bg1:"#1B4D3E",bg2:"#071410",ink:"#EAEEF3",acc:"#A8D4C2",sub:"#7EBFA3"},red:{bg1:"#0F2B1E",bg2:"#051009",ink:"#EAEEF3",acc:"#7EBFA3",sub:"#A8D4C2"}};
 $("cdDrop").onclick=()=>$("cdFile").click();
 $("cdFile").onchange=async e=>{cdImg=await createImageBitmap(e.target.files[0]);cdDraw()};
 ["cdName","cdPur","cdWt","cdPr","cdTh"].forEach(id=>$(id).oninput=$(id).onchange=cdDraw);
@@ -274,13 +274,13 @@ const qrCv=$("qrCv"),qrX=qrCv.getContext("2d");let qrHolder=document.createEleme
 async function qrLib(){if(window.QRCode)return;await new Promise(res=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js";s.onload=res;document.head.appendChild(s)})}
 async function qrDraw(){await qrLib();qrHolder.innerHTML="";new QRCode(qrHolder,{text:$("qrU").value.trim()||"https://google.com",width:512,height:512});
 setTimeout(()=>{const q=qrHolder.querySelector("canvas");const W=qrCv.width,H=qrCv.height;
-qrX.fillStyle="#EAE5D4";qrX.fillRect(0,0,W,H);qrX.fillStyle="#D2042D";qrX.fillRect(0,0,W,H*.015);qrX.fillRect(0,H-H*.015,W,H*.015);
-qrX.textAlign="center";qrX.fillStyle="#2A1A1D";qrX.font=`700 ${W*.06}px Georgia`;qrX.fillText(S.brand.toUpperCase(),W/2,H*.12);
+qrX.fillStyle="#EAF2EE";qrX.fillRect(0,0,W,H);qrX.fillStyle="#1B4D3E";qrX.fillRect(0,0,W,H*.015);qrX.fillRect(0,H-H*.015,W,H*.015);
+qrX.textAlign="center";qrX.fillStyle="#0A1F17";qrX.font=`700 ${W*.06}px Georgia`;qrX.fillText(S.brand.toUpperCase(),W/2,H*.12);
 qrX.font=`${W*.055}px Segoe UI`;qrX.fillText("⭐⭐⭐⭐⭐",W/2,H*.19);
-qrX.fillStyle="#D2042D";qrX.font=`600 ${W*.033}px Segoe UI`;qrX.fillText($("qrT").value,W/2,H*.26);
-const sz=W*.42,qx=(W-sz)/2,qy=H*.33;qrX.fillStyle="#fff";qrX.fillRect(qx-20,qy-20,sz+40,sz+40);qrX.strokeStyle="#D2042D";qrX.lineWidth=4;qrX.strokeRect(qx-20,qy-20,sz+40,sz+40);
+qrX.fillStyle="#1B4D3E";qrX.font=`600 ${W*.033}px Segoe UI`;qrX.fillText($("qrT").value,W/2,H*.26);
+const sz=W*.42,qx=(W-sz)/2,qy=H*.33;qrX.fillStyle="#fff";qrX.fillRect(qx-20,qy-20,sz+40,sz+40);qrX.strokeStyle="#7EBFA3";qrX.lineWidth=4;qrX.strokeRect(qx-20,qy-20,sz+40,sz+40);
 if(q)qrX.drawImage(q,qx,qy,sz,sz);
-qrX.fillStyle="#2A1A1D";qrX.font=`600 ${W*.03}px Segoe UI`;qrX.fillText("Scan with your phone camera",W/2,H*.83);
+qrX.fillStyle="#0A1F17";qrX.font=`600 ${W*.03}px Segoe UI`;qrX.fillText("Scan with your phone camera",W/2,H*.83);
 qrX.fillStyle="#6d6250";qrX.font=`${W*.024}px Segoe UI`;qrX.fillText("30 seconds — it means the world to our family business 🙏",W/2,H*.88)},80)}
 $("qrU").oninput=$("qrT").oninput=qrDraw;
 $("qrDl").onclick=()=>{const a=document.createElement("a");a.download="review-qr.png";a.href=qrCv.toDataURL("image/png");a.click()};
@@ -325,9 +325,9 @@ const due=data.filter(d=>d.next&&d.next<=today()&&!["Sold","Lost"].includes(d.st
 const sold=data.filter(d=>d.stage==="Sold");
 $("dsK").innerHTML=`<div class="stat"><b>${data.filter(d=>d.created>=wk).length}</b><span>Enquiries 7d</span></div><div class="stat"><b style="color:var(--green)">${sold.length}</b><span>Sold</span></div><div class="stat"><b style="color:#C05621">${due.length}</b><span>Due</span></div><div class="stat"><b>${(store("scLeads")||[]).length}</b><span>Scheme leads</span></div><div class="stat"><b>${data.length?Math.round(sold.length/data.length*100):0}%</b><span>Conversion</span></div>`;
 const days=[...Array(14)].map((_,i)=>new Date(Date.now()-(13-i)*864e5).toISOString().slice(0,10));
-dsCharts.push(new Chart($("dsL"),{type:"line",data:{labels:days.map(d=>d.slice(5)),datasets:[{label:"Enquiries",data:days.map(d=>data.filter(x=>x.created===d).length),borderColor:"#D2042D",backgroundColor:"rgba(210,4,45,.12)",fill:true,tension:.35}]},options:{plugins:{legend:{display:false}}}}));
+dsCharts.push(new Chart($("dsL"),{type:"line",data:{labels:days.map(d=>d.slice(5)),datasets:[{label:"Enquiries",data:days.map(d=>data.filter(x=>x.created===d).length),borderColor:"#7EBFA3",backgroundColor:"rgba(126,191,163,.12)",fill:true,tension:.35}]},options:{plugins:{legend:{display:false}}}}));
 const srcs={};data.forEach(d=>srcs[d.source||"Other"]=(srcs[d.source||"Other"]||0)+1);
-dsCharts.push(new Chart($("dsB"),{type:"bar",data:{labels:Object.keys(srcs),datasets:[{data:Object.values(srcs),backgroundColor:"#D2042D"}]},options:{plugins:{legend:{display:false}}}}));
+dsCharts.push(new Chart($("dsB"),{type:"bar",data:{labels:Object.keys(srcs),datasets:[{data:Object.values(srcs),backgroundColor:"#1B4D3E"}]},options:{plugins:{legend:{display:false}}}}));
 $("dsDue").innerHTML="<tr><th>Customer</th><th>Interest</th><th>Due</th><th></th></tr>"+(due.map(d=>`<tr class="due"><td>${esc(d.name)}</td><td>${esc(d.item||"—")}</td><td>${d.next}</td><td>${d.phone?`<a href="https://wa.me/${d.phone.replace(/\D/g,"")}" target="_blank">💬</a>`:""}</td></tr>`).join("")||`<tr><td colspan="4" style="color:#8a7f6d">Nothing due.</td></tr>`)}
 /* ================= SETTINGS ================= */
 $("tab-set").innerHTML=`<div class="grid g22">

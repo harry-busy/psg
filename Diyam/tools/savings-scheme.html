@@ -4,26 +4,26 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gold Savings Scheme Calculator</title>
 <style>
-:root{--red:#D2042D;--cream:#EAE5D4;--ink:#2A1A1D;--gold:#c9a227}
+:root{--emerald:#1B4D3E;--seaglass:#7EBFA3;--seaglass-l:#A8D4C2;--cream:#EAF2EE;--ink:#0A1F17}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',Calibri,sans-serif;background:var(--cream);color:var(--ink)}
-header{background:var(--red);color:#fff;padding:14px 22px}h1{font-size:20px}
+header{background:linear-gradient(135deg,var(--emerald),#0D3326);color:#fff;padding:14px 22px}h1{font-size:20px}
 main{max-width:920px;margin:0 auto;padding:18px;display:grid;grid-template-columns:1fr 1fr;gap:18px}
 @media(max-width:760px){main{grid-template-columns:1fr}}
-.panel{background:#fff;border-radius:12px;padding:18px;box-shadow:0 2px 10px rgba(0,0,0,.07)}
-.panel h2{font-size:13px;color:var(--red);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;border-bottom:2px solid var(--cream);padding-bottom:6px}
+.panel{background:#fff;border-radius:12px;padding:18px;box-shadow:0 2px 10px rgba(8,26,16,.08)}
+.panel h2{font-size:13px;color:var(--emerald);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;border-bottom:2px solid var(--cream);padding-bottom:6px}
 label{font-size:12px;font-weight:600;display:block;margin:10px 0 3px}
-input,select{width:100%;padding:9px;border:1px solid #d8cfc0;border-radius:8px;font-size:14px;background:#fffdf7}
-.big{font-size:34px;font-weight:800;color:var(--red);text-align:center;margin:10px 0 2px}
-.sub{text-align:center;font-size:12px;color:#8a7f6d}
+input,select{width:100%;padding:9px;border:1px solid #b8d4c8;border-radius:8px;font-size:14px;background:#f8fdfa}
+.big{font-size:34px;font-weight:800;color:var(--emerald);text-align:center;margin:10px 0 2px}
+.sub{text-align:center;font-size:12px;color:#4d7264}
 table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
-td{padding:7px 4px;border-bottom:1px solid #f0ead9}td:last-child{text-align:right;font-weight:600}
+td{padding:7px 4px;border-bottom:1px solid #d8eee6}td:last-child{text-align:right;font-weight:600}
 .btn{background:#25D366;color:#fff;border:none;border-radius:8px;padding:12px;font-weight:700;cursor:pointer;width:100%;margin-top:12px;font-size:15px}
-.btn.red{background:var(--red)}
-.owner{grid-column:1/-1;background:#fff8f4;border:1px dashed var(--red)}
+.btn.red{background:var(--emerald)}
+.owner{grid-column:1/-1;background:#f0f9f4;border:1px dashed var(--seaglass)}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 @media(max-width:600px){.grid3{grid-template-columns:1fr}}
-.note{font-size:11px;color:#8a7f6d;margin-top:8px}
+.note{font-size:11px;color:#4d7264;margin-top:8px}
 #leads{font-size:12px;margin-top:8px;max-height:140px;overflow:auto}
 </style>
 </head>

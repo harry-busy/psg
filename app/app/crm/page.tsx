@@ -14,8 +14,8 @@ import { leadScoreSystem } from "@/lib/ai/prompts";
 import { Trash2, MessageCircle, Sparkles, Download } from "lucide-react";
 
 const STAGE_COLORS: Record<Stage, string> = {
-  New: "#2E5AAC", Contacted: "#C05621", Appointment: "#5B3A8C",
-  Visited: "#0E7C7B", Sold: "#1E7D34", Lost: "#999",
+  New: "#1B4D3E", Contacted: "#0F3A2E", Appointment: "#123D31",
+  Visited: "#0E3327", Sold: "#0C2C23", Lost: "#6BB091",
 };
 
 export default function CRMPage() {
@@ -143,7 +143,7 @@ export default function CRMPage() {
               {rows.map((d) => {
                 const isDue = d.next && d.next <= today() && !["Sold", "Lost"].includes(d.stage);
                 return (
-                  <tr key={d.id} className={isDue ? "bg-[#fff3c4]/50" : ""}>
+                  <tr key={d.id} className={isDue ? "bg-[#A8D4C2]/40" : ""}>
                     <td className="py-2.5 pr-3">
                       <div className="font-medium">{d.name}</div>
                       <div className="text-xs text-[var(--color-muted)]">{d.phone || ""} · {d.source}</div>
@@ -153,18 +153,18 @@ export default function CRMPage() {
                       {d.score ? (
                         <span title={`${d.scoreReason || ""}${d.nextAction ? " → " + d.nextAction : ""}`}
                           className="inline-block rounded-full px-2 py-0.5 text-xs font-bold text-white"
-                          style={{ background: d.score >= 8 ? "#1E7D34" : d.score >= 5 ? "#C05621" : "#999" }}>
+                          style={{ background: d.score >= 8 ? "#0E3327" : d.score >= 5 ? "#1B4D3E" : "#6BB091" }}>
                           {d.score}
                         </span>
                       ) : <button className="text-xs text-[var(--color-crimson)]" onClick={() => scoreOne(d).then(() => toast("Scored"))}>score</button>}
                     </td>
                     <td className="pr-3">
                       <input type="date" value={d.next || ""} onChange={(e) => store.update("enquiries", d.id, { next: e.target.value })}
-                        className="rounded-md border border-[var(--color-line)] bg-white/60 px-1.5 py-1 text-xs" />
+                        className="rounded-md border border-[var(--color-line)] bg-[#A8D4C2]/50 px-1.5 py-1 text-xs" />
                     </td>
                     <td className="pr-3">
                       <select value={d.stage} onChange={(e) => store.update("enquiries", d.id, { stage: e.target.value as Stage })}
-                        className="rounded-md border border-[var(--color-line)] bg-white/60 px-1.5 py-1 text-xs font-semibold"
+                        className="rounded-md border border-[var(--color-line)] bg-[#A8D4C2]/50 px-1.5 py-1 text-xs font-semibold"
                         style={{ color: STAGE_COLORS[d.stage] }}>
                         {STAGES.map((x) => <option key={x}>{x}</option>)}
                       </select>
@@ -172,7 +172,7 @@ export default function CRMPage() {
                     <td className="whitespace-nowrap text-right">
                       {d.phone && (
                         <a target="_blank" title="WhatsApp" href={waLink(d.phone, `Namaste ${d.name} ji! Thank you for your interest in ${d.item || "our jewellery"} at ${s.name}. When may we welcome you?`)}>
-                          <MessageCircle size={16} className="inline text-[#25D366]" />
+                          <MessageCircle size={16} className="inline text-[#1B4D3E]" />
                         </a>
                       )}
                       <button className="ml-2" title="Delete" onClick={() => confirm("Delete?") && store.remove("enquiries", d.id)}>

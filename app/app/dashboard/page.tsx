@@ -53,16 +53,16 @@ export default function DashboardPage() {
             <AreaChart data={lineData} margin={{ left: -20, right: 8, top: 8 }}>
               <defs>
                 <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#D2042D" stopOpacity={0.3} />
-                  <stop offset="100%" stopColor="#D2042D" stopOpacity={0} />
+                  <stop offset="0%" stopColor="#1B4D3E" stopOpacity={0.28} />
+                  <stop offset="100%" stopColor="#1B4D3E" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="var(--color-line)" />
               <XAxis dataKey="day" fontSize={11} stroke="var(--color-muted)" />
               <YAxis fontSize={11} stroke="var(--color-muted)" allowDecimals={false} />
               <Tooltip />
-              <Area type="monotone" dataKey="Enquiries" stroke="#D2042D" fill="url(#g1)" strokeWidth={2} />
-              <Area type="monotone" dataKey="Sales" stroke="#1E7D34" fill="transparent" strokeWidth={2} />
+              <Area type="monotone" dataKey="Enquiries" stroke="#1B4D3E" fill="url(#g1)" strokeWidth={2} />
+              <Area type="monotone" dataKey="Sales" stroke="#0E3327" fill="transparent" strokeWidth={2} strokeDasharray="5 3" />
             </AreaChart>
           </ResponsiveContainer>
         </Card>
@@ -75,7 +75,7 @@ export default function DashboardPage() {
               <XAxis dataKey="name" fontSize={10} stroke="var(--color-muted)" interval={0} angle={-20} textAnchor="end" height={50} />
               <YAxis fontSize={11} stroke="var(--color-muted)" allowDecimals={false} />
               <Tooltip />
-              <Bar dataKey="value" fill="#c9a227" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="value" fill="#1B4D3E" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Card>

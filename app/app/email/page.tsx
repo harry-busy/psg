@@ -133,7 +133,7 @@ export default function EmailPage() {
 }
 
 function StatusBadge({ status }: { status: EmailThread["status"] }) {
-  const map = { new: ["New", "#C05621"], drafted: ["Drafted", "#5B3A8C"], sent: ["Sent", "#1E7D34"] } as const;
+  const map = { new: ["New", "#6BB091"], drafted: ["Drafted", "#4E8A72"], sent: ["Sent", "#1B4D3E"] } as const;
   const [label, color] = map[status];
   return <span className="rounded-full px-2 py-0.5 text-[10px] font-bold text-white" style={{ background: color }}>{label}</span>;
 }

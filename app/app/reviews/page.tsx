@@ -28,13 +28,13 @@ export default function ReviewsPage() {
     cv.width = W; cv.height = H;
     const ctx = cv.getContext("2d")!;
     const dark = s.velvet;
-    ctx.fillStyle = dark ? "#221b26" : "#EAE5D4"; ctx.fillRect(0, 0, W, H);
-    ctx.fillStyle = "#D2042D"; ctx.fillRect(0, 0, W, H * 0.015); ctx.fillRect(0, H - H * 0.015, W, H * 0.015);
+    ctx.fillStyle = dark ? "#0D3326" : "#EAF5F0"; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = "#1B4D3E"; ctx.fillRect(0, 0, W, H * 0.015); ctx.fillRect(0, H - H * 0.015, W, H * 0.015);
     ctx.textAlign = "center";
-    ctx.fillStyle = dark ? "#f3ead9" : "#2A1A1D"; ctx.font = `700 ${W * 0.06}px Georgia`;
+    ctx.fillStyle = dark ? "#EAF5F0" : "#1B4D3E"; ctx.font = `700 ${W * 0.06}px Georgia`;
     ctx.fillText((s.name || "Your Brand").toUpperCase(), W / 2, H * 0.12);
     ctx.font = `${W * 0.055}px sans-serif`; ctx.fillText("★★★★★", W / 2, H * 0.19);
-    ctx.fillStyle = "#D2042D"; ctx.font = `600 ${W * 0.033}px sans-serif`;
+    ctx.fillStyle = "#1B4D3E"; ctx.font = `600 ${W * 0.033}px sans-serif`;
     wrap(ctx, tag, W * 0.8, W * 0.033).forEach((l, i) => ctx.fillText(l, W / 2, H * 0.25 + i * W * 0.045));
 
     const qrData = await QRCode.toDataURL(url || "https://google.com", { width: 512, margin: 1 });
@@ -42,12 +42,12 @@ export default function ReviewsPage() {
     await new Promise((res) => { img.onload = res; img.src = qrData; });
     const q = Math.min(W, H) * 0.42, qx = (W - q) / 2, qy = H * 0.33;
     ctx.fillStyle = "#fff"; round(ctx, qx - 20, qy - 20, q + 40, q + 40, 20); ctx.fill();
-    ctx.strokeStyle = "#D2042D"; ctx.lineWidth = 4; round(ctx, qx - 20, qy - 20, q + 40, q + 40, 20); ctx.stroke();
+    ctx.strokeStyle = "#7EBFA3"; ctx.lineWidth = 4; round(ctx, qx - 20, qy - 20, q + 40, q + 40, 20); ctx.stroke();
     ctx.drawImage(img, qx, qy, q, q);
 
-    ctx.fillStyle = dark ? "#f3ead9" : "#2A1A1D"; ctx.font = `600 ${W * 0.03}px sans-serif`;
+    ctx.fillStyle = dark ? "#EAF5F0" : "#1B4D3E"; ctx.font = `600 ${W * 0.03}px sans-serif`;
     ctx.fillText("Scan with your phone camera", W / 2, H * 0.83);
-    ctx.fillStyle = dark ? "#b3a690" : "#6d6250"; ctx.font = `${W * 0.024}px sans-serif`;
+    ctx.fillStyle = dark ? "#A8D4C2" : "#4E8A72"; ctx.font = `${W * 0.024}px sans-serif`;
     ctx.fillText("30 seconds - it means the world to our family business", W / 2, H * 0.88);
   }, [fmt, s.name, s.velvet, tag, url]);
 

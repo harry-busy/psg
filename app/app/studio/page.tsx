@@ -106,7 +106,7 @@ export default function StudioPage() {
                 <button onClick={() => setSource(null)} className="absolute right-2 top-2 rounded-full bg-black/60 p-1 text-white" aria-label="Remove"><X size={14} /></button>
               </div>
             ) : (
-              <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 text-center text-sm text-[var(--color-muted)]">
+              <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-[var(--color-line)] bg-[var(--color-surface-2)] p-6 text-center text-sm text-[#3F6E5C]">
                 <Upload size={18} className="text-[var(--color-crimson)]" />
                 Upload a product photo <span className="text-xs">(optional - improves accuracy)</span>
                 <input type="file" accept="image/*" hidden onChange={(e) => upload(e.target.files?.[0])} />

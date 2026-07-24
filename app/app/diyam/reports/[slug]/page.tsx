@@ -6,8 +6,8 @@ import { DIYAM_REPORTS, diyamReport, type ReportSlide } from "@/lib/diyam/report
 import { SubHead } from "@/components/diyam/SubHead";
 import { ArrowRight } from "lucide-react";
 
-const GOLD = "#b8860b";
-const RED = "#D2042D";
+const GOLD = "#2D6B56";   // mid emerald — competitor accent (reads on sea-glass cards + carries white badge text)
+const RED = "#1B4D3E";    // deep emerald
 
 /* A single deck rendered as a page: every slide's text verbatim + the deck's
    own graphs (images) shown inline. Nothing from the source deck is dropped. */
@@ -35,7 +35,7 @@ export default function DiyamReportPage() {
             <Chip>{r.period}</Chip>
             {r.comparePeriod && <Chip>vs {r.comparePeriod}</Chip>}
             <Chip>{r.nslides} slides</Chip>
-            <span className="rounded-full px-3 py-1 font-mono text-[11px]" style={{ background: "var(--color-surface-2)", color: "var(--color-muted)" }}>
+            <span className="rounded-full px-3 py-1 font-mono text-[11px]" style={{ background: "var(--color-surface-2)", color: "#3F6E5C" }}>
               {r.filename}
             </span>
           </>
@@ -72,7 +72,7 @@ export default function DiyamReportPage() {
 
 function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center rounded-full px-3 py-1 text-[12px] font-semibold" style={{ background: `${GOLD}1e`, color: GOLD }}>
+    <span className="inline-flex items-center rounded-full px-3 py-1 text-[12px] font-semibold" style={{ background: `${GOLD}1e`, color: "#EFF8F4" }}>
       {children}
     </span>
   );
@@ -117,7 +117,7 @@ function SlideCard({ slide, total, accent }: { slide: ReportSlide; total: number
                 src={src}
                 alt={`Slide ${slide.n} graphic ${i + 1}`}
                 loading="lazy"
-                className="w-full rounded-lg border bg-white object-contain p-1.5"
+                className="w-full rounded-lg border bg-[var(--color-surface)] object-contain p-1.5"
                 style={{ borderColor: "var(--color-line)" }}
               />
             ))}
