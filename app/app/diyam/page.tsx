@@ -20,24 +20,26 @@ import {
  * Diyam sells both 925 silver and hallmarked gold.
  */
 
-/* ── Brand palette ─────────────────────────────────────────────────────────── */
-const EMERALD   = "#1B4D3E";   // primary brand dark
-const EMERALD_D = "#0D3326";   // deepest emerald (footer, hero depth)
-const EMERALD_M = "#2D6B56";   // mid emerald (hover states)
-const SEAGLASS  = "#7EBFA3";   // primary brand accent
-const SEAGLASS_L = "#A8D4C2";  // light sea glass (on-dark secondary text)
-const CANVAS_L  = "#EAF5F0";   // ultra-light sea glass (light section bg)
-const CANVAS_M  = "#C8E8DC";   // mid sea glass (zebra, dividers)
+/* ── Brand palette — white-primary like diyamhouseofsilver.vercel.app ──────── */
+const EMERALD   = "#1B4D3E";   // brand dark: buttons, hero, dark bands
+const EMERALD_D = "#0D3326";   // footer, deepest dark
+const EMERALD_M = "#2D6B56";   // hover / mid
+const SEAGLASS  = "#7EBFA3";   // accent: borders, chips, thin lines
+const SEAGLASS_L = "#A8D4C2";  // light sea glass for text on dark
+const WHITE     = "#ffffff";   // primary section background
+const OFF_WHITE = "#f7faf8";   // alternate light section background
+const SEA_TINT  = "#eef8f3";   // very subtle sea glass tint (zebra rows, chips)
+const DIVIDER   = "#d8ede6";   // sea glass border line
 
-/* legacy aliases used throughout JSX — keep these so nothing breaks */
+/* backward-compat aliases */
 const RED       = EMERALD;
 const RED_DEEP  = EMERALD_D;
-const CREAM     = CANVAS_L;
-const CREAM_2   = CANVAS_M;
+const CREAM     = WHITE;
+const CREAM_2   = SEA_TINT;
 const GOLD      = EMERALD_M;
 const GOLD_SOFT = SEAGLASS;
-const INK       = EMERALD;     // body text = brand emerald (Cartier uses near-black; we use brand)
-const MUTED     = "#4D7264";   // muted green
+const INK       = "#1a1a1a";   // near-black body text
+const MUTED     = "#6b7f74";   // muted green-gray
 const redWash   = `linear-gradient(160deg, ${EMERALD} 0%, ${EMERALD_D} 100%)`;
 
 /* ── scroll reveal ─────────────────────────────────────────────────────────── */
@@ -109,19 +111,19 @@ function GoldLine() {
   );
 }
 
-/* Light section — sea glass canvas background */
+/* Primary white section */
 function Section({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <section className={`px-5 py-20 sm:px-8 sm:py-28 ${className}`} style={{ background: CANVAS_L }}>
+    <section className={`px-5 py-16 sm:px-8 sm:py-24 ${className}`} style={{ background: WHITE }}>
       <div className="mx-auto max-w-6xl">{children}</div>
     </section>
   );
 }
 
-/* Sea-glass section — the brighter of the two light tones (Cartier alternates tones) */
+/* Alternate off-white section */
 function WhiteSection({ children }: { children: React.ReactNode }) {
   return (
-    <section className="px-5 py-20 sm:px-8 sm:py-28" style={{ background: SEAGLASS }}>
+    <section className="px-5 py-16 sm:px-8 sm:py-24" style={{ background: OFF_WHITE }}>
       <div className="mx-auto max-w-6xl">{children}</div>
     </section>
   );
@@ -292,7 +294,7 @@ function TimeBox({ k, l }: { k: string; l: string }) {
 }
 function PostStat({ icon, v, l }: { icon: React.ReactNode; v: string; l: string }) {
   return (
-    <div className="rounded-lg py-2" style={{ background: CANVAS_L }}>
+    <div className="rounded-lg py-2" style={{ background: SEA_TINT }}>
       <div className="flex items-center justify-center gap-1 font-display text-[15px] font-semibold tabular-nums" style={{ color: RED }}>
         <span style={{ color: GOLD }}>{icon}</span>{v}
       </div>
@@ -303,7 +305,7 @@ function PostStat({ icon, v, l }: { icon: React.ReactNode; v: string; l: string 
 
 export default function DiyamBlueprint() {
   return (
-    <div className="-mx-4 -my-6 sm:-mx-8 lg:-ml-10 lg:-mr-8" style={{ background: CREAM, color: INK }}>
+    <div className="-mx-4 -my-6 sm:-mx-8 lg:-ml-10 lg:-mr-8" style={{ background: WHITE, color: INK }}>
 
       {/* ── HERO — Cartier-style: full-bleed emerald, centered serif, minimal ── */}
       <header
@@ -548,7 +550,7 @@ export default function DiyamBlueprint() {
                 </thead>
                 <tbody>
                   {COMPARE.map((r, i) => (
-                    <tr key={r.m} style={{ background: i % 2 ? CANVAS_L : "#fff" }}>
+                    <tr key={r.m} style={{ background: i % 2 ? SEA_TINT : "#fff" }}>
                       <td className="px-4 py-3 text-[13.5px] font-medium sm:px-6" style={{ color: INK }}>{r.m}</td>
                       <td className="px-4 py-3 text-[14px] font-bold tabular-nums sm:px-6" style={{ color: RED, background: "rgba(27,77,62,0.06)" }}>{r.d}</td>
                       <td className="px-4 py-3 text-[13.5px] tabular-nums sm:px-6" style={{ color: MUTED }}>{r.o}</td>
@@ -666,10 +668,10 @@ export default function DiyamBlueprint() {
             in-store, content and commerce, silver and gold.
           </p>
         </Reveal>
-        <div className="mt-12 grid gap-px sm:grid-cols-2 lg:grid-cols-3" style={{ background: CANVAS_M }}>
+        <div className="mt-12 grid gap-px sm:grid-cols-2 lg:grid-cols-3" style={{ background: DIVIDER }}>
           {ENGINE.map((e, i) => (
             <Reveal key={e.h} delay={(i % 3) * 60} className="h-full">
-              <div className="flex h-full flex-col bg-white p-8 transition-colors duration-200 hover:bg-[#EAF5F0]">
+              <div className="flex h-full flex-col bg-white p-8 transition-colors duration-200 hover:bg-[#eef8f3]">
                 <e.icon size={20} style={{ color: SEAGLASS }} />
                 <h3 className="mt-4 font-display text-[17px] font-semibold tracking-tight" style={{ color: EMERALD }}>{e.h}</h3>
                 <p className="mt-1.5 text-[13px] leading-relaxed" style={{ color: MUTED }}>{e.p}</p>
@@ -737,9 +739,9 @@ export default function DiyamBlueprint() {
           <p className="max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#1A3428" }}>
             You asked for growth in the next month. Here is exactly how we spend it, foundation to first results in four weeks.
           </p>
-          <div className="mt-12 grid gap-px sm:grid-cols-2 lg:grid-cols-4" style={{ background: CANVAS_M }}>
+          <div className="mt-12 grid gap-px sm:grid-cols-2 lg:grid-cols-4" style={{ background: DIVIDER }}>
             {SPRINT.map((w, i) => (
-              <div key={w.n} className="bg-white p-7 hover:bg-[#EAF5F0] transition-colors">
+              <div key={w.n} className="bg-white p-7 hover:bg-[#eef8f3] transition-colors">
                 <div className="text-[10px] font-bold uppercase tracking-[0.32em]" style={{ color: SEAGLASS }}>{w.n}</div>
                 <h4 className="mt-2 mb-4 font-display text-[18px] font-semibold" style={{ color: EMERALD }}>{w.h}</h4>
                 <div className="w-6 border-t mb-4" style={{ borderColor: SEAGLASS, opacity: 0.5 }} />
@@ -799,7 +801,7 @@ export default function DiyamBlueprint() {
           <p className="max-w-3xl text-base leading-relaxed sm:text-lg" style={{ color: "#1A3428" }}>
             Honest, directional targets, the same craft, finally seen. We report the real curve every week.
           </p>
-          <div className="mt-12 grid gap-px sm:grid-cols-3" style={{ background: CANVAS_M }}>
+          <div className="mt-12 grid gap-px sm:grid-cols-3" style={{ background: DIVIDER }}>
             {[
               { h: "30 days", n: "1,500+", c: "followers, reels crossing thousands, live WhatsApp enquiries", mid: false },
               { h: "90 days", n: "8,000+", c: "a real content brand, steady sales from Instagram and WhatsApp", mid: true },

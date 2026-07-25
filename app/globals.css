@@ -51,80 +51,40 @@
 }
 
 /*
-  Diyam · House of Silver workspace — STRICT TWO-COLOUR SYSTEM.
-  The only hues anywhere are Deep Emerald #1B4D3E and Sea Glass #7EBFA3
-  (in graded shades); all text is white/silver or dark emerald.
-  Emerald-dominant "mix" per the House of Silver poster: a deep-emerald silk
-  field, sea-glass cards / panels / sidebar, silver-white text on emerald and
-  dark-emerald text on sea glass. No red, gold, cream, blue or grey — ever.
+  Diyam House of Silver workspace theme.
+  White-primary design (like diyamhouseofsilver.vercel.app):
+  - Canvas + cards = clean white
+  - #1B4D3E (deep emerald) for buttons, active nav, accent text
+  - #7EBFA3 (sea glass) for borders, chips, thin accents
+  - Text = near-black for readability
 */
 .diyam-ws {
-  --color-canvas:      #123D31;   /* deep emerald — page field                  */
-  --color-surface:     #7EBFA3;   /* sea glass — cards / panels / sidebar        */
-  --color-surface-2:   #6BB091;   /* deeper sea glass — raised fills / zebra     */
-  --color-line:        #0F3A2E;   /* emerald hairline on sea-glass surfaces      */
-  --color-ink:         #0E3327;   /* dark emerald — text on sea glass            */
-  --color-muted:       #C6E6DB;   /* light sea glass — secondary text on emerald */
-  --color-crimson:     #123D31;   /* primary buttons / active = emerald          */
-  --color-crimson-600: #0C2C23;   /* hover                                       */
-  --color-gold:        #0E3327;   /* former gold accent → emerald                */
-  --color-coral:       #7EBFA3;   /* former coral → sea glass                    */
-  --color-ivory:       #7EBFA3;
-  --color-success:     #0E3327;
-  --color-warn:        #0E3327;
-  --color-info:        #7EBFA3;   /* focus ring = sea glass                      */
-
-  /* poster-like emerald silk field */
-  background:
-    radial-gradient(1100px 700px at 16% -10%, #2D6B56 0%, transparent 55%),
-    radial-gradient(1000px 680px at 100% 6%, #17493A 0%, transparent 52%),
-    linear-gradient(158deg, #143E31 0%, #0E2F25 60%, #0B271E 100%);
-  background-attachment: fixed;
-  color: #EFF8F4;                 /* default = silver-white text on the field    */
-  min-height: 100vh;
+  --color-canvas:      #ffffff;
+  --color-surface:     #ffffff;
+  --color-surface-2:   #f2faf6;   /* very subtle sea glass tint for zebra/raised */
+  --color-line:        #d8ede6;   /* sea glass tinted border                      */
+  --color-ink:         #1a1a1a;   /* near-black body text                         */
+  --color-muted:       #4a6b5c;   /* muted green for secondary text               */
+  --color-crimson:     #1B4D3E;   /* emerald for buttons & active icons           */
+  --color-crimson-600: #0D3326;   /* darker on hover                              */
+  --color-gold:        #4E8A72;   /* sea glass dark for small accents             */
+  --color-ivory:       #f2faf6;
+  --color-success:     #1A7A4A;
+  --color-warn:        #b25000;
+  --color-info:        #7EBFA3;
 }
 
-/* On sea-glass surfaces, text returns to dark emerald for contrast. */
-.diyam-ws .card,
-.diyam-ws .glass,
-.diyam-ws .bg-white,
-.diyam-ws [class*="--color-surface"] { color: var(--color-ink); }
-
-/* Any hardcoded white surface becomes sea glass. */
-.diyam-ws .bg-white { background-color: var(--color-surface) !important; }
-
-/* Primary (emerald) buttons & active chips keep white text. */
-.diyam-ws .bg-\[var\(--color-crimson\)\] { color: #ffffff !important; }
-
-/* Secondary text darkens inside a sea-glass surface. */
-.diyam-ws .card [class*="--color-muted"],
-.diyam-ws [class*="--color-surface"] [class*="--color-muted"] { color: #3F6E5C; }
-
-/* Fold the messenger / AI brand colours into the two-tone within Diyam. */
-.diyam-ws [class*="#25D366"],
-.diyam-ws [class*="#2AABEE"],
-.diyam-ws [class*="#5B3A8C"] {
-  background-color: var(--color-crimson) !important;
-  color: #ffffff !important;
-}
-
-/* Remove the warm hero wash inside Diyam. */
-.diyam-ws .bg-warm-radial { background: transparent !important; }
-
-/* Velvet toggle keeps the same emerald field (deeper). */
+/* Velvet dark mode in Diyam workspace */
 .diyam-ws.velvet {
-  --color-canvas:    #0B271E;
-  --color-surface:   #6BB091;
-  --color-surface-2: #5AA184;
-  --color-line:      #0C2C23;
-  --color-ink:       #0E3327;
-  --color-muted:     #BFE3D6;
+  --color-canvas:    #0a1a12;
+  --color-surface:   #111f17;
+  --color-surface-2: #182c20;
+  --color-line:      #1e4030;
+  --color-ink:       #f0f7f4;
+  --color-muted:     #7EBFA3;
 }
 
-/* Thin sea-glass focus ring in Diyam workspace */
-.diyam-ws :focus-visible {
-  outline-color: #7EBFA3;
-}
+.diyam-ws :focus-visible { outline-color: #7EBFA3; }
 
 * {
   box-sizing: border-box;

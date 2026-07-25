@@ -11,14 +11,14 @@ import {
 } from "lucide-react";
 
 /* ── theme (two-colour: deep emerald + sea glass only) ─────────────────────── */
-const RED = "#1B4D3E";                 // deep emerald (primary)
-const RED_DEEP = "#0D3326";            // darker emerald
-const CREAM = "#C6E6DB";               // light sea glass
-const CREAM_2 = "#A8D4C2";             // light sea glass, deeper
-const GOLD = "#6BB091";                // deep sea glass (accent)
-const GOLD_SOFT = "#7EBFA3";           // sea glass
-const INK = "var(--color-ink)";        // dark emerald text
-const MUTED = "#3F6E5C";               // secondary text on sea-glass surfaces (dark, matches globals card-muted)
+const RED = "#1B4D3E";
+const RED_DEEP = "#0D3326";
+const CREAM = "#ffffff";    // white page background
+const CREAM_2 = "#f7faf8";  // very light off-white for alt bg
+const GOLD = "#4E8A72";
+const GOLD_SOFT = "#7EBFA3";
+const INK = "#1a1a1a";
+const MUTED = "#6b7f74";
 const redWash = `linear-gradient(135deg, ${RED} 0%, ${RED_DEEP} 100%)`;
 
 /* ── types ──────────────────────────────────────────────────────────────── */
