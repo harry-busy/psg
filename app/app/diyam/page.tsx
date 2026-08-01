@@ -30,6 +30,7 @@ const WHITE     = "#ffffff";   // primary section background
 const OFF_WHITE = "#f7faf8";   // alternate light section background
 const SEA_TINT  = "#eef8f3";   // very subtle sea glass tint (zebra rows, chips)
 const DIVIDER   = "#d8ede6";   // sea glass border line
+const CANVAS_M  = "#d8ede6";   // border / divider alias used in tables & cards
 
 /* backward-compat aliases */
 const RED       = EMERALD;

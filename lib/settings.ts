@@ -21,7 +21,7 @@ export interface Settings extends Brand {
 
 export const DEFAULT_SETTINGS: Settings = {
   ...DEFAULT_BRAND,
-  rate24: 7400,
+  rate24: 14433, // ₹/g 24K → 22K auto-calculates to ₹13,220/g (as on 01 Aug 2026)
   rateSilver: 110,
   makingDefault: 12,
   telegramToken: "",
