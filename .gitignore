@@ -30,3 +30,31 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# ── Diyam production workspace ────────────────────────────────────────
+# Reel builds, renders and campaign folders live on the workstation only.
+# ~2.3 GB of mp4/png/zip that must never enter git history.
+Diyam/01_DIYAM-greenREEL-BUILD/
+Diyam/PRODUCT-02-PINK-STONE-RING/
+Diyam/campaign-one-bloom-and-shadow/
+Diyam/ospyr-bridal-reel-pack-*/
+Diyam/reel-ruby-emerald-set-*/
+Diyam/reel1/
+Diyam/p5/
+Diyam/pinterest-lab/
+Diyam/final images/
+Diyam/reference images/
+Diyam/_superseded/
+Diyam/_to_delete/
+Diyam/bannerfinal.png
+Diyam/DIYAM-INDEPENDENCE-DAY-CAROUSEL.md
+Diyam/DIYAM-TORN-PAPER-WATCH-PROMPTS.md
+
+# heavy media anywhere under Diyam (already-tracked files are unaffected)
+Diyam/**/*.mp4
+Diyam/**/*.mov
+Diyam/**/*.wav
+Diyam/**/*.m4a
+Diyam/**/*.mp3
+Diyam/**/*.zip
+Diyam/**/*.part[0-9][0-9]
